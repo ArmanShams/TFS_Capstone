@@ -5,8 +5,6 @@
 #include "GameFramework/Pawn.h"
 #include "CharacterController.generated.h"
 
-
-
 UCLASS(Blueprintable)
 class WANTED_B01_API ACharacterController : public APawn
 {
@@ -22,12 +20,11 @@ private:
 
 	float moveSpeed;
 
+	static const FName MoveForwardBinding;
 
-
+	static const FName MoveRightBinding;
 
 public:
-
-
 
 	// Sets default values for this pawn's properties
 	ACharacterController();
@@ -42,7 +39,5 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 
 
-	static const FName MoveForwardBinding;
-	static const FName MoveRightBinding;
 	
 };
