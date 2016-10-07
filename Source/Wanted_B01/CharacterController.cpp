@@ -18,10 +18,22 @@ ACharacterController::ACharacterController()
 
 	CubeComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("THE CUBE!"));
 	CubeComponent->AttachTo(RootComponent);
+	CubeComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
 	RootComponent = CubeComponent;
 
-	CubeComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
 
+
+}
+
+// Called to bind functionality to input
+void ACharacterController::SetupPlayerInputComponent(class UInputComponent* InputComponent)
+{
+	check(InputComponent);
+
+	InputComponent->BindAxis(MoveRightBinding);
+	InputComponent->BindAxis(MoveForwardBinding);
+
+	//Super::SetupPlayerInputComponent(InputComponent);
 }
 
 // Called when the game starts or when spawned
@@ -36,14 +48,14 @@ void ACharacterController::Tick( float DeltaSeconds )
 {
 	//Super::Tick(DeltaSeconds);
 
-	const float ForwardValue = GetInputAxisValue(MoveForwardBinding);
-	const float RightValue = GetInputAxisValue(MoveRightBinding);
+	float ForwardValue = GetInputAxisValue(MoveForwardBinding);
+	float RightValue = GetInputAxisValue(MoveRightBinding);
 
 	// Clamp max size so that (X=1, Y=1) doesn't cause faster movement in diagonal directions
-	const FVector MoveDirection = FVector(ForwardValue, RightValue, 0.f).GetClampedToMaxSize(1.0f);
+	FVector MoveDirection = FVector(ForwardValue, RightValue, 0.f).GetClampedToMaxSize(1.0f);
 
 	// Calculate  movement
-	const FVector Movement = MoveDirection * moveSpeed * DeltaSeconds;
+	FVector Movement = MoveDirection * moveSpeed * DeltaSeconds;
 
 	// Two FVectors are created. mouseLocation and mouseDirection. FVector is very similar to a Vector3 from unity3d.
 	// FVectors store an X, Y, and Z component.
@@ -82,15 +94,8 @@ void ACharacterController::Tick( float DeltaSeconds )
 		RootComponent->MoveComponent(Movement, Movement.Rotation(), true);
 	}
 	
-	UE_LOG(PlayerControl, Warning, Movement.);
-}
-
-// Called to bind functionality to input
-void ACharacterController::SetupPlayerInputComponent(class UInputComponent* InputComponent)
-{
-	InputComponent->BindAxis(MoveRightBinding);
-	InputComponent->BindAxis(MoveForwardBinding);
-
-	//Super::SetupPlayerInputComponent(InputComponent);
+	UE_LOG(PlayerControl, Warning, TEXT("Movement: %s"), *Movement.ToString());
+	UE_LOG(PlayerControl, Warning, TEXT("MovementForward: %s"), ForwardValue);
+	UE_LOG(PlayerControl, Warning, TEXT("MovementRight: %s"), RightValue);
 }
 
