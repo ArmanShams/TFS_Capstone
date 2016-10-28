@@ -5,15 +5,15 @@
 #include "Wanted_B01PlayerController.h"
 #include "Wanted_B01Character.h"
 
-AWanted_B01GameMode::AWanted_B01GameMode()
+AWanted_B01GameMode::AWanted_B01GameMode(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
 {
-	// use our custom PlayerController class
-	PlayerControllerClass = AWanted_B01PlayerController::StaticClass();
-
-	// set default pawn class to our Blueprinted character
-	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/TopDownCPP/Blueprints/TopDownCharacter"));
-	if (PlayerPawnBPClass.Class != NULL)
+	// TEXT("AssetPath'/MyAsset.MyAsset_C'") to get the class. <APawn>
+	ConstructorHelpers::FClassFinder<APawn> CharacterClassAsset(TEXT("Blueprint'/Game/TopDownCPP/Blueprints/CharacterControllerBlueprint.CharacterControllerBlueprint_C'"));
+	if (CharacterClassAsset.Class)
 	{
-		DefaultPawnClass = PlayerPawnBPClass.Class;
+		DefaultPawnClass = CharacterClassAsset.Class;
 	}
+
 }
+
