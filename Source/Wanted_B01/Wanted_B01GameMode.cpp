@@ -2,8 +2,7 @@
 
 #include "Wanted_B01.h"
 #include "Wanted_B01GameMode.h"
-#include "Wanted_B01PlayerController.h"
-#include "Wanted_B01Character.h"
+
 
 AWanted_B01GameMode::AWanted_B01GameMode(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)

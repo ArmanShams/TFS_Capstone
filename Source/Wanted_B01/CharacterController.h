@@ -37,6 +37,8 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float moveSpeed;
 
+	UPROPERTY(EditAnywhere)
+	float rollDistance;
 
 protected:
 	void OnMoveForward(float scale);
@@ -49,4 +51,5 @@ protected:
 	void OnShootPressed();
 	void OnShootReleased();
 
+	void Roll();
 };
