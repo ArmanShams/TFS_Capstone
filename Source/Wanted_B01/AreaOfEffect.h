@@ -23,6 +23,8 @@ public:
 	UPROPERTY(EditAnywhere)
 	uint8 damagePerTick;
 	
+	uint8 totalTicks;
+
 	UPROPERTY(EditAnywhere)
 	float radius;
 

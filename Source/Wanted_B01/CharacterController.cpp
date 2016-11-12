@@ -14,6 +14,8 @@ ACharacterController::ACharacterController()
 
 	rollDistance = 1.f;
 
+	health = 100;
+
 	//static ConstructorHelpers::FObjectFinder<UStaticMesh> CUBE(TEXT("/Engine/BasicShapes/Cube.Cube"));
 
 
@@ -61,6 +63,13 @@ void ACharacterController::SetupPlayerInputComponent(class UInputComponent* InIn
 	InInputComponent->BindAction(TEXT("Shoot"), IE_Released, this, &ThisClass::OnShootReleased);
 	InInputComponent->BindAction(TEXT("Roll"), IE_Pressed, this, &ThisClass::OnRollPressed);
 
+}
+
+void ACharacterController::ApplyDamage(uint8 dam)
+{
+	health -= dam;
+
+	UE_LOG(LogTemp, Warning, TEXT("Player took damage, health is now: %d"), health);
 }
 
 

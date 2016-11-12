@@ -2,7 +2,7 @@
 
 #include "Wanted_B01.h"
 #include "AreaOfEffect.h"
-
+#include "CharacterController.h"
 
 // Sets default values
 AAreaOfEffect::AAreaOfEffect(const FObjectInitializer& ObjectInitializer)
@@ -12,11 +12,14 @@ AAreaOfEffect::AAreaOfEffect(const FObjectInitializer& ObjectInitializer)
 
 	timeSinceLastTick = 0.f;
 
+	damagePerTick = 5;
 
-	ticksPerSecond = 3.f;
+	ticksPerSecond = 2.f;
 	lifeTimeInSeconds = 3.f;
 
 	radius = 30.f;
+
+	totalTicks = 0;
 
 	sphereCollider = CreateDefaultSubobject<USphereComponent>(TEXT("Collider"));
 	sphereCollider->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
@@ -33,31 +36,38 @@ void AAreaOfEffect::BeginPlay()
 	timeOfCreation = UGameplayStatics::GetRealTimeSeconds(GetWorld());
 }
 
-// Called every frame
+
 void AAreaOfEffect::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
 
 	timeSinceLastTick += DeltaTime;
-
-	if ((timeOfCreation + lifeTimeInSeconds) >= UGameplayStatics::GetRealTimeSeconds(GetWorld()))
+	if ((timeOfCreation + lifeTimeInSeconds) + timeSinceLastTick >= UGameplayStatics::GetRealTimeSeconds(GetWorld()))
 	{
-		if (timeSinceLastTick >= ticksPerSecond / 10)
+		if (timeSinceLastTick >= 1 / ticksPerSecond)
 		{
+			if (sphereCollider->IsOverlappingActor(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)))
+			{
+				ACharacterController* player = Cast<ACharacterController>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+				player->ApplyDamage(damagePerTick);
+
+				//UE_LOG(LogTemp, Warning, TEXT("Overlapping another actor"));
+			}
 			//float realtimeSeconds = UGameplayStatics::GetRealTimeSeconds(GetWorld());
 			//UE_LOG(LogTemp, Warning, TEXT("Time since last tick: %f"), timeSinceLastTick);
 			//UE_LOG(LogTemp, Warning, TEXT("Total game time: %f"),  realtimeSeconds);
-
 			UE_LOG(LogTemp, Warning, TEXT("AreaOfEffect ticked!"));
 
 			//STUFF HAPPENS HERE.
+			totalTicks++;
 
 			timeSinceLastTick = 0.f;
+
 		}
 	}
-	else
+	else 
 	{
-		UE_LOG(LogTemp, Warning, TEXT("AreaOfEffect should now be destroyed!"));
+		UE_LOG(LogTemp, Warning, TEXT("AreaOfEffect should now be destroyed! Total ticks: %d"), totalTicks);
 		Destroy();
 	}
 }

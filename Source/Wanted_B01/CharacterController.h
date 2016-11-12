@@ -25,6 +25,7 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* InInputComponent) override;
 
+	void ApplyDamage(uint8 dam);
 
 protected:
 
@@ -39,6 +40,11 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	float rollDistance;
+
+	UPROPERTY(EditAnywhere)
+	uint8 health;
+
+
 
 protected:
 	void OnMoveForward(float scale);
