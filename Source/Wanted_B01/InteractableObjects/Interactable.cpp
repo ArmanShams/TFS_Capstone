@@ -28,6 +28,8 @@ void AInteractable::Tick( float DeltaTime )
 
 void AInteractable::Interact(class ACharacterController* player)
 {
+
+
 	UE_LOG(LogTemp, Display, TEXT("Interact"));
 }
 

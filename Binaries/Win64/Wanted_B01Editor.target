@@ -2,11 +2,7 @@
 	"TargetName" : "Wanted_B01Editor",
 	"Platform" : "Win64",
 	"Configuration" : "Development",
-<<<<<<< HEAD
-	"BuildId" : "71a32ca3-412c-42ef-bec9-31b53ceee654",
-=======
-	"BuildId" : "8d4db311-27e9-4d1c-9a5e-4f3aaa3910a0",
->>>>>>> refs/remotes/origin/AreaOfEffectImplementation
+	"BuildId" : "43e6cda1-a181-4508-bc44-fda67eaded68",
 	"Version" : 
 	{
 		"MajorVersion" : 4,
@@ -19,15 +15,15 @@
 	"BuildProducts" :
 	[
 		{
-			"Path" : "$(ProjectDir)/Binaries/Win64/UE4Editor-Wanted_B01-5792.dll",
+			"Path" : "$(ProjectDir)/Binaries/Win64/UE4Editor-Wanted_B01.dll",
 			"Type" : "DynamicLibrary"
 		},
 		{
-			"Path" : "$(ProjectDir)/Binaries/Win64/UE4Editor-Wanted_B01-5792.pdb",
+			"Path" : "$(ProjectDir)/Binaries/Win64/UE4Editor-Wanted_B01.pdb",
 			"Type" : "SymbolFile"
 		},
 		{
-			"Path" : "$(ProjectDir)/Intermediate/Build/Win64/UE4Editor/Development/UE4Editor-Wanted_B01-5792.lib",
+			"Path" : "$(ProjectDir)/Intermediate/Build/Win64/UE4Editor/Development/UE4Editor-Wanted_B01.lib",
 			"Type" : "ImportLibrary"
 		}
 	],
