@@ -1,8 +1,15 @@
 {
 	"Changelist" : 3172292,
+<<<<<<< HEAD
+	"BuildId" : "71a32ca3-412c-42ef-bec9-31b53ceee654",
+	"Modules" : 
+	{
+		"Wanted_B01" : "UE4Editor-Wanted_B01.dll"
+=======
 	"BuildId" : "8d4db311-27e9-4d1c-9a5e-4f3aaa3910a0",
 	"Modules" : 
 	{
 		"Wanted_B01" : "UE4Editor-Wanted_B01-8916.dll"
+>>>>>>> refs/remotes/origin/AreaOfEffectImplementation
 	}
 }
