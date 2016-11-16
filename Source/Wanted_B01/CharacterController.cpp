@@ -2,6 +2,7 @@
 
 #include "Wanted_B01.h"
 #include "CharacterController.h"
+#include "InteractableObjects/Interactable.h"
 
 
 // Sets default values
@@ -115,7 +116,13 @@ void ACharacterController::OnInteractPressed()
 
 void ACharacterController::OnInteractReleased()
 {
+	FHitResult hitResult;
+	GetWorld()->SweepSingleByChannel(hitResult, GetActorLocation(), GetActorLocation(), FQuat::Identity, ECC_GameTraceChannel1, FCollisionShape::MakeSphere(50.f) );
 
+	if (AInteractable* Interactable = Cast<AInteractable>(hitResult.Actor.Get()))
+		Interactable->Interact(this);
+
+	UE_LOG(LogTemp, Display, TEXT("Interact key released"));
 }
 
 void ACharacterController::OnRollPressed()

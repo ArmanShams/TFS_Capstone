@@ -3,6 +3,7 @@
 #pragma once
 
 #include "GameFramework/Pawn.h"
+//#include "/InteractableObject/Interactable.h"
 #include "CharacterController.generated.h"
 
 UCLASS(Blueprintable)
