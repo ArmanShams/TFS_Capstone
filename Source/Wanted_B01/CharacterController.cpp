@@ -2,6 +2,7 @@
 
 #include "Wanted_B01.h"
 #include "CharacterController.h"
+#include "Wanted_B01/InteractableObject.h"
 
 
 // Sets default values
@@ -123,7 +124,21 @@ void ACharacterController::OnInteractPressed()
 
 void ACharacterController::OnInteractReleased()
 {
+	//FHitResult HitResult;
+	TArray<FOverlapResult> hitResult;
+	GetWorld()->OverlapMultiByChannel(hitResult,
+		GetActorLocation(),
+		FQuat::Identity,
+		ECC_Interactable,
+		FCollisionShape::MakeSphere(50.0f));
 
+	if (hitResult.Num() > 0)
+	{
+		if (AInteractableObject* Interactable = Cast<AInteractableObject>(hitResult[0].GetActor()))
+		{
+			Interactable->Interact(this);
+		}
+	}
 }
 
 void ACharacterController::OnRollPressed()
