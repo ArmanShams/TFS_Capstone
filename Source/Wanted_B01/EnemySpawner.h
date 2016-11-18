@@ -26,5 +26,10 @@ public:
 	UPROPERTY(EditAnywhere)
 	float spawnRateInSeconds;
 
+	UPROPERTY(EditAnywhere)
+	float spawnTimer;
+
+	uint16 enemyCount;
+
 	void spawnEnemy();
 };

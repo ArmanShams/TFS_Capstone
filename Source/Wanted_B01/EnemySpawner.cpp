@@ -11,6 +11,11 @@ AEnemySpawner::AEnemySpawner()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	spawnRateInSeconds = 15.f;
+
+	spawnTimer = 0.f;
+
+	enemyCount = 0;
 }
 
 // Called when the game starts or when spawned
@@ -24,14 +29,16 @@ void AEnemySpawner::BeginPlay()
 void AEnemySpawner::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
-	//spawnRateInSeconds++;
+	
+	spawnTimer++;
 
+	if (spawnTimer == spawnRateInSeconds && enemyCount != 5)
+	{
+		spawnEnemy();
+	}
 }
 
 void AEnemySpawner::spawnEnemy()
 {
-	//if (spawnRateInSeconds == ?? && Enemies > ??)
-	//{
-	//		spawn enemy.
-	//}
+	//spawn enemy
 }
