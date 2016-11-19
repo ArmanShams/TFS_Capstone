@@ -66,11 +66,18 @@ void ACharacterController::SetupPlayerInputComponent(class UInputComponent* InIn
 
 }
 
-void ACharacterController::ApplyDamage(uint8 dam)
+void ACharacterController::ModifyHealth(uint8 mod)
 {
-	health -= dam;
+	// Prevention of adding health greater than the maximum currently disabled.
+	//if (health + mod <= 100) 
+	{
+		health += mod;
+		UE_LOG(LogTemp, Display, TEXT("Player health modified, health is now: %d"), health);
+	}
+	//else
+		//UE_LOG(LogTemp, Display, TEXT("Attempted to modify player health but the modified value exceeded the player's maximum health."), health);
 
-	UE_LOG(LogTemp, Warning, TEXT("Player took damage, health is now: %d"), health);
+	
 }
 
 
@@ -101,8 +108,6 @@ void ACharacterController::OnMouseMove(float scale)
 
 			FVector Diff = FVector(MousePosition.X - CenterPoint.X, MousePosition.Y - CenterPoint.Y, 0.f);
 
-			//float yaw = Diff.Rotation().Yaw;
-
 			GetMesh()->SetWorldRotation(FMath::Lerp(GetMesh()->RelativeRotation, FRotator(0.f, Diff.Rotation().Yaw, 0.f), 0.25f));
 
 		}
@@ -116,11 +121,15 @@ void ACharacterController::OnInteractPressed()
 
 void ACharacterController::OnInteractReleased()
 {
-	FHitResult hitResult;
-	GetWorld()->SweepSingleByChannel(hitResult, GetActorLocation(), GetActorLocation(), FQuat::Identity, ECC_GameTraceChannel1, FCollisionShape::MakeSphere(50.f) );
+	TArray<FOverlapResult> hitResult;
+	GetWorld()->OverlapMultiByChannel(hitResult, GetActorLocation(), FQuat::Identity, ECC_GameTraceChannel1, FCollisionShape::MakeSphere(50.f) );
 
-	if (AInteractable* Interactable = Cast<AInteractable>(hitResult.Actor.Get()))
-		Interactable->Interact(this);
+	if (hitResult.Num() > 0) {
+		if (AInteractable* Interactable = Cast<AInteractable>(hitResult[0].GetActor())) {
+			Interactable->Interact(this);
+			UE_LOG(LogTemp, Display, TEXT("Actually hit a thing."));
+		}
+	}
 
 	UE_LOG(LogTemp, Display, TEXT("Interact key released"));
 }
@@ -130,20 +139,15 @@ void ACharacterController::OnRollPressed()
 	if (GetLastMovementInputVector() != FVector::ZeroVector)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Rolling!"));
-		//GetMovementComponent()->AddInputVector(GetLastMovementInputVector() * rollDistance);
 	}
 	else
 	{
 		FVector current = FVector(RootComponent->RelativeLocation);
 
 		UE_LOG(LogTemp, Warning, TEXT("Defaulting to rolling backwards"));
-		//RootComponent->MovetoLocation
-		//RootComponent->AddWorldTransform(FMath::Lerp(current, (-FVector::ForwardVector * rollDistance), 1.f));
-		//RootComponent->AddRelativeLocation(FMath::Lerp<FVector>(current, (-FVector::ForwardVector * rollDistance), 0.2f));
-		//RootComponent->MoveComponent((FMath::Lerp(current, (-GetActorRightVector() * rollDistance), 0.5f)), RootComponent->GetComponentRotation(), true);
-		//RootComponent->AddRelativeLocation(FMath::Lerp<FVector>((FVector)RootComponent->RelativeLocation, (-FVector::ForwardVector * rollDistance), 0.2f));
+	
 	}
-	//(FMath::Lerp(this->GetActorLocation(), (-GetActorRightVector() * rollDistance), 0.5f)));
+
 
 }
 

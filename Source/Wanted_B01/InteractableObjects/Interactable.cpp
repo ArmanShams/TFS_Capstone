@@ -5,10 +5,11 @@
 
 
 // Sets default values
-AInteractable::AInteractable()
+AInteractable::AInteractable(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 }
 
@@ -28,8 +29,5 @@ void AInteractable::Tick( float DeltaTime )
 
 void AInteractable::Interact(class ACharacterController* player)
 {
-
-
-	UE_LOG(LogTemp, Display, TEXT("Interact"));
 }
 

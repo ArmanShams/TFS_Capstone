@@ -26,7 +26,7 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* InInputComponent) override;
 
-	void ApplyDamage(uint8 dam);
+	void ModifyHealth(uint8 mod);
 
 protected:
 

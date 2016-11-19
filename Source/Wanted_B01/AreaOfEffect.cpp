@@ -49,7 +49,7 @@ void AAreaOfEffect::Tick( float DeltaTime )
 			if (sphereCollider->IsOverlappingActor(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)))
 			{
 				ACharacterController* player = Cast<ACharacterController>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-				player->ApplyDamage(damagePerTick);
+				player->ModifyHealth(-damagePerTick);
 
 				//UE_LOG(LogTemp, Warning, TEXT("Overlapping another actor"));
 			}
