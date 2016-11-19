@@ -22,6 +22,7 @@ void AInteractable_Torch::BeginPlay() {
 }
 
 void AInteractable_Torch::Interact(ACharacterController * player) {
+
 	//MEANS OF UPDATING PROGRESS WILL BE ADDED ONCE GAME MANAGER IS IMPLEMENTED
 
 	Destroy();

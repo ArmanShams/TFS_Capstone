@@ -80,6 +80,11 @@ void ACharacterController::ModifyHealth(uint8 mod)
 	
 }
 
+void ACharacterController::EquipNewWeapon(AWeapon* newWeapon)
+{
+	currentlyEquippedWeapon = newWeapon;
+}
+
 
 void ACharacterController::OnMoveForward(float scale)
 {

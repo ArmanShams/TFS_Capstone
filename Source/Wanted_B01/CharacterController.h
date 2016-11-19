@@ -3,7 +3,7 @@
 #pragma once
 
 #include "GameFramework/Pawn.h"
-//#include "/InteractableObject/Interactable.h"
+#include "Weapons/Weapon.h"
 #include "CharacterController.generated.h"
 
 UCLASS(Blueprintable)
@@ -28,6 +28,8 @@ public:
 
 	void ModifyHealth(uint8 mod);
 
+	void EquipNewWeapon(AWeapon* newWeapon);
+
 protected:
 
 	UPROPERTY(Category = Camera, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -45,6 +47,7 @@ protected:
 	UPROPERTY(EditAnywhere)
 	uint8 health;
 
+	AWeapon* currentlyEquippedWeapon;
 
 
 protected:
@@ -57,6 +60,8 @@ protected:
 	//void OnRollReleased();
 	void OnShootPressed();
 	void OnShootReleased();
+
+
 
 	void Roll();
 };
