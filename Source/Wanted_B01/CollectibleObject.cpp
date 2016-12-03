@@ -2,7 +2,7 @@
 
 #include "Wanted_B01.h"
 #include "CollectibleObject.h"
-
+#include "Engine.h"
 
 // Sets default values
 ACollectibleObject::ACollectibleObject()
@@ -17,6 +17,8 @@ ACollectibleObject::ACollectibleObject()
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh Component"));
 
 	MeshComponent->AttachTo(ColliderComponent);
+	//AttachTo function is deprecated for this build version, use AttachToComponent
+		//MeshComponent->AttachToComponent(ColliderComponent, );
 
 	MovementComponent = CreateDefaultSubobject<UMovementComponent>(TEXT("Movement Component"));
 
@@ -43,10 +45,10 @@ void ACollectibleObject::OnOverlapBegin(UPrimitiveComponent * OverlappedComp, AA
 {
 	if ((OtherActor != nullptr) && (OtherActor != this))
 	{
-		//GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::White, FString::Printf(TEXT("Hello World!")));
-
+		GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::White, FString::Printf(TEXT("Hello World!")));
 		Destroy();
-		SetLifeSpan(5);
+		//Set a lifespan to 5 seconds     SetLifeSpan(5);
 	}
 }
+
 

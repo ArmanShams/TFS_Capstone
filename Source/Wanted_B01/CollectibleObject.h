@@ -5,6 +5,7 @@
 #include "GameFramework/Actor.h"
 #include "CollectibleObject.generated.h"
 
+
 UCLASS()
 class WANTED_B01_API ACollectibleObject : public AActor
 {
