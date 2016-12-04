@@ -18,6 +18,7 @@ ACollectibleObject::ACollectibleObject()
 	//MeshComponent->AttachTo(ColliderComponent);
 	//AttachTo function is deprecated for this build version, use AttachToComponent
 		//YourComp->AttachToComponent(OtherComp, FAttachmentTransformRules::KeepWorldTransform) or KeepRelativeTransform
+	MeshComponent->AttachToComponent(ColliderComponent, FAttachmentTransformRules::KeepWorldTransform);
 
 	MovementComponent = CreateDefaultSubobject<UMovementComponent>(TEXT("Movement Component"));
 
@@ -43,13 +44,13 @@ void ACollectibleObject::OnOverlapBegin(UPrimitiveComponent * OverlappedComp, AA
 	if ((OtherActor != nullptr) && (OtherActor != this))
 	{
 		//On Screen Debug Message (#include "Engine.h")
-		GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::White, FString::Printf(TEXT("Hello World!")));
+		GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::White, FString::Printf(TEXT("You have collided with Collectible Object!")));
 		
 		//Destroy the actor
-		Destroy();
+		//Destroy();
 		
 		//Set a lifespan to 5 seconds
-		SetLifeSpan(5);
+		//SetLifeSpan(5);
 	}
 }
 
