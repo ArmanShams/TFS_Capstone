@@ -3,6 +3,8 @@
 #ifndef __WANTED_B01_H__
 #define __WANTED_B01_H__
 
+#define ECC_Interactable ECC_GameTraceChannel1
+
 #include "EngineMinimal.h"
 
 

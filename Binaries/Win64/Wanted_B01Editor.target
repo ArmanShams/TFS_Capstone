@@ -2,12 +2,13 @@
 	"TargetName" : "Wanted_B01Editor",
 	"Platform" : "Win64",
 	"Configuration" : "Development",
+
 	"Version" : 
 	{
 		"MajorVersion" : 4,
 		"MinorVersion" : 13,
-		"PatchVersion" : 2,
-		"Changelist" : 3172292,
+		"PatchVersion" : 1,
+		"Changelist" : 3142249,
 		"IsLicenseeVersion" : 0,
 		"BranchName" : "++UE4+Release-4.13"
 	},

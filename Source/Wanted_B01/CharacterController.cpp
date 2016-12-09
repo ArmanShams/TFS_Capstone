@@ -5,6 +5,7 @@
 #include "InteractableObjects/Interactable.h"
 
 
+
 // Sets default values
 ACharacterController::ACharacterController()
 {
@@ -137,6 +138,7 @@ void ACharacterController::OnInteractReleased()
 	}
 
 	UE_LOG(LogTemp, Display, TEXT("Interact key released"));
+
 }
 
 void ACharacterController::OnRollPressed()
