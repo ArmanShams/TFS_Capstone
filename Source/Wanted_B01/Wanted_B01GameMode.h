@@ -9,6 +9,7 @@ class AWanted_B01GameMode : public AGameMode
 	GENERATED_BODY()
 
 public:
+
 	//AWanted_B01GameMode();
 	AWanted_B01GameMode(const FObjectInitializer& ObjectInitializer);
 
