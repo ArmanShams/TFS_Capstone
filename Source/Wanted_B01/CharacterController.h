@@ -3,6 +3,7 @@
 #pragma once
 
 #include "GameFramework/Pawn.h"
+#include "Weapons/Weapon.h"
 #include "CharacterController.generated.h"
 
 UCLASS(Blueprintable)
@@ -25,6 +26,9 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* InInputComponent) override;
 
+	void ModifyHealth(uint8 mod);
+
+	void EquipNewWeapon(AWeapon* newWeapon);
 
 protected:
 
@@ -36,6 +40,14 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	float moveSpeed;
+
+	UPROPERTY(EditAnywhere)
+	float rollDistance;
+
+	UPROPERTY(EditAnywhere)
+	uint8 health;
+
+	AWeapon* currentlyEquippedWeapon;
 
 
 protected:
@@ -49,4 +61,7 @@ protected:
 	void OnShootPressed();
 	void OnShootReleased();
 
+
+
+	void Roll();
 };
