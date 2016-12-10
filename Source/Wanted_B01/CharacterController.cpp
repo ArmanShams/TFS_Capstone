@@ -2,6 +2,8 @@
 
 #include "Wanted_B01.h"
 #include "CharacterController.h"
+#include "InteractableObjects/Interactable.h"
+
 
 
 // Sets default values
@@ -12,7 +14,11 @@ ACharacterController::ACharacterController()
 
 	moveSpeed = .4f;
 
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> CUBE(TEXT("/Engine/BasicShapes/Cube.Cube"));
+	rollDistance = 1.f;
+
+	health = 100;
+
+	//static ConstructorHelpers::FObjectFinder<UStaticMesh> CUBE(TEXT("/Engine/BasicShapes/Cube.Cube"));
 
 
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -39,26 +45,7 @@ void ACharacterController::BeginPlay()
 void ACharacterController::Tick( float DeltaSeconds )
 {
 	Super::Tick(DeltaSeconds);
-
-	// Clamp max size so that (X=1, Y=1) doesn't cause faster movement in diagonal directions
-	//FVector MoveDirection = FVector(ForwardValue, RightValue, 0.f).GetClampedToMaxSize(1.0f);
-
-	// Calculate  movement
-	//FVector Movement = MoveDirection * moveSpeed * DeltaSeconds;
-
-	// Two FVectors are created. mouseLocation and mouseDirection. FVector is very similar to a Vector3 from unity3d.
-	// FVectors store an X, Y, and Z component.
-	//FVector mouseLocation, mouseDirection;
-	//APlayerController* playerController = (APlayerController*)GetWorld()->GetFirstPlayerController();
-
-	// The mouse's location and direction are stored in FVector, since the goal is to make
-	// the pawn face toward the mouse, the mouse direction is used 
-	//playerController->DeprojectMousePositionToWorld(mouseLocation, mouseDirection);
-
-	// FRotator stores 3 values, Pitch, Yaw, and Roll.
-	// FRotator requires 3 floats. Pitch and Roll are not altered.
-	// Comment out this line if you prefer method 2.
-	// ---Method 1---
+	
 	
 }
 
@@ -78,6 +65,25 @@ void ACharacterController::SetupPlayerInputComponent(class UInputComponent* InIn
 	InInputComponent->BindAction(TEXT("Shoot"), IE_Released, this, &ThisClass::OnShootReleased);
 	InInputComponent->BindAction(TEXT("Roll"), IE_Pressed, this, &ThisClass::OnRollPressed);
 
+}
+
+void ACharacterController::ModifyHealth(uint8 mod)
+{
+	// Prevention of adding health greater than the maximum currently disabled.
+	//if (health + mod <= 100) 
+	{
+		health += mod;
+		UE_LOG(LogTemp, Display, TEXT("Player health modified, health is now: %d"), health);
+	}
+	//else
+		//UE_LOG(LogTemp, Display, TEXT("Attempted to modify player health but the modified value exceeded the player's maximum health."), health);
+
+	
+}
+
+void ACharacterController::EquipNewWeapon(AWeapon* newWeapon)
+{
+	currentlyEquippedWeapon = newWeapon;
 }
 
 
@@ -108,9 +114,7 @@ void ACharacterController::OnMouseMove(float scale)
 
 			FVector Diff = FVector(MousePosition.X - CenterPoint.X, MousePosition.Y - CenterPoint.Y, 0.f);
 
-			//float yaw = Diff.Rotation().Yaw;
-
-			GetMesh()->SetWorldRotation(FRotator(0.f, Diff.Rotation().Yaw, 0.f));
+			GetMesh()->SetWorldRotation(FMath::Lerp(GetMesh()->RelativeRotation, FRotator(0.f, Diff.Rotation().Yaw, 0.f), 0.25f));
 
 		}
 	}
@@ -123,10 +127,38 @@ void ACharacterController::OnInteractPressed()
 
 void ACharacterController::OnInteractReleased()
 {
+	TArray<FOverlapResult> hitResult;
+	GetWorld()->OverlapMultiByChannel(hitResult, GetActorLocation(), FQuat::Identity, ECC_GameTraceChannel1, FCollisionShape::MakeSphere(50.f) );
+
+	if (hitResult.Num() > 0) {
+		if (AInteractable* Interactable = Cast<AInteractable>(hitResult[0].GetActor())) {
+			Interactable->Interact(this);
+			UE_LOG(LogTemp, Display, TEXT("Actually hit a thing."));
+		}
+	}
+
+	UE_LOG(LogTemp, Display, TEXT("Interact key released"));
 
 }
 
 void ACharacterController::OnRollPressed()
+{
+	if (GetLastMovementInputVector() != FVector::ZeroVector)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Rolling!"));
+	}
+	else
+	{
+		FVector current = FVector(RootComponent->RelativeLocation);
+
+		UE_LOG(LogTemp, Warning, TEXT("Defaulting to rolling backwards"));
+	
+	}
+
+
+}
+
+void ACharacterController::Roll()
 {
 
 }

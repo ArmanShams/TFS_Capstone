@@ -1,7 +1,10 @@
 DerivedDataCache
 Intermediate
 Saved
+*.hotreload
 *.opensdf
+*.VC.db
+*.VC.openDB
 *.sdf
 *.sln
 *.suo
