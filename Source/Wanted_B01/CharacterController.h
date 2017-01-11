@@ -6,6 +6,17 @@
 #include "Weapons/Weapon.h"
 #include "CharacterController.generated.h"
 
+UENUM(BlueprintType)
+enum class State : uint8
+{
+	IDLE_HUMAN		UMETA(DisplayName = "Idle"),
+	IDLE_WOLF		UMETA(DisplayName = "Idle_Wolf"),
+	ROLLING			UMETA(DisplayName = "Rolling"),
+	ROLLING_WOLF	UMETA(DisplayName = "Rolling_Wolf")
+
+
+};
+
 UCLASS(Blueprintable)
 class WANTED_B01_API ACharacterController : public ACharacter
 {
@@ -39,15 +50,21 @@ protected:
 	class USpringArmComponent* CameraBoom;
 
 	UPROPERTY(EditAnywhere)
-	float moveSpeed;
+	float MoveSpeed;
 
 	UPROPERTY(EditAnywhere)
-	float rollDistance;
+	float TurnRate;
 
 	UPROPERTY(EditAnywhere)
-	uint8 health;
+	float RollDistance;
 
-	AWeapon* currentlyEquippedWeapon;
+	UPROPERTY(EditAnywhere)
+	uint8 Health;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enum)
+	State CharacterState;
+
+	AWeapon* CurrentlyEquippedWeapon;
 
 
 protected:

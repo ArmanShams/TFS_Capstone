@@ -12,11 +12,13 @@ ACharacterController::ACharacterController()
 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	moveSpeed = .4f;
+	MoveSpeed = .4f;
 
-	rollDistance = 1.f;
+	RollDistance = 1.f;
 
-	health = 100;
+	Health = 100;
+
+	TurnRate = 0.25f;
 
 	//static ConstructorHelpers::FObjectFinder<UStaticMesh> CUBE(TEXT("/Engine/BasicShapes/Cube.Cube"));
 
@@ -31,6 +33,7 @@ ACharacterController::ACharacterController()
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	CameraComponent->AttachToComponent(CameraBoom, FAttachmentTransformRules::KeepRelativeTransform);
 
+
 }
 
 
@@ -39,6 +42,8 @@ void ACharacterController::BeginPlay()
 {
 	Super::BeginPlay();
 	
+
+	CharacterState = State::IDLE_HUMAN;
 }
 
 // Called every frame
@@ -72,8 +77,8 @@ void ACharacterController::ModifyHealth(uint8 mod)
 	// Prevention of adding health greater than the maximum currently disabled.
 	//if (health + mod <= 100) 
 	{
-		health += mod;
-		UE_LOG(LogTemp, Display, TEXT("Player health modified, health is now: %d"), health);
+		Health += mod;
+		UE_LOG(LogTemp, Display, TEXT("Player health modified, health is now: %d"), Health);
 	}
 	//else
 		//UE_LOG(LogTemp, Display, TEXT("Attempted to modify player health but the modified value exceeded the player's maximum health."), health);
@@ -83,20 +88,25 @@ void ACharacterController::ModifyHealth(uint8 mod)
 
 void ACharacterController::EquipNewWeapon(AWeapon* newWeapon)
 {
-	currentlyEquippedWeapon = newWeapon;
+	CurrentlyEquippedWeapon = newWeapon;
 }
 
 
 void ACharacterController::OnMoveForward(float scale)
 {
-	GetMovementComponent()->AddInputVector(GetActorForwardVector() * scale * moveSpeed);
+	if (CharacterState != State::ROLLING)
+	{
+		GetMovementComponent()->AddInputVector(GetActorForwardVector() * scale * MoveSpeed);
+	}
 
 }
 
 void ACharacterController::OnMoveRight(float scale)
 {
-	GetMovementComponent()->AddInputVector(GetActorRightVector() * scale * moveSpeed);
-
+	if (CharacterState != State::ROLLING)
+	{
+		GetMovementComponent()->AddInputVector(GetActorRightVector() * scale * MoveSpeed);
+	}
 }
 
 void ACharacterController::OnMouseMove(float scale)
@@ -112,9 +122,18 @@ void ACharacterController::OnMouseMove(float scale)
 			FVector2D CenterPoint;
 			PlayerController->ProjectWorldLocationToScreen(GetMesh()->GetComponentLocation(), CenterPoint);
 
-			FVector Diff = FVector(MousePosition.X - CenterPoint.X, MousePosition.Y - CenterPoint.Y, 0.f);
+			//UE_LOG(LogTemp, Display, TEXT("MousePostion: %s"), *MousePosition.ToString());
+			//UE_LOG(LogTemp, Display, TEXT("CenterPoint: %s"), *CenterPoint.ToString());
 
-			GetMesh()->SetWorldRotation(FMath::Lerp(GetMesh()->RelativeRotation, FRotator(0.f, Diff.Rotation().Yaw, 0.f), 0.25f));
+			FVector Diff = FVector(MousePosition.X - CenterPoint.X, MousePosition.Y - CenterPoint.Y, 0.f);
+			
+			GetMesh()->SetRelativeRotation(FMath::Lerp(GetMesh()->RelativeRotation, FRotator(0.f, Diff.Rotation().Yaw, 0.f), TurnRate));
+
+			//UE_LOG(LogTemp, Display, TEXT("Forward vector: %s"), *GetMesh()->GetForwardVector().ToCompactString());
+
+			//GetMesh()->SetRelativeRotation(FRotator(0.f, Diff.Rotation().Yaw, 0.f));
+
+			UE_LOG(LogTemp, Display, TEXT("MeshRelativeRotation: %s"), *GetMesh()->RelativeRotation.Vector().ToString());
 
 		}
 	}
@@ -130,8 +149,10 @@ void ACharacterController::OnInteractReleased()
 	TArray<FOverlapResult> hitResult;
 	GetWorld()->OverlapMultiByChannel(hitResult, GetActorLocation(), FQuat::Identity, ECC_GameTraceChannel1, FCollisionShape::MakeSphere(50.f) );
 
-	if (hitResult.Num() > 0) {
-		if (AInteractable* Interactable = Cast<AInteractable>(hitResult[0].GetActor())) {
+	if (hitResult.Num() > 0) 
+	{
+		if (AInteractable* Interactable = Cast<AInteractable>(hitResult[0].GetActor())) 
+		{
 			Interactable->Interact(this);
 			UE_LOG(LogTemp, Display, TEXT("Actually hit a thing."));
 		}
@@ -143,16 +164,17 @@ void ACharacterController::OnInteractReleased()
 
 void ACharacterController::OnRollPressed()
 {
+	CharacterState = State::ROLLING;
+
 	if (GetLastMovementInputVector() != FVector::ZeroVector)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Rolling!"));
 	}
 	else
 	{
-		FVector current = FVector(RootComponent->RelativeLocation);
+		//FVector current = FVector(RootComponent->RelativeLocation);
 
 		UE_LOG(LogTemp, Warning, TEXT("Defaulting to rolling backwards"));
-	
 	}
 
 
