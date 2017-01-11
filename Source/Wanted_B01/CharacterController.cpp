@@ -133,7 +133,7 @@ void ACharacterController::OnMouseMove(float scale)
 
 			//GetMesh()->SetRelativeRotation(FRotator(0.f, Diff.Rotation().Yaw, 0.f));
 
-			UE_LOG(LogTemp, Display, TEXT("MeshRelativeRotation: %s"), *GetMesh()->RelativeRotation.Vector().ToString());
+			//UE_LOG(LogTemp, Display, TEXT("MeshRelativeRotation: %s"), *GetMesh()->RelativeRotation.Vector().ToString());
 
 		}
 	}
@@ -168,7 +168,8 @@ void ACharacterController::OnRollPressed()
 
 	if (GetLastMovementInputVector() != FVector::ZeroVector)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Rolling!"));
+		UE_LOG(LogTemp, Display, TEXT("Rolling!"));
+		FVector StartingPosition = RootComponent->GetComponentLocation();
 	}
 	else
 	{
