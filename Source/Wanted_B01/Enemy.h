@@ -1,9 +1,32 @@
 // Fill out your copyright notice in the Description page of Project Settings.
+// this is the enemy base class which will derive the enemys health, attacks, and status effects.
 
 #pragma once
 
 #include "GameFramework/Actor.h"
 #include "Enemy.generated.h"
+
+UENUM(BlueprintType)
+enum class EState : uint8
+{
+	Idle			UMETA(DisplayName = "Idle"),
+	Search			UMETA(DisplayName = "Search"),
+	Attack			UMETA(DisplayName = "Attack"),
+	Flee			UMETA(DisplayName = "Flee")
+
+
+};
+
+UENUM(BlueprintType)
+enum class Effects : uint8
+{
+	Stun			UMETA(DisplayName = "Stun"),
+	DOT				UMETA(DisplayName = "DOT"),
+	Slow			UMETA(DisplayName = "Slow"),
+	Null			UMETA(DisplayName = "Null")
+
+
+};
 
 UCLASS()
 class WANTED_B01_API AEnemy : public AActor
@@ -21,5 +44,37 @@ public:
 	virtual void Tick( float DeltaSeconds ) override;
 
 	void Enemy();
+
+protected:
+	UPROPERTY(EditAnywhere)
+	uint8 Health;
+
+	UPROPERTY(EditAnywhere)
+	float MoveSpeed;
+
+	UPROPERTY(EditAnywhere)
+	float TurnRate;
+
+	// cooldown for how frequently the skills can be used
+	UPROPERTY(EditAnywhere)
+	float Skill1Cooldown;
+
+	// cooldown for how frequently the skills can be used
+	UPROPERTY(EditAnywhere)
+	float Skill2Cooldown;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enum)
+	EState EnemyState;
+
+protected:
+
+	//enemy's basic attack which will be most frequently used can include input for status effect application
+	void BasicAttack(Effects effect);
+
+	//enemy's 1st skill, will include an input for status effect application
+	void Skill1(Effects effect);
+
+	//enemy's 1st skill, will include an input for status effect application
+	void Skill2(Effects effect);
 	
 };
