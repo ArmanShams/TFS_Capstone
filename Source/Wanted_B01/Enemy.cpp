@@ -17,6 +17,8 @@ AEnemy::AEnemy()
 
 	TurnRate = 0.25f;
 
+	Range = 1.0f;
+
 	Skill1Cooldown = 5.0f;
 
 	Skill2Cooldown = 5.0f;
@@ -47,20 +49,28 @@ void AEnemy::Enemy()
 	//}
 }
 
-void AEnemy::BasicAttack(Effects effect)
+void AEnemy::BasicAttack(Effects effect, float Range)
 {
 	//attack has effect application
+
+	//range also gets applied for specific attack
 
 }
 
-void AEnemy::Skill1(Effects effect)
+void AEnemy::Skill1(Effects effect, float Range)
 {
 	//attack has effect application
+
+	//range also gets applied for specific attack
+
 }
 
-void AEnemy::Skill2(Effects effect)
+void AEnemy::Skill2(Effects effect, float Range)
 {
 	//attack has effect application
+
+	//range also gets applied for specific attack
+
 }
 
 

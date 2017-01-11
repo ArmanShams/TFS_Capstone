@@ -55,6 +55,9 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float TurnRate;
 
+	UPROPERTY(EditAnywhere)
+	float Range;
+
 	// cooldown for how frequently the skills can be used
 	UPROPERTY(EditAnywhere)
 	float Skill1Cooldown;
@@ -69,12 +72,12 @@ protected:
 protected:
 
 	//enemy's basic attack which will be most frequently used can include input for status effect application
-	void BasicAttack(Effects effect);
+	void BasicAttack(Effects effect, float Range);
 
 	//enemy's 1st skill, will include an input for status effect application
-	void Skill1(Effects effect);
+	void Skill1(Effects effect, float Range);
 
 	//enemy's 1st skill, will include an input for status effect application
-	void Skill2(Effects effect);
+	void Skill2(Effects effect, float Range);
 	
 };
