@@ -18,10 +18,27 @@ ACharacterController::ACharacterController()
 
 	Health = 100;
 
-	TurnRate = 0.25f;
+	if (TurnRate == 0.0f)
+	{
+		TurnRate = 0.25f;
+	}
 
+
+	//CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleCollider"));
+	//RootComponent = GetCapsuleComponent();
 	//static ConstructorHelpers::FObjectFinder<UStaticMesh> CUBE(TEXT("/Engine/BasicShapes/Cube.Cube"));
+	//CapsuleCollider = ObjectInitializer.CreateDefaultSubobject<UCapsuleComponent>(this, TEXT("CapsuleCollider"));
+	//CapsuleCollider = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleCollider"));
 
+	//CapsuleCollider = GetCapsuleComponent();
+	//RootComponent = CapsuleCollider;
+	//RootComponent = GetCapsuleComponent();
+	//UE_LOG(LogTemp, Display, TEXT("%s"), *CapsuleCollider->GetName());
+	UE_LOG(LogTemp, Display, TEXT("%s"), *RootComponent->GetName());
+
+	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &ThisClass::OnCollision);
+
+	//UE_LOG(LogTemp, Display, TEXT("%s"), *RootComponent->GetName());
 
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
@@ -50,8 +67,34 @@ void ACharacterController::BeginPlay()
 void ACharacterController::Tick( float DeltaSeconds )
 {
 	Super::Tick(DeltaSeconds);
+
+	switch (CharacterState)
+	{
+	default:
+		break;
+
+	case State::ROLLING:
+		FVector CurrentPosition = (FMath::Lerp(RootComponent->RelativeLocation, RollDestination, 25.f * DeltaSeconds) - RootComponent->RelativeLocation);
+		//RootComponent->SetWorldLocation(FMath::Lerp(RootComponent->RelativeLocation, RollDestination, 0.25f));
+
+
+		// Physics Lab 01: Add 2 components that haven't already been added in class or are already not present in the character class.
+
+		GetMovementComponent()->AddInputVector(CurrentPosition);
+
+		if (RootComponent->RelativeLocation.Y >= RollDestination.Y - 5.3f && RootComponent->RelativeLocation.X >= RollDestination.X - 5.3f
+			&& RootComponent->RelativeLocation.Y <= RollDestination.Y + 5.3f && RootComponent->RelativeLocation.X <= RollDestination.X + 5.3f)
+		{
+			GetMovementComponent()->StopActiveMovement();
+			UE_LOG(LogTemp, Display, TEXT("Setting state to idle."));
+			CharacterState = State::IDLE_HUMAN;
+		}
+
+		break;
+
+	}
 	
-	
+
 }
 
 
@@ -164,20 +207,27 @@ void ACharacterController::OnInteractReleased()
 
 void ACharacterController::OnRollPressed()
 {
-	CharacterState = State::ROLLING;
-
-	if (GetLastMovementInputVector() != FVector::ZeroVector)
+	if (CharacterState == State::IDLE_HUMAN)
 	{
-		UE_LOG(LogTemp, Display, TEXT("Rolling!"));
-		FVector StartingPosition = RootComponent->GetComponentLocation();
-	}
-	else
-	{
-		//FVector current = FVector(RootComponent->RelativeLocation);
+		CharacterState = State::ROLLING;
 
-		UE_LOG(LogTemp, Warning, TEXT("Defaulting to rolling backwards"));
-	}
+		RollStartingPoint = RootComponent->RelativeLocation;
 
+		FVector MovementVector = GetLastMovementInputVector();
+
+		if (MovementVector != FVector::ZeroVector)
+		{
+			UE_LOG(LogTemp, Display, TEXT("Rolling!"));
+			RollDestination = FVector(RollStartingPoint.X + (MovementVector.X * RollDistance), RollStartingPoint.Y + (MovementVector.Y * RollDistance), RollStartingPoint.Z);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Defaulting to rolling backwards"));
+			RollDestination = FVector(RollStartingPoint.X, RollStartingPoint.Y + RollDistance, RollStartingPoint.Z );
+		}
+
+	}
+	
 
 }
 
@@ -194,4 +244,19 @@ void ACharacterController::OnShootPressed()
 void ACharacterController::OnShootReleased()
 {
 
+}
+
+void ACharacterController::OnCollision(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	//UE_LOG(LogTemp, Display, TEXT("WE ARE IN THE BEAM"));
+	switch(CharacterState)
+	{
+	case State::ROLLING:
+		//UE_LOG(LogTemp, Display, TEXT("Returning the player to the starting point of the roll, setting state to idle."));
+		//CharacterState = State::IDLE_HUMAN;
+		//FVector ReturnPoint = FVector(RollStartingPoint.X - Hit.Location.X, RollStartingPoint.Y - Hit.Location.Y, RollStartingPoint.Z);
+		//UE_LOG(LogTemp, Display, TEXT("Roll Starting Point: %s"), *RollStartingPoint.ToString())
+		RollDestination = RootComponent->RelativeLocation;
+	break;
+	}
 }
