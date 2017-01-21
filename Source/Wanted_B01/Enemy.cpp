@@ -19,10 +19,15 @@ AEnemy::AEnemy()
 
 	Range = 1.0f;
 
-	Skill1Cooldown = 5.0f;
+	AttackFrequency = 5.f;
 
-	Skill2Cooldown = 5.0f;
+	//AttackType.Add(0);
+	//AttackType.Add(1);
+	//AttackType.Add(2);
 
+
+	//PawnSensingComponent = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensingComponent"));
+	//PawnSensingComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform)
 }
 
 // Called when the game starts or when spawned
@@ -31,6 +36,10 @@ void AEnemy::BeginPlay()
 	Super::BeginPlay();
 	
 	EnemyState = EState::Idle;
+
+	LastAttacked = MAX_FLT;
+	Skill1Cooldown = MAX_FLT;
+	Skill2Cooldown = MAX_FLT;
 }
 
 // Called every frame
@@ -38,6 +47,15 @@ void AEnemy::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
 
+	LastAttacked += DeltaTime;
+
+	Skill1Cooldown += DeltaTime;
+	Skill2Cooldown += DeltaTime;
+
+	if (bIsAttacking && LastAttacked >= AttackFrequency)
+	{
+		//Attack();
+	}
 }
 
 void AEnemy::Enemy()
@@ -49,16 +67,47 @@ void AEnemy::Enemy()
 	//}
 }
 
+void AEnemy::Attack(int32 AttackType)
+{
+	LastAttacked = 0.f;
+
+
+	if (AttackType == 0)
+	{
+		//BasicAttack();
+	}
+
+	if ((AttackType == 1) && (Skill1Cooldown >= 10.f))
+	{
+		//Skill1();
+	}
+
+	if ((AttackType == 2) && (Skill2Cooldown >= 10.f))
+	{
+		//Skill2();
+	}
+}
+
 void AEnemy::BasicAttack(Effects effect, float Range)
 {
+	bIsAttacking = true;
+	
 	//attack has effect application
 
 	//range also gets applied for specific attack
 
 }
 
+void AEnemy::AttackEnd()
+{
+	bIsAttacking = false;
+}
+
 void AEnemy::Skill1(Effects effect, float Range)
 {
+	bIsAttacking = true;
+
+	Skill1Cooldown = 0.f;
 	//attack has effect application
 
 	//range also gets applied for specific attack
@@ -67,9 +116,15 @@ void AEnemy::Skill1(Effects effect, float Range)
 
 void AEnemy::Skill2(Effects effect, float Range)
 {
+	bIsAttacking = true;
+
+	Skill2Cooldown = 0.f;
 	//attack has effect application
 
 	//range also gets applied for specific attack
+
+}
+
 
 }
 

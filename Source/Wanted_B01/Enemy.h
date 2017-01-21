@@ -58,6 +58,12 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float Range;
 
+	UPROPERTY(EditAnywhere)
+	float LastAttacked;
+
+	UPROPERTY(EditAnywhere)
+	float AttackFrequency;
+
 	// cooldown for how frequently the skills can be used
 	UPROPERTY(EditAnywhere)
 	float Skill1Cooldown;
@@ -69,10 +75,22 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enum)
 	EState EnemyState;
 
+	UPROPERTY(EditAnywhere)
+	bool bIsAttacking;
+
+	//USTRUCT(EditDefaultsOnly)
+	//class UPawnSensingComponent* PawnSensingComponent;
+
+	//TArray<int32> AttackType;
+
 protected:
 
+	void Attack(int32 AttackType);
+	
 	//enemy's basic attack which will be most frequently used can include input for status effect application
 	void BasicAttack(Effects effect, float Range);
+
+	void AttackEnd();
 
 	//enemy's 1st skill, will include an input for status effect application
 	void Skill1(Effects effect, float Range);
@@ -80,4 +98,5 @@ protected:
 	//enemy's 1st skill, will include an input for status effect application
 	void Skill2(Effects effect, float Range);
 	
+
 };
