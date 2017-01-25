@@ -78,10 +78,13 @@ protected:
 	UPROPERTY(EditAnywhere)
 	bool bIsAttacking;
 
+	UPROPERTY(EditAnywhere)
+	float isInRange;
+
 	//USTRUCT(EditDefaultsOnly)
 	//class UPawnSensingComponent* PawnSensingComponent;
 
-	//TArray<int32> AttackType;
+	int32 AttackType;
 
 protected:
 
@@ -97,6 +100,7 @@ protected:
 
 	//enemy's 1st skill, will include an input for status effect application
 	void Skill2(Effects effect, float Range);
+	
 	
 
 };

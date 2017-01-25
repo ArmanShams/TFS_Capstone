@@ -21,10 +21,7 @@ AEnemy::AEnemy()
 
 	AttackFrequency = 5.f;
 
-	//AttackType.Add(0);
-	//AttackType.Add(1);
-	//AttackType.Add(2);
-
+	isInRange = 5.0f;
 
 	//PawnSensingComponent = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensingComponent"));
 	//PawnSensingComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform)
@@ -52,9 +49,11 @@ void AEnemy::Tick( float DeltaTime )
 	Skill1Cooldown += DeltaTime;
 	Skill2Cooldown += DeltaTime;
 
-	if (bIsAttacking && LastAttacked >= AttackFrequency)
+	if (bIsAttacking && LastAttacked >= AttackFrequency && isInRange)
 	{
-		//Attack();
+		AttackType = FMath::RandRange(0, 2);
+		
+		Attack(AttackType);
 	}
 }
 
@@ -77,15 +76,21 @@ void AEnemy::Attack(int32 AttackType)
 		//BasicAttack();
 	}
 
-	if ((AttackType == 1) && (Skill1Cooldown >= 10.f))
+	else if ((AttackType == 1) && (Skill1Cooldown >= 10.f))
 	{
 		//Skill1();
 	}
 
-	if ((AttackType == 2) && (Skill2Cooldown >= 10.f))
+	else if ((AttackType == 2) && (Skill2Cooldown >= 10.f))
 	{
 		//Skill2();
 	}
+	
+	else
+	{
+		//BasicAttack();
+	}
+
 }
 
 void AEnemy::BasicAttack(Effects effect, float Range)
