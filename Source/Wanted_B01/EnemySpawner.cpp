@@ -10,11 +10,6 @@ AEnemySpawner::AEnemySpawner()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-	spawnRateInSeconds = 15.f;
-
-	spawnTimer = 0.f;
-
 	enemyCount = 0;
 }
 
@@ -26,19 +21,47 @@ void AEnemySpawner::BeginPlay()
 }
 
 // Called every frame
-void AEnemySpawner::Tick( float DeltaTime )
+void AEnemySpawner::Tick(float DeltaTime)
 {
-	Super::Tick( DeltaTime );
-	
-	spawnTimer++;
+	Super::Tick(DeltaTime);
 
-	if (spawnTimer == spawnRateInSeconds && enemyCount != 5)
+	if (Iteration > 0)
 	{
-		spawnEnemy();
+		TimeToSpawn -= DeltaTime;
+		if (TimeToSpawn < 0.f)
+			if (EnemyCount != 5)
+			{
+				SpawnEnemy();
+				EnemyCount++;
+			}
 	}
 }
 
-void AEnemySpawner::spawnEnemy()
+void AEnemySpawner::SpawnEnemy()
 {
-	//spawn enemy
+	if (EnemyBP)
+	{
+		FActorSpawnParameters SpawnParameters;
+		AEnemy *NewEnemy = GetWorld()->SpawnActor<AEnemy>(EnemyBP, GetTransform(), SpawnParameters);
+		GLog->Log("Spawned an Enemy");
+		GLog->Log("Spawned an Enemy");
+
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AEnemySpawner::EnemyArray, TimeToSpawn);
+
+		NewEnemy->Iteration = Iteration - 1;
+		Iteration = 0;
+	}
+}
+
+void AEnemySpawner::EnemyArray()
+{
+	TArray<AActor*> TypeofEnemy;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy::StaticClass(), TypeofEnemy);
+
+	AEnemy* EnemyType = Cast<AEnemy>(TypeofEnemy[0]);
+	if (EnemyType)
+	{
+		GLog->Log("Enemy Type verrified");
+	}
 }

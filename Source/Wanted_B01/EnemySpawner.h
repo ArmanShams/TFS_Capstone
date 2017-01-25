@@ -19,17 +19,19 @@ public:
 	
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
+	
+	uint16 EnemyCount;
+	uint16 Iteration;
+	
+	UPROPERTY(EditAnywhere, Category = "Enemy Spawning")
+		TSubclassOf<AEnemy> EnemyBP;
 
-	//UPROPERTY(EditAnywhere)
-	//Enemy enemyToSpawn;
+	UPROPERTY(EditDefaultsOnly, Category = "Enemy Spawning")
+		float TimeToSpawn;
 
-	UPROPERTY(EditAnywhere)
-	float spawnRateInSeconds;
+	UFUNCTION()
+		void SpawnEnemy();
 
-	UPROPERTY(EditAnywhere)
-	float spawnTimer;
-
-	uint16 enemyCount;
-
-	void spawnEnemy();
+	UFUNCTION()
+		void EnemyArray();
 };
