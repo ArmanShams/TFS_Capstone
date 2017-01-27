@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "GameFramework/Actor.h"
+#include "GameFramework/Character.h"
 #include "Enemy.generated.h"
 
 UENUM(BlueprintType)
@@ -29,12 +29,12 @@ enum class Effects : uint8
 };
 
 UCLASS()
-class WANTED_B01_API AEnemy : public AActor
+class WANTED_B01_API AEnemy : public ACharacter
 {
 	GENERATED_BODY()
-	
-public:	
-	// Sets default values for this actor's properties
+
+public:
+	// Sets default values for this character's properties
 	AEnemy();
 
 	// Called when the game starts or when spawned
@@ -43,53 +43,54 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
-	void Enemy();
+	// Called to bind functionality to input
+	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 
+	void Enemy();
+	
 protected:
 	UPROPERTY(EditAnywhere)
-	uint8 Health;
+		uint8 Health;
 
 	UPROPERTY(EditAnywhere)
-	float MoveSpeed;
+		float MoveSpeed;
 
 	UPROPERTY(EditAnywhere)
-	float TurnRate;
+		float TurnRate;
 
 	UPROPERTY(EditAnywhere)
-	float Range;
+		float Range;
 
 	UPROPERTY(EditAnywhere)
-	float LastAttacked;
+		float LastAttacked;
 
 	UPROPERTY(EditAnywhere)
-	float AttackFrequency;
-
-	// cooldown for how frequently the skills can be used
-	UPROPERTY(EditAnywhere)
-	float Skill1Cooldown;
+		float AttackFrequency;
 
 	// cooldown for how frequently the skills can be used
 	UPROPERTY(EditAnywhere)
-	float Skill2Cooldown;
+		float Skill1Cooldown;
+
+	// cooldown for how frequently the skills can be used
+	UPROPERTY(EditAnywhere)
+		float Skill2Cooldown;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enum)
-	EState EnemyState;
+		EState EnemyState;
 
 	UPROPERTY(EditAnywhere)
-	bool bIsAttacking;
+		bool bIsAttacking;
 
 	UPROPERTY(EditAnywhere)
-	float isInRange;
+		float isInRange;
 
 	//USTRUCT(EditDefaultsOnly)
 	//class UPawnSensingComponent* PawnSensingComponent;
 
 	int32 AttackType;
 
-protected:
-
 	void Attack(int32 AttackType);
-	
+
 	//enemy's basic attack which will be most frequently used can include input for status effect application
 	void BasicAttack(Effects effect, float Range);
 
@@ -100,7 +101,7 @@ protected:
 
 	//enemy's 1st skill, will include an input for status effect application
 	void Skill2(Effects effect, float Range);
-	
-	
+
+
 
 };

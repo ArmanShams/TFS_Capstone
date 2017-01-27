@@ -8,7 +8,7 @@
 // Sets default values
 AEnemy::AEnemy()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	Health = 100;
@@ -31,7 +31,7 @@ AEnemy::AEnemy()
 void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	EnemyState = EState::Idle;
 
 	LastAttacked = MAX_FLT;
@@ -40,9 +40,9 @@ void AEnemy::BeginPlay()
 }
 
 // Called every frame
-void AEnemy::Tick( float DeltaTime )
+void AEnemy::Tick(float DeltaTime)
 {
-	Super::Tick( DeltaTime );
+	Super::Tick(DeltaTime);
 
 	LastAttacked += DeltaTime;
 
@@ -52,10 +52,18 @@ void AEnemy::Tick( float DeltaTime )
 	if (bIsAttacking && LastAttacked >= AttackFrequency && isInRange)
 	{
 		AttackType = FMath::RandRange(0, 2);
-		
+
 		Attack(AttackType);
 	}
 }
+
+// Called to bind functionality to input
+void AEnemy::SetupPlayerInputComponent(class UInputComponent* InputComponent)
+{
+	Super::SetupPlayerInputComponent(InputComponent);
+
+}
+
 
 void AEnemy::Enemy()
 {
@@ -85,7 +93,7 @@ void AEnemy::Attack(int32 AttackType)
 	{
 		//Skill2();
 	}
-	
+
 	else
 	{
 		//BasicAttack();
@@ -96,7 +104,7 @@ void AEnemy::Attack(int32 AttackType)
 void AEnemy::BasicAttack(Effects effect, float Range)
 {
 	bIsAttacking = true;
-	
+
 	//attack has effect application
 
 	//range also gets applied for specific attack
@@ -131,7 +139,9 @@ void AEnemy::Skill2(Effects effect, float Range)
 }
 
 
-}
+
+
+
 
 
 
