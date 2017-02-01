@@ -75,11 +75,8 @@ void ACharacterController::Tick( float DeltaSeconds )
 
 	case State::ROLLING:
 		FVector CurrentPosition = (FMath::Lerp(RootComponent->RelativeLocation, RollDestination, 25.f * DeltaSeconds) - RootComponent->RelativeLocation);
-		//RootComponent->SetWorldLocation(FMath::Lerp(RootComponent->RelativeLocation, RollDestination, 0.25f));
-
 
 		// Physics Lab 01: Add 2 components that haven't already been added in class or are already not present in the character class.
-
 		GetMovementComponent()->AddInputVector(CurrentPosition);
 
 		if (RootComponent->RelativeLocation.Y >= RollDestination.Y - 5.3f && RootComponent->RelativeLocation.X >= RollDestination.X - 5.3f
@@ -223,7 +220,7 @@ void ACharacterController::OnRollPressed()
 		else
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Defaulting to rolling backwards"));
-			RollDestination = FVector(RollStartingPoint.X, RollStartingPoint.Y + RollDistance, RollStartingPoint.Z );
+			RollDestination = FVector(RollStartingPoint.X, RollStartingPoint.Y + RollDistance, RollStartingPoint.Z);
 		}
 
 	}
@@ -238,7 +235,7 @@ void ACharacterController::Roll()
 
 void ACharacterController::OnShootPressed()
 {
-
+	
 }
 
 void ACharacterController::OnShootReleased()

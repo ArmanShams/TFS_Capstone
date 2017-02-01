@@ -5,8 +5,8 @@
 
 #define ECC_Interactable ECC_GameTraceChannel1
 
-#include "EngineMinimal.h"
-
+#include "Engine.h"
+#include "UMG.h"
 
 #define ECC_Interactable ECC_GameTraceChannel1;
 

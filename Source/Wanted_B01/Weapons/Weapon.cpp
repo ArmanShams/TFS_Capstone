@@ -16,12 +16,36 @@ AWeapon::AWeapon()
 void AWeapon::BeginPlay()
 {
 	Super::BeginPlay();
+
+	bIsFiring = false;
+	LastFired = MAX_FLT;
 }
 
 // Called every frame
 void AWeapon::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
-
+	LastFired += DeltaTime;
+	if (bIsFiring && LastFired >= RateOfFire)
+	{
+		Fire();
+	}
 }
+
+void AWeapon::BeginFire()
+{
+	bIsFiring = true;
+}
+
+void AWeapon::Fire()
+{
+	LastFired = 0.f;
+}
+
+void AWeapon::EndFire()
+{
+	bIsFiring = false;
+}
+
+
 

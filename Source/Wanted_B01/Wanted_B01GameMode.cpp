@@ -13,5 +13,7 @@ AWanted_B01GameMode::AWanted_B01GameMode(const FObjectInitializer& ObjectInitial
 		DefaultPawnClass = CharacterClassAsset.Class;
 	}
 
+
+
 }
 
