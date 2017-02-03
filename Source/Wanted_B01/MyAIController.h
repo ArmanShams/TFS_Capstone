@@ -13,7 +13,26 @@ class WANTED_B01_API AMyAIController : public AAIController
 {
 	GENERATED_BODY()
 	
+public:
 	
-	
+	AMyAIController();
+
+	virtual void Possess(APawn* InPawn) override;
+
+	virtual void UnPossess() override;
+
+
+protected:
+
+	UPROPERTY(VisibleAnywhere)
+	class UBehaviorTreeComponent* BehaviorTreeComponent;
+
+	UPROPERTY(VisibleAnywhere)
+	class UBlackboardComponent* BlackboardComponent;
+
+	UPROPERTY(EditDefaultsOnly)
+	class UBehaviorTree* BehaviorTreeAsset;
+
+
 	
 };
