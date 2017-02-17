@@ -19,20 +19,14 @@ public:
 
 	virtual void Possess(APawn* InPawn) override;
 
-	virtual void UnPossess() override;
+	ETeamAttitude::Type GetTeamAttitudeTowards(const AActor& Other) const override;
+
 
 
 protected:
 
-	UPROPERTY(VisibleAnywhere)
-	class UBehaviorTreeComponent* BehaviorTreeComponent;
-
-	UPROPERTY(VisibleAnywhere)
-	class UBlackboardComponent* BlackboardComponent;
-
 	UPROPERTY(EditDefaultsOnly)
 	class UBehaviorTree* BehaviorTreeAsset;
-
 
 	
 };

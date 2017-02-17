@@ -5,20 +5,24 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/PlayerState.h"
 #include "FindTargetBTTask.h"
+#include "Perception/AIPerceptionComponent.h"
+#include "Perception/AISense_Sight.h"
 
 EBTNodeResult::Type UFindTargetBTTask::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-	for (FConstPawnIterator PawnItr = GetWorld()->GetPawnIterator(); PawnItr; ++PawnItr)
+
+	UAIPerceptionComponent* PerceptionComponent = OwnerComp.GetAIOwner()->GetPerceptionComponent();
+
+	TArray<AActor*> HostileActors;
+	PerceptionComponent->GetPerceivedHostileActors(HostileActors);
+
+	if (HostileActors.Num() > 0)
 	{
-		APawn* Pawn = *PawnItr;
-		if (Pawn == OwnerComp.GetAIOwner()->GetPawn() || (!Pawn->PlayerState || !Pawn->PlayerState->bIsABot))
-		{
-			continue;
-		}
-
-		OwnerComp.GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), Pawn);
-
+		AActor* HostileActor = HostileActors[0];
+		OwnerComp.GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), HostileActor);
 		return EBTNodeResult::Succeeded;
 	}
+
 	return EBTNodeResult::Failed;
+
 }
