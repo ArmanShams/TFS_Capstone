@@ -4,8 +4,6 @@
 #include "CharacterController.h"
 #include "InteractableObjects/Interactable.h"
 
-
-
 // Sets default values
 ACharacterController::ACharacterController()
 {
@@ -53,13 +51,11 @@ ACharacterController::ACharacterController()
 
 }
 
-
 // Called when the game starts or when spawned
 void ACharacterController::BeginPlay()
 {
 	Super::BeginPlay();
 	
-
 	CharacterState = State::IDLE_HUMAN;
 }
 
@@ -157,6 +153,8 @@ void ACharacterController::OnMouseMove(float scale)
 		FVector2D MousePosition;
 		UGameViewportClient* ViewportClient = GetWorld()->GetGameViewport();
 
+		
+
 		if (ViewportClient && ViewportClient->GetMousePosition(MousePosition))
 		{
 			FVector2D CenterPoint;
@@ -235,7 +233,7 @@ void ACharacterController::Roll()
 
 void ACharacterController::OnShootPressed()
 {
-	
+	//GetMesh()->PlayAnimation()
 }
 
 void ACharacterController::OnShootReleased()
