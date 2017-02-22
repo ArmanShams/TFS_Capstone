@@ -23,6 +23,7 @@ EBTNodeResult::Type UFindTargetBTTask::ExecuteTask(UBehaviorTreeComponent& Owner
 		return EBTNodeResult::Succeeded;
 	}
 
-	return EBTNodeResult::Failed;
 
+
+	return EBTNodeResult::Failed;
 }

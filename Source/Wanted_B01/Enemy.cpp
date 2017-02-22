@@ -14,7 +14,7 @@ AEnemy::AEnemy()
 
 	Health = 100;
 
-	MoveSpeed = .4f;
+	MoveSpeed = .04f;
 
 	TurnRate = 0.25f;
 
@@ -24,8 +24,6 @@ AEnemy::AEnemy()
 
 	isInRange = 5.0f;
 
-	//PawnSensingComponent = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensingComponent"));
-	//PawnSensingComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform)
 }
 
 // Called when the game starts or when spawned
