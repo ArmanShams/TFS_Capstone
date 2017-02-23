@@ -14,7 +14,6 @@ enum class State : uint8
 	ROLLING			UMETA(DisplayName = "Rolling"),
 	ROLLING_WOLF	UMETA(DisplayName = "Rolling_Wolf")
 
-
 };
 
 UCLASS(Blueprintable)
