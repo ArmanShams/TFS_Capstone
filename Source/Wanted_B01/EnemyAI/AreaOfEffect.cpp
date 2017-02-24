@@ -11,20 +11,15 @@ AAreaOfEffect::AAreaOfEffect(const FObjectInitializer& ObjectInitializer)
 	PrimaryActorTick.bCanEverTick = true;
 
 	timeSinceLastTick = 0.f;
-
 	damagePerTick = 5;
-
 	ticksPerSecond = 2.f;
 	lifeTimeInSeconds = 3.f;
-
 	radius = 30.f;
-
 	totalTicks = 0;
 
 	sphereCollider = CreateDefaultSubobject<USphereComponent>(TEXT("Collider"));
 	sphereCollider->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	sphereCollider->SetSphereRadius(radius);
-
 	//sphereCollider->OnComponentBeginOverlap.AddDynamic(this, &AAreaOfEffect::OnBeginOverllap);
 }
 
@@ -50,7 +45,6 @@ void AAreaOfEffect::Tick( float DeltaTime )
 			{
 				ACharacterController* player = Cast<ACharacterController>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 				player->ModifyHealth(-damagePerTick);
-
 				//UE_LOG(LogTemp, Warning, TEXT("Overlapping another actor"));
 			}
 			//float realtimeSeconds = UGameplayStatics::GetRealTimeSeconds(GetWorld());

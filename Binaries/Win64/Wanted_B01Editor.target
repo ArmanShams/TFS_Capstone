@@ -2,6 +2,7 @@
 	"TargetName" : "Wanted_B01Editor",
 	"Platform" : "Win64",
 	"Configuration" : "Development",
+	"BuildId" : "1b1b70bf-cbc6-4d63-b6c2-38a4ef2c47ab",
 	"Version" : 
 	{
 		"MajorVersion" : 4,

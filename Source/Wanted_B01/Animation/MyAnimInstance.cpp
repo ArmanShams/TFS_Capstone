@@ -23,6 +23,5 @@ void UMyAnimInstance::AnimNotify_AttackStart()
 void UMyAnimInstance::AnimNotify_AttackEnd()
 {
 	bIsAttacking = false;
-
 	//call a function on our character to disable colliders on melee weapons
 }

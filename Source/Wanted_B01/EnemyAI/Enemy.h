@@ -102,6 +102,11 @@ protected:
 	//enemy's 1st skill, will include an input for status effect application
 	void Skill2(Effects effect, float Range);
 
+protected:
+	UPROPERTY(EditDefaultsOnly)
+	float MaxAtttackDistance = 50.f;
 
+	bool CanAttack();
 
+	friend class UEnemyAnimInstance;
 };

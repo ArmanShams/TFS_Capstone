@@ -12,9 +12,7 @@ AEnemySpawner::AEnemySpawner()
 	PrimaryActorTick.bCanEverTick = true;
 
 	spawnRateInSeconds = 15.f;
-
 	spawnTimer = 0.f;
-
 	enemyCount = 0;
 }
 
