@@ -3,7 +3,7 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
-#include "CharacterController.h"
+#include "Character/CharacterController.h"
 #include "Interactable.generated.h"
 
 UCLASS()

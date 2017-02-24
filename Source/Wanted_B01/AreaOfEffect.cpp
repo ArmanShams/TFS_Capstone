@@ -2,7 +2,7 @@
 
 #include "Wanted_B01.h"
 #include "AreaOfEffect.h"
-#include "CharacterController.h"
+#include "Character/CharacterController.h"
 
 // Sets default values
 AAreaOfEffect::AAreaOfEffect(const FObjectInitializer& ObjectInitializer)
