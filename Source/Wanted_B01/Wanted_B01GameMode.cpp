@@ -7,7 +7,7 @@ AWanted_B01GameMode::AWanted_B01GameMode(const FObjectInitializer& ObjectInitial
 	: Super(ObjectInitializer)
 {
 	// TEXT("AssetPath'/MyAsset.MyAsset_C'") to get the class. <APawn>
-	ConstructorHelpers::FClassFinder<APawn> CharacterClassAsset(TEXT("Blueprint'/Game/TopDownCPP/Blueprints/CharacterControllerBlueprint.CharacterControllerBlueprint_C'"));
+	ConstructorHelpers::FClassFinder<APawn> CharacterClassAsset(TEXT("Blueprint'/Game/Blueprints/Player/CharacterControllerBlueprint.CharacterControllerBlueprint_C'"));
 	if (CharacterClassAsset.Class)
 	{
 		DefaultPawnClass = CharacterClassAsset.Class;

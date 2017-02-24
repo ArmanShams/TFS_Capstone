@@ -2,8 +2,7 @@
 
 #include "Wanted_B01.h"
 #include "CharacterController.h"
-#include "InteractableObjects/Interactable.h"
-
+#include "Environment/Interactable.h"
 
 
 // Sets default values
