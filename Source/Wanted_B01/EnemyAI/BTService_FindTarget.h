@@ -5,9 +5,6 @@
 #include "BehaviorTree/Services/BTService_BlackboardBase.h"
 #include "BTService_FindTarget.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class WANTED_B01_API UBTService_FindTarget : public UBTService_BlackboardBase
 {

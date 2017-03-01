@@ -5,9 +5,6 @@
 #include "GameFramework/HUD.h"
 #include "HeadsUpDisplay.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class WANTED_B01_API AHeadsUpDisplay : public AHUD
 {
