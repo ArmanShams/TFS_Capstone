@@ -12,7 +12,9 @@ ACharacterController::ACharacterController()
 	PrimaryActorTick.bCanEverTick = true;
 
 	MoveSpeed = .4f;
+
 	RollDistance = 1.f;
+
 	Health = 100;
 
 	if (TurnRate == 0.0f)
@@ -20,9 +22,22 @@ ACharacterController::ACharacterController()
 		TurnRate = 0.25f;
 	}
 
+
+	//CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleCollider"));
+	//RootComponent = GetCapsuleComponent();
+	//static ConstructorHelpers::FObjectFinder<UStaticMesh> CUBE(TEXT("/Engine/BasicShapes/Cube.Cube"));
+	//CapsuleCollider = ObjectInitializer.CreateDefaultSubobject<UCapsuleComponent>(this, TEXT("CapsuleCollider"));
+	//CapsuleCollider = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleCollider"));
+
+	//CapsuleCollider = GetCapsuleComponent();
+	//RootComponent = CapsuleCollider;
+	//RootComponent = GetCapsuleComponent();
+	//UE_LOG(LogTemp, Display, TEXT("%s"), *CapsuleCollider->GetName());
 	UE_LOG(LogTemp, Display, TEXT("%s"), *RootComponent->GetName());
 
 	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &ThisClass::OnCollision);
+
+	//UE_LOG(LogTemp, Display, TEXT("%s"), *RootComponent->GetName());
 
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
@@ -34,6 +49,7 @@ ACharacterController::ACharacterController()
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	CameraComponent->AttachToComponent(CameraBoom, FAttachmentTransformRules::KeepRelativeTransform);
 
+
 }
 
 
@@ -41,6 +57,8 @@ ACharacterController::ACharacterController()
 void ACharacterController::BeginPlay()
 {
 	Super::BeginPlay();
+	
+
 	CharacterState = State::IDLE_HUMAN;
 }
 
@@ -56,9 +74,11 @@ void ACharacterController::Tick( float DeltaSeconds )
 
 	case State::ROLLING:
 		FVector CurrentPosition = (FMath::Lerp(RootComponent->RelativeLocation, RollDestination, 25.f * DeltaSeconds) - RootComponent->RelativeLocation);
-
 		//RootComponent->SetWorldLocation(FMath::Lerp(RootComponent->RelativeLocation, RollDestination, 0.25f));
+
+
 		// Physics Lab 01: Add 2 components that haven't already been added in class or are already not present in the character class.
+
 		GetMovementComponent()->AddInputVector(CurrentPosition);
 
 		if (RootComponent->RelativeLocation.Y >= RollDestination.Y - 5.3f && RootComponent->RelativeLocation.X >= RollDestination.X - 5.3f
@@ -68,9 +88,16 @@ void ACharacterController::Tick( float DeltaSeconds )
 			UE_LOG(LogTemp, Display, TEXT("Setting state to idle."));
 			CharacterState = State::IDLE_HUMAN;
 		}
+
 		break;
+
 	}
+	
+
 }
+
+
+
 // Called to bind functionality to input
 void ACharacterController::SetupPlayerInputComponent(class UInputComponent* InInputComponent)
 {
@@ -96,7 +123,8 @@ void ACharacterController::ModifyHealth(uint8 mod)
 		UE_LOG(LogTemp, Display, TEXT("Player health modified, health is now: %d"), Health);
 	}
 	//else
-	//UE_LOG(LogTemp, Display, TEXT("Attempted to modify player health but the modified value exceeded the player's maximum health."), health);
+		//UE_LOG(LogTemp, Display, TEXT("Attempted to modify player health but the modified value exceeded the player's maximum health."), health);
+
 	
 }
 
@@ -112,6 +140,7 @@ void ACharacterController::OnMoveForward(float scale)
 	{
 		GetMovementComponent()->AddInputVector(GetActorForwardVector() * scale * MoveSpeed);
 	}
+
 }
 
 void ACharacterController::OnMoveRight(float scale)
@@ -143,8 +172,11 @@ void ACharacterController::OnMouseMove(float scale)
 			GetMesh()->SetRelativeRotation(FMath::Lerp(GetMesh()->RelativeRotation, FRotator(0.f, Diff.Rotation().Yaw, 0.f), TurnRate));
 
 			//UE_LOG(LogTemp, Display, TEXT("Forward vector: %s"), *GetMesh()->GetForwardVector().ToCompactString());
+
 			//GetMesh()->SetRelativeRotation(FRotator(0.f, Diff.Rotation().Yaw, 0.f));
+
 			//UE_LOG(LogTemp, Display, TEXT("MeshRelativeRotation: %s"), *GetMesh()->RelativeRotation.Vector().ToString());
+
 		}
 	}
 }
@@ -167,7 +199,9 @@ void ACharacterController::OnInteractReleased()
 			UE_LOG(LogTemp, Display, TEXT("Actually hit a thing."));
 		}
 	}
+
 	UE_LOG(LogTemp, Display, TEXT("Interact key released"));
+
 }
 
 void ACharacterController::OnRollPressed()
@@ -175,7 +209,9 @@ void ACharacterController::OnRollPressed()
 	if (CharacterState == State::IDLE_HUMAN)
 	{
 		CharacterState = State::ROLLING;
+
 		RollStartingPoint = RootComponent->RelativeLocation;
+
 		FVector MovementVector = GetLastMovementInputVector();
 
 		if (MovementVector != FVector::ZeroVector)
@@ -188,7 +224,10 @@ void ACharacterController::OnRollPressed()
 			UE_LOG(LogTemp, Warning, TEXT("Defaulting to rolling backwards"));
 			RollDestination = FVector(RollStartingPoint.X, RollStartingPoint.Y + RollDistance, RollStartingPoint.Z );
 		}
+
 	}
+	
+
 }
 
 void ACharacterController::Roll()

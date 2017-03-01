@@ -42,6 +42,8 @@ public:
 
 protected:
 
+
+
 	UPROPERTY(Category = Camera, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* CameraComponent;
 
@@ -66,14 +68,10 @@ protected:
 	UPROPERTY(Category = Collision, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UCapsuleComponent* CapsuleCollider;
 
-	
-
 	FVector RollStartingPoint;
 	FVector RollDestination;
 
-
 	AWeapon* CurrentlyEquippedWeapon;
-
 
 protected:
 	void OnMoveForward(float scale);

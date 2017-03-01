@@ -7,13 +7,17 @@
 #include "GameFramework/PlayerState.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISense_Sight.h"
+#include "Enemy.h"
+#include "Engine/TargetPoint.h"
 
-void UBTService_FindTarget::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) 
+
+void UBTService_FindTarget::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
 	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
 
 	UAIPerceptionComponent* PerceptionComponent = OwnerComp.GetAIOwner()->GetPerceptionComponent();
 
+	TArray<ATargetPoint*> PatrolPoints = Cast<AEnemy>(OwnerComp.GetAIOwner()->GetPawn())->PatrolPoints;
 	TArray<AActor*> HostileActors;
 	PerceptionComponent->GetPerceivedHostileActors(HostileActors);
 
@@ -24,8 +28,16 @@ void UBTService_FindTarget::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* N
 		return;
 	}
 
+	if (HostileActors.Num() == 0 && PatrolPoints.Num() > 0)
+	{
+		AActor* PatrolPoint = PatrolPoints[0];
+		OwnerComp.GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), PatrolPoint);
+		return;
+	}
+
 	OwnerComp.GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), NULL);
 	OwnerComp.GetAIOwner()->StopMovement();
 }
+
 
 

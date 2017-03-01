@@ -11,8 +11,11 @@ AProjectile::AProjectile()
 	PrimaryActorTick.bCanEverTick = true;
 
 	initialVelocity;
+
 	travelSpeed = 1.0f;
+
 	damageOnImpact = 1;
+
 	lifetimeInSeconds = 1.0f;
 }
 
@@ -20,12 +23,14 @@ AProjectile::AProjectile()
 void AProjectile::BeginPlay()
 {
 	Super::BeginPlay();
+	
 }
 
 // Called every frame
 void AProjectile::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
+
 }
 
 void AProjectile::OnCollision()

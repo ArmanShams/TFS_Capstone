@@ -47,6 +47,9 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 
 	void Enemy();
+
+	UPROPERTY(EditInstanceOnly)
+	TArray<class ATargetPoint*> PatrolPoints;
 	
 protected:
 	UPROPERTY(EditAnywhere)
@@ -58,8 +61,8 @@ protected:
 	UPROPERTY(EditAnywhere)
 		float TurnRate;
 
-	UPROPERTY(EditAnywhere)
-		float Range;
+	UPROPERTY(EditDefaultsOnly)
+		float MaxRange = 100.0f;
 
 	UPROPERTY(EditAnywhere)
 		float LastAttacked;
@@ -78,14 +81,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enum)
 		EState EnemyState;
 
-	UPROPERTY(EditAnywhere)
-		bool bIsAttacking;
+		bool bIsAttacking();
 
 	UPROPERTY(EditAnywhere)
 		float isInRange;
-
-	//USTRUCT(EditDefaultsOnly)
-	//class UPawnSensingComponent* PawnSensingComponent;
 
 	int32 AttackType;
 
@@ -102,11 +101,6 @@ protected:
 	//enemy's 1st skill, will include an input for status effect application
 	void Skill2(Effects effect, float Range);
 
-protected:
-	UPROPERTY(EditDefaultsOnly)
-	float MaxAtttackDistance = 50.f;
-
-	bool CanAttack();
-
 	friend class UEnemyAnimInstance;
+
 };

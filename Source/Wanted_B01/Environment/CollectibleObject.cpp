@@ -10,13 +10,16 @@ ACollectibleObject::ACollectibleObject()
 	
 	// Create a collider component so that we can check if anything comes into collision with it
 	ColliderComponent = CreateDefaultSubobject<USphereComponent>(TEXT("ColliderComponent"));
+
 	RootComponent = ColliderComponent;
+
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh Component"));
 
 	//MeshComponent->AttachTo(ColliderComponent);
 	//AttachTo function is deprecated for this build version, use AttachToComponent
 		//YourComp->AttachToComponent(OtherComp, FAttachmentTransformRules::KeepWorldTransform) or KeepRelativeTransform
 	MeshComponent->AttachToComponent(ColliderComponent, FAttachmentTransformRules::KeepWorldTransform);
+
 	MovementComponent = CreateDefaultSubobject<UMovementComponent>(TEXT("Movement Component"));
 
 	//Set up a notification for when this component overlaps something
@@ -27,11 +30,13 @@ ACollectibleObject::ACollectibleObject()
 void ACollectibleObject::BeginPlay()
 {
 	Super::BeginPlay();
+	
 }
 
 void ACollectibleObject::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
+
 }
 
 void ACollectibleObject::OnOverlapBegin(UPrimitiveComponent * OverlappedComp, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
