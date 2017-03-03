@@ -23,6 +23,11 @@ void UBTService_FindTarget::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* N
 
 	if (HostileActors.Num() > 0)
 	{
+		if (test == 1)
+		{
+			OwnerComp.GetAIOwner()->StopMovement();
+			test = 0;
+		}
 		AActor* HostileActor = HostileActors[0];
 		OwnerComp.GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), HostileActor);
 		return;
@@ -30,7 +35,13 @@ void UBTService_FindTarget::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* N
 
 	if (HostileActors.Num() == 0 && PatrolPoints.Num() > 0)
 	{
-		AActor* PatrolPoint = PatrolPoints[0];
+		if (test == 0)
+		{
+			OwnerComp.GetAIOwner()->StopMovement();
+			test = 1;
+		}
+		RangePoint = FMath::RandRange(0, PatrolPoints.Num() - 1);
+		AActor* PatrolPoint = PatrolPoints[RangePoint];
 		OwnerComp.GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), PatrolPoint);
 		return;
 	}

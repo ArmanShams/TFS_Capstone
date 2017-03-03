@@ -5,9 +5,6 @@
 #include "Animation/AnimInstance.h"
 #include "MyAnimInstance.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class WANTED_B01_API UMyAnimInstance : public UAnimInstance
 {

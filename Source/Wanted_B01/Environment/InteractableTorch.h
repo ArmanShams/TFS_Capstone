@@ -2,9 +2,6 @@
 
 #pragma once
 
-/**
- * 
- */
 class WANTED_B01_API InteractableTorch
 {
 public:

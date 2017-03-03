@@ -5,9 +5,6 @@
 #include "AIController.h"
 #include "MyAIController.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class WANTED_B01_API AMyAIController : public AAIController
 {

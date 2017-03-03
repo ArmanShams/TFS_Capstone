@@ -31,10 +31,26 @@ public:
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	
-	// Called every frame
-	virtual void Tick( float DeltaSeconds ) override;
 
-	
+	// Called every frame
+	virtual void Tick(float DeltaSeconds) override;
+
+	virtual void BeginFire();
+
+	virtual void Fire();
+
+	virtual void EndFire();
+
+	virtual bool CanFire();
+
+
+protected:
+
+	float RateOfFire;
+
+	float LastFired;
+
+	bool bIsFiring;
+
 	
 };

@@ -7,8 +7,8 @@
 // Sets default values
 AWeapon::AWeapon()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = true;
 
 }
 
@@ -16,12 +16,41 @@ AWeapon::AWeapon()
 void AWeapon::BeginPlay()
 {
 	Super::BeginPlay();
+
+	LastFired = MAX_FLT;
+
 }
 
 // Called every frame
-void AWeapon::Tick( float DeltaTime )
+void AWeapon::Tick(float DeltaTime)
 {
-	Super::Tick( DeltaTime );
+	Super::Tick(DeltaTime);
+
+	LastFired += DeltaTime;
+
+	if (CanFire())
+	{
+		Fire();
+	}
 
 }
 
+void AWeapon::BeginFire()
+{
+	bIsFiring = true;
+}
+
+void AWeapon::Fire()
+{
+	LastFired = 0.f;
+}
+
+void AWeapon::EndFire()
+{
+	bIsFiring = false;
+}
+
+bool AWeapon::CanFire()
+{
+	return bIsFiring && LastFired >= RateOfFire;
+}
