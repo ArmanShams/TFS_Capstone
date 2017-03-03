@@ -9,15 +9,21 @@ ARangedAI::ARangedAI()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	// Set the root component
+	RangedAIMesh = GetMesh();
+	RangedAIMesh->GetComponentLocation();
+	RangedAIMesh->GetComponentRotation();
+	RootComponent = RangedAIMesh;
+
 	// Attach the weapon mesh to the character mesh component
 	WeaponMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WeaponMesh"));
-	WeaponMesh->SetupAttachment(GetMesh());
-
+	WeaponMesh->SetupAttachment(RangedAIMesh);
+	
 	// Attach the spawn point for the projectile to the weapon
 	ProjectileSpawnPoint = CreateDefaultSubobject<USceneComponent>(TEXT("ProjectileSpawnPoint"));
 	ProjectileSpawnPoint->SetupAttachment(WeaponMesh);
-	ProjectileSpawnPoint->SetRelativeLocation(FVector(0.f, 0.f, 0.f));
-	ProjectileSpawnPoint->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
+	// ProjectileSpawnPoint->SetRelativeLocation(FVector(0.f, 0.f, 0.f));
+	// ProjectileSpawnPoint->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
 }
 
 void ARangedAI::BeginPlay()
@@ -28,44 +34,25 @@ void ARangedAI::BeginPlay()
 void ARangedAI::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
-	if (bCanAttack == true)
-	{
-		CanAttack();
-	}
 }
 
-void ARangedAI::SetupPlayerInputComponent(UInputComponent * InInputComponent)
-{	
-	// Run Simulation
-	Super::SetupPlayerInputComponent(InInputComponent);
-	InInputComponent->BindAction(TEXT("DebugTool"), IE_Pressed, this, &ThisClass::DebugTool);
+void ARangedAI::StartSimulation()
+{
+	OnFire();
+}
+
+void ARangedAI::EndSimulation()
+{
 }
 
 void ARangedAI::OnFire()
 {
-	UWorld* const World = GetWorld();
-	if (GetWorld() != nullptr)
-	{
-		const FVector SpawnLocation = ProjectileSpawnPoint->GetComponentLocation();
-		const FRotator SpawnRotation = WeaponMesh->GetComponentRotation();
-		World->SpawnActor<ARangedAIProjectile>(ProjectileClassSpawned, SpawnLocation, SpawnRotation);
-	}
-}
-
-void ARangedAI::CanAttack()
-{
 	GEngine->AddOnScreenDebugMessage(-2, 1.f, FColor::White, FString::Printf(TEXT("Attack Triggered!")));
-	if (PlayerDistance <= DetectionRange)
-	{
-		OnFire();
-		GEngine->AddOnScreenDebugMessage(-3, 1.f, FColor::Red, FString::Printf(TEXT("Projectile Spawned!")));
-	}
-}
+	// GetWorld()->SpawnActor<ARangedAI>();
+	const FRotator SpawnRotation = ProjectileSpawnPoint->GetComponentRotation();
+	const FVector SpawnLocation = ProjectileSpawnPoint->GetComponentLocation();
 
-void ARangedAI::DebugTool()
-{
-	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::White, FString::Printf(TEXT("Can Attack!")));
-	PlayerDistance = 5.0f;
-	DetectionRange = 10.0f;
-	CanAttack();
+	if (ProjectileClassSpawned != NULL) {
+		ARangedAIProjectile* RangedAIProjectile = GetWorld()->SpawnActor<ARangedAIProjectile>(ProjectileClassSpawned, SpawnLocation, SpawnRotation);
+	}
 }

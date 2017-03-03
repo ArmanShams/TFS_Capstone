@@ -28,13 +28,10 @@ private:
 		USphereComponent* ColliderComponent;
 
 	UPROPERTY(EditDefaultsOnly)
-		UStaticMeshComponent* MeshComponent;
-
-	UPROPERTY(EditDefaultsOnly)
-		UMovementComponent* MovementComponent;
+		UStaticMeshComponent* ObjectMesh;
 
 	UFUNCTION()
-	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+		void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 
 };

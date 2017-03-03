@@ -2,6 +2,7 @@
 
 #include "Wanted_B01.h"
 #include "CharacterController.h"
+#include "EnemyAI/RangedAI.h"
 #include "Environment/Interactable.h"
 
 
@@ -84,7 +85,8 @@ void ACharacterController::SetupPlayerInputComponent(class UInputComponent* InIn
 	InInputComponent->BindAction(TEXT("Shoot"), IE_Pressed, this, &ThisClass::OnShootPressed);
 	InInputComponent->BindAction(TEXT("Shoot"), IE_Released, this, &ThisClass::OnShootReleased);
 	InInputComponent->BindAction(TEXT("Roll"), IE_Pressed, this, &ThisClass::OnRollPressed);
-
+	InInputComponent->BindAction(TEXT("DebugTool"), IE_Pressed, this, &ThisClass::DebugToolPressed);
+	InInputComponent->BindAction(TEXT("DebugTool"), IE_Released, this, &ThisClass::DebugToolReleased);
 }
 
 void ACharacterController::ModifyHealth(uint8 mod)
@@ -206,6 +208,17 @@ void ACharacterController::OnShootReleased()
 
 }
 
+void ACharacterController::DebugToolPressed()
+{
+	ARangedAI* RangedAI = Cast<ARangedAI>(GetClass());
+	RangedAI->StartSimulation();
+}
+
+void ACharacterController::DebugToolReleased()
+{
+	ARangedAI* RangedAI = Cast<ARangedAI>(GetClass());
+	RangedAI->EndSimulation();
+}
 void ACharacterController::OnCollision(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	//UE_LOG(LogTemp, Display, TEXT("WE ARE IN THE BEAM"));

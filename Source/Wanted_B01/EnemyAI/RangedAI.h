@@ -5,17 +5,6 @@
 #include "GameFramework/Character.h"
 #include "RangedAI.generated.h"
 
-UENUM(BlueprintType)
-enum class RangedEnemyState : uint8
-{
-	Idle			UMETA(DisplayName = "Idle"), //	UMETA as it appears in the editor
-	Targeting		UMETA(DisplayName = "Target"),
-	Attacking		UMETA(DisplayName = "Attack"),
-	Fleeing			UMETA(DisplayName = "Flee"),
-
-};
-
-
 UCLASS()
 class WANTED_B01_API ARangedAI : public ACharacter
 {
@@ -31,42 +20,33 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
-	// Projectile class to spawn
+	// Creates the array of projectile classes spawned
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
 	TSubclassOf<class ARangedAIProjectile> ProjectileClassSpawned;
 
-	// Playtesting whether or not the enemy can shoot
-	virtual void SetupPlayerInputComponent(class UInputComponent* InInputComponent) override;
-
 	// Location on gun mesh where projectiles should spawn.
-	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
 	class USceneComponent* ProjectileSpawnPoint;
 
 	// Enemy Weapon Mesh
 	UPROPERTY(VisibleDefaultsOnly, Category = Weapon)
 	class UStaticMeshComponent* WeaponMesh;
 
+	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+	class USkeletalMeshComponent* RangedAIMesh;
+
 	// Placeholder audio for when the weapon is fired
-	UPROPERTY(EditAnywhere, Category = Weapon)
-	class USoundBase* FireSFX;
+	// UPROPERTY(EditAnywhere, Category = Weapon)
+	// class USoundBase* FireSFX;
 
 	// Weapon's offset location from the character's location
-	UPROPERTY(EditAnywhere, Category = Weapon)
-	FVector WeaponOffset;
+	// UPROPERTY(EditAnywhere, Category = Weapon)
+	// FVector WeaponOffset;
 
-	bool bCanAttack;
+	void StartSimulation();
+	void EndSimulation();
 
 protected:
 	void OnFire();
-	void CanAttack();
-	void DebugTool();
 
-	uint8 Health;
-	uint8 Ammo;
-	
-	float MoveSpeed;
-	float TurnRate;
-	
-	float PlayerDistance;
-	float DetectionRange;
 };

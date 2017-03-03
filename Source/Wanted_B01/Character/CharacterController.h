@@ -66,11 +66,8 @@ protected:
 	UPROPERTY(Category = Collision, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UCapsuleComponent* CapsuleCollider;
 
-	
-
 	FVector RollStartingPoint;
 	FVector RollDestination;
-
 
 	AWeapon* CurrentlyEquippedWeapon;
 
@@ -85,13 +82,14 @@ protected:
 	//void OnRollReleased();
 	void OnShootPressed();
 	void OnShootReleased();
+	void DebugToolPressed();
+	void DebugToolReleased();
 
 	//UFUNCTION()
 	//void OnComponentBeginOverlap(AActor* other);
 
 	UFUNCTION()
 	void OnCollision(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
-
 
 	void Roll();
 };
