@@ -10,10 +10,29 @@ AProjectile::AProjectile()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	initialVelocity;
-	travelSpeed = 1.0f;
-	damageOnImpact = 1;
-	lifetimeInSeconds = 1.0f;
+	// Sphere collider for the projectile
+	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("SphereCollisionComponent"));
+	CollisionComponent->InitSphereRadius(SphereRadius);
+	CollisionComponent->BodyInstance.SetCollisionProfileName("Projectile");
+	CollisionComponent->OnComponentHit.AddDynamic(this, &AProjectile::OnHit);
+
+	// Mesh Component for the projectile
+	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
+	MeshComponent->SetupAttachment(CollisionComponent);
+
+	// Root Component
+	RootComponent = CollisionComponent;
+
+	// ProjectileMovementComponent used to regulate the projectile's movement 
+	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
+	ProjectileMovementComponent->UpdatedComponent = CollisionComponent;
+	ProjectileMovementComponent->InitialSpeed = InitSpeed;
+	ProjectileMovementComponent->MaxSpeed = MaxSpeed;
+	ProjectileMovementComponent->bRotationFollowsVelocity = true;
+	ProjectileMovementComponent->bShouldBounce = false;
+
+	// Deconstruct after X seconds as a default
+	// InitialLifeSpan = LifeTime;
 }
 
 // Called when the game starts or when spawned
@@ -28,7 +47,9 @@ void AProjectile::Tick( float DeltaTime )
 	Super::Tick( DeltaTime );
 }
 
-void AProjectile::OnCollision()
+void AProjectile::OnHit(UPrimitiveComponent * HitComp, AActor * OtherActor, UPrimitiveComponent * OtherComp, FVector NormalImpulse, const FHitResult & Hit)
 {
-	//On collision apply apporpriate damage to player based on the weapon used.
+	GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::White, FString::Printf(TEXT("Projectile hit something")));
+	// OtherComp->AddImpulseAtLocation(GetVelocity() * BulletImpulse, GetActorLocation());
+	// Destroy();
 }
