@@ -4,6 +4,7 @@
 
 #include "GameFramework/Pawn.h"
 #include "Weapons/Weapon.h"
+
 #include "CharacterController.generated.h"
 
 UENUM(BlueprintType)
@@ -36,7 +37,7 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* InInputComponent) override;
 
-	void ModifyHealth(uint8 mod);
+	void ModifyHealth(float mod);
 
 	void EquipNewWeapon(AWeapon* newWeapon);
 
@@ -58,7 +59,9 @@ protected:
 	float RollDistance;
 
 	UPROPERTY(EditAnywhere)
-	uint8 Health;
+	float Health;
+
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enum)
 	State CharacterState;
@@ -94,4 +97,8 @@ protected:
 
 
 	void Roll();
+
+
+private:
+	const float MAXHEALTH = 100.f;
 };

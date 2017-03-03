@@ -2,6 +2,8 @@
 
 #include "Wanted_B01.h"
 #include "CharacterController.h"
+#include "Weapons/Weapon_Ranged.h"
+#include "Weapons/Weapon_PlayerRevolver.h"
 #include "Environment/Interactable.h"
 
 
@@ -13,7 +15,7 @@ ACharacterController::ACharacterController()
 
 	MoveSpeed = .4f;
 	RollDistance = 1.f;
-	Health = 100;
+	Health = 100.f;
 
 	if (TurnRate == 0.0f)
 	{
@@ -34,6 +36,8 @@ ACharacterController::ACharacterController()
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	CameraComponent->AttachToComponent(CameraBoom, FAttachmentTransformRules::KeepRelativeTransform);
 
+	
+
 }
 
 
@@ -42,6 +46,15 @@ void ACharacterController::BeginPlay()
 {
 	Super::BeginPlay();
 	CharacterState = State::IDLE_HUMAN;
+	
+	CurrentlyEquippedWeapon = GetWorld()->SpawnActor<AWeapon_PlayerRevolver>();
+
+	if (CurrentlyEquippedWeapon != NULL)
+	{
+		UE_LOG(LogTemp, Display, TEXT("HasGun"));
+	}
+
+	
 }
 
 // Called every frame
@@ -87,17 +100,18 @@ void ACharacterController::SetupPlayerInputComponent(class UInputComponent* InIn
 
 }
 
-void ACharacterController::ModifyHealth(uint8 mod)
+void ACharacterController::ModifyHealth(float mod)
 {
 	// Prevention of adding health greater than the maximum currently disabled.
-	//if (health + mod <= 100) 
-	{
-		Health += mod;
-		UE_LOG(LogTemp, Display, TEXT("Player health modified, health is now: %d"), Health);
-	}
-	//else
-	//UE_LOG(LogTemp, Display, TEXT("Attempted to modify player health but the modified value exceeded the player's maximum health."), health);
 	
+	Health += mod;
+	UE_LOG(LogTemp, Display, TEXT("Player health modified, health is now: %d"), Health);
+	
+	if (Health > MAXHEALTH)
+	{
+		Health = MAXHEALTH;
+		UE_LOG(LogTemp, Display, TEXT("Attempted to modify player health but the modified value exceeded the player's maximum health. Health after modification: %d"), Health);
+	}	
 }
 
 void ACharacterController::EquipNewWeapon(AWeapon* newWeapon)
@@ -198,7 +212,7 @@ void ACharacterController::Roll()
 
 void ACharacterController::OnShootPressed()
 {
-
+	CurrentlyEquippedWeapon->Fire();
 }
 
 void ACharacterController::OnShootReleased()
