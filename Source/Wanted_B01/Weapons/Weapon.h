@@ -21,7 +21,9 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 
 	virtual bool Fire();
-	
+
+	virtual bool AltFire();
+
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	float RateOfFire;

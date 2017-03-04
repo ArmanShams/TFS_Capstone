@@ -41,3 +41,13 @@ bool AWeapon::Fire()
 	return false;
 }
 
+bool AWeapon::AltFire()
+{
+	if (TimeSinceLastFire > RateOfFire)
+	{
+		TimeSinceLastFire = 0.f;
+		return true;
+	}
+	return false;
+}
+

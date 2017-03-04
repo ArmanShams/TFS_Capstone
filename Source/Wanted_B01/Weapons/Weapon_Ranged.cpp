@@ -63,7 +63,15 @@ bool AWeapon_Ranged::Fire()
 		Reload();
 	}
 	return false;
+}
 
+bool AWeapon_Ranged::AltFire()
+{
+	if (Super::AltFire())
+	{
+		return true;
+	}
+	return false;
 }
 
 void AWeapon_Ranged::Reload()

@@ -4,6 +4,7 @@
 
 #include "GameFramework/Actor.h"
 #include "Weapons/Weapon.h"
+
 #include "Weapon_Ranged.generated.h"
 
 UCLASS()
@@ -24,6 +25,8 @@ public:
 	virtual void Tick( float DeltaSeconds ) override;
 	
 	virtual bool Fire() override;
+
+	virtual bool AltFire() override;
 
 	virtual void Reload();
 
