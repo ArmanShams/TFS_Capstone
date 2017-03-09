@@ -15,12 +15,17 @@ AProjectile::AProjectile()
 	CollisionComponent->InitSphereRadius(SphereRadius);
 	//CollisionComponent->BodyInstance.SetCollisionProfileName("Projectile");
 	CollisionComponent->OnComponentHit.AddDynamic(this, &ThisClass::OnHit);
+	CollisionComponent->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Ignore);
+
 
 	// Root Component
 	RootComponent = CollisionComponent;
 
+	ConstructorHelpers::FObjectFinder<UStaticMesh>sphere(TEXT("StaticMesh'/Engine/BasicShapes/Sphere.Sphere'"));
+	
 	// Mesh Component for the projectile
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
+	MeshComponent->SetStaticMesh(sphere.Object);
 	MeshComponent->SetupAttachment(RootComponent);
 
 
@@ -34,7 +39,7 @@ AProjectile::AProjectile()
 	ProjectileMovementComponent->bShouldBounce = false;
 
 	// Deconstruct after X seconds as a default
-	// InitialLifeSpan = LifeTime;
+	InitialLifeSpan = LifeTime;
 }
 
 // Called when the game starts or when spawned
@@ -52,7 +57,8 @@ void AProjectile::Tick( float DeltaTime )
 void AProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	//GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::White, FString::Printf(TEXT("Projectile hit something")));
-	UE_LOG(LogTemp, Display, TEXT("PROJECTILE HIT A THING"));
+	UE_LOG(LogTemp, Display, TEXT("PROJECTILE HIT A THING %s"), *OtherActor->GetName());
 	// OtherComp->AddImpulseAtLocation(GetVelocity() * BulletImpulse, GetActorLocation());
+	UGameplayStatics::ApplyDamage(OtherActor, Damage, GetWorld()->GetFirstPlayerController(), this, TSubclassOf<UDamageType>());
 	Destroy();
 }

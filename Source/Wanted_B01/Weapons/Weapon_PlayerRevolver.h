@@ -25,7 +25,15 @@ public:
 
 	virtual bool Fire() override;
 
+	virtual bool AltFire() override;
+
 	virtual void Reload() override;
 	
+	UPROPERTY(EditDefaultsOnly)
+	float FanFireInterval;
+
+private:
+	bool bFanFiring;
+
 	
 };

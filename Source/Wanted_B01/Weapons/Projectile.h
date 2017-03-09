@@ -45,7 +45,14 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Projectile)
 	float BulletImpulse = 100.0f;
 
+
+	float Damage;
+
 	// Called when projectile hits something 
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+
+	friend class AWeapon_Ranged;
+	friend class AWeapon_PlayerRevolver;
 };

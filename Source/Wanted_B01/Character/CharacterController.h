@@ -75,8 +75,8 @@ protected:
 	FVector RollDestination;
 
 
+	TSubclassOf<AWeapon> DefaultWeapon;
 	AWeapon* CurrentlyEquippedWeapon;
-
 
 protected:
 	void OnMoveForward(float scale);
@@ -88,6 +88,8 @@ protected:
 	//void OnRollReleased();
 	void OnShootPressed();
 	void OnShootReleased();
+	void OnAltShootPressed();
+	void OnAltShootReleased();
 
 	//UFUNCTION()
 	//void OnComponentBeginOverlap(AActor* other);
@@ -97,6 +99,7 @@ protected:
 
 
 	void Roll();
+
 
 
 private:

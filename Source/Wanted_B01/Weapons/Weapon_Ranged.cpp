@@ -2,13 +2,19 @@
 
 #include "Wanted_B01.h"
 #include "Weapon_Ranged.h"
+#include "Weapons/Projectile.h"
 
 
 // Sets default values
 AWeapon_Ranged::AWeapon_Ranged()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	ConstructorHelpers::FClassFinder<AProjectile> ProjectileAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/ProjectileBP.ProjectileBP_C'"));
+	if (ProjectileAsset.Class)
+	{
+		ProjectileToFire = (UClass*)ProjectileAsset.Class;
+	}
 
 
 }
@@ -18,6 +24,12 @@ void AWeapon_Ranged::BeginPlay()
 {
 	Super::BeginPlay();
 
+	
+	UE_LOG(LogTemp, Display, TEXT("ProjectileSpawnLocation: %s"), *MeshComponent->GetSocketRotation(FName("BarrelSocket")).ToString());
+
+
+	//MeshComponent->SetStaticMesh(Mesh);
+	
 	/*
 	CurrentAmmo = 0;
 	RateOfFire = 0.3f;
@@ -38,13 +50,28 @@ void AWeapon_Ranged::Tick( float DeltaSeconds )
 
 bool AWeapon_Ranged::Fire()
 {
-	UE_LOG(LogTemp, Display, TEXT("Current ammo: %d"), CurrentAmmo);
+	UE_LOG(LogTemp, Display, TEXT("Current ammo: %u"), CurrentAmmo);
 
 	if (Super::Fire())
 	{
 		if (CurrentAmmo > 0)
 		{
 			CurrentAmmo--;
+			
+			if (MeshComponent->GetSocketByName(FName("BarrelSocket")))
+			{
+				AProjectile* Temp = GetWorld()->SpawnActor<AProjectile>(ProjectileToFire, MeshComponent->GetSocketLocation(FName("BarrelSocket")), MeshComponent->GetSocketRotation(FName("BarrelSocket")));
+				Temp->Damage = DamagePerAttack;
+
+				if (bOwnedByPlayer)
+				{
+					Temp->CollisionComponent->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore);
+				}
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("A weapon's static mesh doesn't have a 'BarrelSocket' socket. Please add one"));
+			}
 
 			//UE_LOG(LogTemp, Display, TEXT("Rate of fire: %f"), RateOfFire);
 			UE_LOG(LogTemp, Display, TEXT("Calling Fire on a ranged weapon"));

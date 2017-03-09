@@ -24,14 +24,19 @@ public:
 
 	virtual bool AltFire();
 
+	bool bOwnedByPlayer;
+
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	float RateOfFire;
 
-	UPROPERTY(EditDefaultsOnly)
 	float TimeSinceLastFire;
 
 	UPROPERTY(EditDefaultsOnly)
 	float DamagePerAttack;
 
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite)
+	class UStaticMeshComponent* MeshComponent;
+
+	
 };

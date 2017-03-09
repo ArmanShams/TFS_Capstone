@@ -2,9 +2,8 @@
 
 #pragma once
 
-#include "GameFramework/Actor.h"
 #include "Weapons/Weapon.h"
-
+#include "Weapons/Projectile.h"
 #include "Weapon_Ranged.generated.h"
 
 UCLASS()
@@ -42,6 +41,10 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	int8 TotalAmmo;
+
+	TSubclassOf<AProjectile> ProjectileToFire;
+	
+	friend class AProjectle;
 
 	
 };

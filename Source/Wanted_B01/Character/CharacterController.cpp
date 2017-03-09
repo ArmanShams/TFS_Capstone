@@ -22,7 +22,7 @@ ACharacterController::ACharacterController()
 		TurnRate = 0.25f;
 	}
 
-	UE_LOG(LogTemp, Display, TEXT("%s"), *RootComponent->GetName());
+	//UE_LOG(LogTemp, Display, TEXT("%s"), *RootComponent->GetName());
 
 	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &ThisClass::OnCollision);
 
@@ -36,7 +36,13 @@ ACharacterController::ACharacterController()
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	CameraComponent->AttachToComponent(CameraBoom, FAttachmentTransformRules::KeepRelativeTransform);
 
-	
+
+	ConstructorHelpers::FClassFinder<AWeapon>WeaponAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/PlayerRevolverBlueprint.PlayerRevolverBlueprint_C'"));
+	if (WeaponAsset.Class)
+	{
+		UE_LOG(LogTemp, Display, TEXT("WE HAVE FOUND THE CLASS"));
+		DefaultWeapon = (UClass*)WeaponAsset.Class;
+	}
 
 }
 
@@ -47,7 +53,9 @@ void ACharacterController::BeginPlay()
 	Super::BeginPlay();
 	CharacterState = State::IDLE_HUMAN;
 	
-	CurrentlyEquippedWeapon = GetWorld()->SpawnActor<AWeapon_PlayerRevolver>();
+	CurrentlyEquippedWeapon = GetWorld()->SpawnActor<AWeapon>(DefaultWeapon);
+	CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("hand_r"));
+	CurrentlyEquippedWeapon->bOwnedByPlayer = true;
 
 	if (CurrentlyEquippedWeapon != NULL)
 	{
@@ -96,6 +104,8 @@ void ACharacterController::SetupPlayerInputComponent(class UInputComponent* InIn
 	InInputComponent->BindAction(TEXT("Interact"), IE_Released, this, &ThisClass::OnInteractReleased);
 	InInputComponent->BindAction(TEXT("Shoot"), IE_Pressed, this, &ThisClass::OnShootPressed);
 	InInputComponent->BindAction(TEXT("Shoot"), IE_Released, this, &ThisClass::OnShootReleased);
+	InInputComponent->BindAction(TEXT("AltShoot"), IE_Pressed, this, &ThisClass::OnAltShootPressed);
+	InInputComponent->BindAction(TEXT("AltShoot"), IE_Released, this, &ThisClass::OnAltShootReleased);
 	InInputComponent->BindAction(TEXT("Roll"), IE_Pressed, this, &ThisClass::OnRollPressed);
 
 }
@@ -116,7 +126,7 @@ void ACharacterController::ModifyHealth(float mod)
 
 void ACharacterController::EquipNewWeapon(AWeapon* newWeapon)
 {
-	CurrentlyEquippedWeapon = newWeapon;
+	//CurrentlyEquippedWeapon = newWeapon;
 }
 
 
@@ -149,16 +159,10 @@ void ACharacterController::OnMouseMove(float scale)
 			FVector2D CenterPoint;
 			PlayerController->ProjectWorldLocationToScreen(GetMesh()->GetComponentLocation(), CenterPoint);
 
-			//UE_LOG(LogTemp, Display, TEXT("MousePostion: %s"), *MousePosition.ToString());
-			//UE_LOG(LogTemp, Display, TEXT("CenterPoint: %s"), *CenterPoint.ToString());
-
 			FVector Diff = FVector(MousePosition.X - CenterPoint.X, MousePosition.Y - CenterPoint.Y, 0.f);
 			
 			GetMesh()->SetRelativeRotation(FMath::Lerp(GetMesh()->RelativeRotation, FRotator(0.f, Diff.Rotation().Yaw, 0.f), TurnRate));
 
-			//UE_LOG(LogTemp, Display, TEXT("Forward vector: %s"), *GetMesh()->GetForwardVector().ToCompactString());
-			//GetMesh()->SetRelativeRotation(FRotator(0.f, Diff.Rotation().Yaw, 0.f));
-			//UE_LOG(LogTemp, Display, TEXT("MeshRelativeRotation: %s"), *GetMesh()->RelativeRotation.Vector().ToString());
 		}
 	}
 }
@@ -199,8 +203,8 @@ void ACharacterController::OnRollPressed()
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Defaulting to rolling backwards"));
-			RollDestination = FVector(RollStartingPoint.X, RollStartingPoint.Y + RollDistance, RollStartingPoint.Z );
+			//UE_LOG(LogTemp, Warning, TEXT("Defaulting to rolling backwards"));
+			//RollDestination = FVector(RollStartingPoint.X, RollStartingPoint.Y + RollDistance, RollStartingPoint.Z );
 		}
 	}
 }
@@ -216,6 +220,16 @@ void ACharacterController::OnShootPressed()
 }
 
 void ACharacterController::OnShootReleased()
+{
+
+}
+
+void ACharacterController::OnAltShootPressed()
+{
+	CurrentlyEquippedWeapon->AltFire();
+}
+
+void ACharacterController::OnAltShootReleased()
 {
 
 }
