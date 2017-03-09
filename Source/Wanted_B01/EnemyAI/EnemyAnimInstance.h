@@ -16,6 +16,14 @@ public:
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bCanAttack;
-	
+
+protected:
+	UFUNCTION()
+		void AnimNotify_MeleeAtkStart();
+
+	UFUNCTION()
+		void AnimNotify_MeleeAtkEnd();
+
+
 	friend class AEnemy;
 };

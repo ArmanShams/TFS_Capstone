@@ -50,6 +50,8 @@ public:
 
 	UPROPERTY(EditInstanceOnly)
 	TArray<class ATargetPoint*> PatrolPoints;
+
+	bool bIsAttacking();
 	
 protected:
 	UPROPERTY(EditAnywhere)
@@ -70,6 +72,9 @@ protected:
 	UPROPERTY(EditAnywhere)
 		float AttackFrequency;
 
+	UPROPERTY(EditAnywhere)
+		float MeleeRange = 150.0f;
+
 	// cooldown for how frequently the skills can be used
 	UPROPERTY(EditAnywhere)
 		float Skill1Cooldown;
@@ -81,7 +86,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enum)
 		EState EnemyState;
 
-		bool bIsAttacking();
+		FVector PlayerLocation();
 
 	UPROPERTY(EditAnywhere)
 		float isInRange;

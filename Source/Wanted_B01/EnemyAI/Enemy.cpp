@@ -28,6 +28,8 @@ AEnemy::AEnemy()
 
 	isInRange = 5.0f;
 
+	MeleeRange = 150.0f;
+
 }
 
 // Called when the game starts or when spawned
@@ -52,6 +54,7 @@ void AEnemy::Tick(float DeltaTime)
 	Skill1Cooldown += DeltaTime;
 	Skill2Cooldown += DeltaTime;
 
+	bIsAttacking();
 	//if (bIsAttacking && LastAttacked >= AttackFrequency && isInRange)
 	//{
 	//	AttackType = FMath::RandRange(0, 2);
@@ -81,17 +84,32 @@ bool AEnemy::bIsAttacking()
 {
 	if (AAIController* AIController = Cast<AAIController>(GetController()))
 	{
+
 		if (UBrainComponent* BrainComponent = AIController->GetBrainComponent())
 		{
-			AActor* CurrentTarget = Cast<AActor>(BrainComponent->GetBlackboardComponent()->GetValue<UBlackboardKeyType_Object>(TEXT("Target")));
-		
-			if (CurrentTarget)
+			if (UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent()) 
 			{
-				const FVector CurrentTargetLocation = CurrentTarget->GetActorLocation();
-				const FVector MyLocation = GetActorLocation();
-				const float CurrentDistance = FVector::Dist(CurrentTargetLocation, MyLocation);
+				AActor* CurrentTarget = Cast<AActor>(BlackboardComponent->GetValue<UBlackboardKeyType_Object>(TEXT("Target")));
 
-				return CurrentDistance < MaxRange;
+			
+			//if (!BrainComponent->GetBlackboardComponent())
+			//{
+			//	UE_LOG(LogTemp, Warning, TEXT("broken here"));
+			//}
+
+			//AActor* CurrentTarget = Cast<AActor>(BrainComponent->GetBlackboardComponent()->GetValue<UBlackboardKeyType_Object>(TEXT("Target")));
+
+				if (CurrentTarget)
+				{
+					const FVector CurrentTargetLocation = CurrentTarget->GetActorLocation();
+					const FVector MyLocation = GetActorLocation();
+					const float CurrentDistance = FVector::Dist(CurrentTargetLocation, MyLocation);
+					//UE_LOG(LogTemp, Warning, TEXT("CurrentTargetLocation is %s"),  *CurrentTargetLocation.ToString());
+					//UE_LOG(LogTemp, Warning, TEXT("MyLocation is %s"), *MyLocation.ToString());
+					UE_LOG(LogTemp, Warning, TEXT("CurrentDistance is %f"), CurrentDistance);
+					return CurrentDistance < MeleeRange;
+	
+				}
 			}
 		}
 	}
