@@ -37,40 +37,46 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* InInputComponent) override;
 
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
 	void ModifyHealth(float mod);
 
 	void EquipNewWeapon(AWeapon* newWeapon);
 
-protected:
 
+
+protected:
 	UPROPERTY(Category = Camera, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* CameraComponent;
 
 	UPROPERTY(Category = Camera, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly)
 	float MoveSpeed;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly)
 	float TurnRate;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly)
 	float RollDistance;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly)
 	float Health;
 
+	UPROPERTY(EditDefaultsOnly)
+	float Rage;
 
+	UPROPERTY(EditDefaultsOnly)
+	float RageDrainPerSecond;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enum)
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enum)
 	State CharacterState;
 
 	UPROPERTY(Category = Collision, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UCapsuleComponent* CapsuleCollider;
 
 	
-
 	FVector RollStartingPoint;
 	FVector RollDestination;
 
@@ -90,6 +96,7 @@ protected:
 	void OnShootReleased();
 	void OnAltShootPressed();
 	void OnAltShootReleased();
+	void OnDebugRagePressed();
 
 	//UFUNCTION()
 	//void OnComponentBeginOverlap(AActor* other);
@@ -97,11 +104,11 @@ protected:
 	UFUNCTION()
 	void OnCollision(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
-
 	void Roll();
 
-
+	void EquipRevolver();
 
 private:
 	const float MAXHEALTH = 100.f;
+	const float MAXRAGE = 100.f;
 };

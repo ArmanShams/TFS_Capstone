@@ -16,6 +16,8 @@ ACharacterController::ACharacterController()
 	MoveSpeed = .4f;
 	RollDistance = 1.f;
 	Health = 100.f;
+	Rage = 0.f;
+	RageDrainPerSecond = 4.f;
 
 	if (TurnRate == 0.0f)
 	{
@@ -53,9 +55,7 @@ void ACharacterController::BeginPlay()
 	Super::BeginPlay();
 	CharacterState = State::IDLE_HUMAN;
 	
-	CurrentlyEquippedWeapon = GetWorld()->SpawnActor<AWeapon>(DefaultWeapon);
-	CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("hand_r"));
-	CurrentlyEquippedWeapon->bOwnedByPlayer = true;
+	EquipRevolver();
 
 	if (CurrentlyEquippedWeapon != NULL)
 	{
@@ -70,6 +70,35 @@ void ACharacterController::Tick( float DeltaSeconds )
 {
 	Super::Tick(DeltaSeconds);
 
+	if (Rage >= MAXRAGE && CharacterState == State::IDLE_HUMAN)
+	{
+		CharacterState = State::IDLE_WOLF;
+		UE_LOG(LogTemp, Display, TEXT("Player 'Transformed' to wolf"));
+
+		USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(NULL, TEXT("SkeletalMesh'/Game/Geometry/Characters/Werewolf/M_Werewolf.M_Werewolf'"), NULL, LOAD_None, NULL);
+		if (NewMesh)
+		{
+			GetMesh()->SetSkeletalMesh(NewMesh);
+		}
+	}
+
+	if (Rage <= 0.1f && CharacterState == State::IDLE_WOLF)
+	{
+		CharacterState = State::IDLE_HUMAN;
+		UE_LOG(LogTemp, Display, TEXT("Player 'Transformed' to human"));
+
+		USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(NULL, TEXT("SkeletalMesh'/Game/Geometry/Characters/VincentArgo/SK_Vincent_Proxy.SK_Vincent_Proxy'"), NULL, LOAD_None, NULL);
+		if (NewMesh)
+		{
+			GetMesh()->SetSkeletalMesh(NewMesh);
+		}
+	}
+
+	if (CharacterState == State::IDLE_WOLF || CharacterState == State::ROLLING_WOLF)
+	{
+		Rage -= RageDrainPerSecond * DeltaSeconds;
+	}
+	
 	switch (CharacterState)
 	{
 	default:
@@ -79,11 +108,11 @@ void ACharacterController::Tick( float DeltaSeconds )
 		FVector CurrentPosition = (FMath::Lerp(RootComponent->RelativeLocation, RollDestination, 25.f * DeltaSeconds) - RootComponent->RelativeLocation);
 
 		//RootComponent->SetWorldLocation(FMath::Lerp(RootComponent->RelativeLocation, RollDestination, 0.25f));
-		// Physics Lab 01: Add 2 components that haven't already been added in class or are already not present in the character class.
 		GetMovementComponent()->AddInputVector(CurrentPosition);
 
-		if (RootComponent->RelativeLocation.Y >= RollDestination.Y - 5.3f && RootComponent->RelativeLocation.X >= RollDestination.X - 5.3f
-			&& RootComponent->RelativeLocation.Y <= RollDestination.Y + 5.3f && RootComponent->RelativeLocation.X <= RollDestination.X + 5.3f)
+		//if (RootComponent->RelativeLocation.Y >= RollDestination.Y - 5.3f && RootComponent->RelativeLocation.X >= RollDestination.X - 5.3f
+		//	&& RootComponent->RelativeLocation.Y <= RollDestination.Y + 5.3f && RootComponent->RelativeLocation.X <= RollDestination.X + 5.3f)
+		if (FVector::Dist(RootComponent->RelativeLocation, RollDestination) <= 5.3f)
 		{
 			GetMovementComponent()->StopActiveMovement();
 			UE_LOG(LogTemp, Display, TEXT("Setting state to idle."));
@@ -107,21 +136,31 @@ void ACharacterController::SetupPlayerInputComponent(class UInputComponent* InIn
 	InInputComponent->BindAction(TEXT("AltShoot"), IE_Pressed, this, &ThisClass::OnAltShootPressed);
 	InInputComponent->BindAction(TEXT("AltShoot"), IE_Released, this, &ThisClass::OnAltShootReleased);
 	InInputComponent->BindAction(TEXT("Roll"), IE_Pressed, this, &ThisClass::OnRollPressed);
+	InInputComponent->BindAction(TEXT("DebugRage"), IE_Pressed, this, &ThisClass::OnDebugRagePressed);
 
+}
+
+float ACharacterController::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
+{
+	float NewHealth = Health;
+	NewHealth -= DamageAmount;
+
+	if (NewHealth > MAXHEALTH)
+	{
+		NewHealth = MAXHEALTH;
+	}
+
+	UE_LOG(LogTemp, Display, TEXT("Player health modified, health is now: %f"), Health);
+
+	Health = NewHealth;
+
+	return Health;
 }
 
 void ACharacterController::ModifyHealth(float mod)
 {
 	// Prevention of adding health greater than the maximum currently disabled.
 	
-	Health += mod;
-	UE_LOG(LogTemp, Display, TEXT("Player health modified, health is now: %d"), Health);
-	
-	if (Health > MAXHEALTH)
-	{
-		Health = MAXHEALTH;
-		UE_LOG(LogTemp, Display, TEXT("Attempted to modify player health but the modified value exceeded the player's maximum health. Health after modification: %d"), Health);
-	}	
 }
 
 void ACharacterController::EquipNewWeapon(AWeapon* newWeapon)
@@ -162,7 +201,6 @@ void ACharacterController::OnMouseMove(float scale)
 			FVector Diff = FVector(MousePosition.X - CenterPoint.X, MousePosition.Y - CenterPoint.Y, 0.f);
 			
 			GetMesh()->SetRelativeRotation(FMath::Lerp(GetMesh()->RelativeRotation, FRotator(0.f, Diff.Rotation().Yaw, 0.f), TurnRate));
-
 		}
 	}
 }
@@ -214,9 +252,21 @@ void ACharacterController::Roll()
 
 }
 
+void ACharacterController::EquipRevolver()
+{
+	CurrentlyEquippedWeapon = GetWorld()->SpawnActor<AWeapon>(DefaultWeapon);
+	CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(90.f, 180.f, 0.f));
+	CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("hand_r"));
+	CurrentlyEquippedWeapon->bOwnedByPlayer = true;
+}
+
 void ACharacterController::OnShootPressed()
 {
-	CurrentlyEquippedWeapon->Fire();
+	if (CharacterState == State::IDLE_HUMAN)
+	{
+		CurrentlyEquippedWeapon->Fire();
+	}
+	
 }
 
 void ACharacterController::OnShootReleased()
@@ -226,12 +276,30 @@ void ACharacterController::OnShootReleased()
 
 void ACharacterController::OnAltShootPressed()
 {
-	CurrentlyEquippedWeapon->AltFire();
+	if (CharacterState == State::IDLE_HUMAN)
+	{
+		CurrentlyEquippedWeapon->AltFire();
+	}
 }
 
 void ACharacterController::OnAltShootReleased()
 {
 
+}
+
+void ACharacterController::OnDebugRagePressed()
+{
+	if (Rage < MAXRAGE)
+	{
+		Rage = MAXRAGE;
+		UE_LOG(LogTemp, Display, TEXT("Rage has been set to maximum %f"), Rage);
+	}
+	else
+	{
+		Rage = 0.f;
+		UE_LOG(LogTemp, Display, TEXT("Rage has been set to minimum %f"), Rage);
+	}
+	
 }
 
 void ACharacterController::OnCollision(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
