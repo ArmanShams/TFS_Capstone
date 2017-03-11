@@ -23,6 +23,7 @@ void UEnemyAnimInstance::AnimNotify_MeleeAtkStart()
 	if (bCanAttack == true)
 	{
 		//call a function on our characters to enable colliders on melee weapons
+
 	}
 }
 

@@ -9,6 +9,7 @@ AEnemyMelee::AEnemyMelee()
 	RootComponent = Collider;
 
 	Collider->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnMeleeWeaponOverlapBegin);
+
 }
 
 void AEnemyMelee::Fire()
@@ -28,3 +29,4 @@ void AEnemyMelee::OnMeleeWeaponHit(AActor * HitActor)
 {
 	UGameplayStatics::ApplyDamage(HitActor, Damage, Instigator->GetController(), this, UDamageType::StaticClass());
 }
+

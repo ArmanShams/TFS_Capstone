@@ -7,6 +7,9 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyAllTypes.h"
 #include "BrainComponent.h"
+#include "EnemyMelee.h"
+#include "Character/CharacterController.h"
+#include "Weapons/Weapon.h"
 
 
 // Sets default values
@@ -30,6 +33,18 @@ AEnemy::AEnemy()
 
 	MeleeRange = 150.0f;
 
+
+	ConstructorHelpers::FClassFinder<AWeapon>WeaponAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/KnifeBP.KnifeBP_C'"));
+
+	if (WeaponAsset.Class)
+
+	{
+
+		UE_LOG(LogTemp, Display, TEXT("WE HAVE FOUND THE CLASS"));
+
+		DefaultWeapon = (UClass*)WeaponAsset.Class;
+
+	}
 }
 
 // Called when the game starts or when spawned
@@ -42,6 +57,16 @@ void AEnemy::BeginPlay()
 	LastAttacked = MAX_FLT;
 	Skill1Cooldown = MAX_FLT;
 	Skill2Cooldown = MAX_FLT;
+
+	EquipKnife();
+
+	if (CurrentlyEquippedWeapon != NULL)
+
+	{
+
+		UE_LOG(LogTemp, Display, TEXT("Knife Equipped"));
+
+	}
 }
 
 // Called every frame
@@ -89,8 +114,7 @@ bool AEnemy::bIsAttacking()
 		{
 			if (UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent()) 
 			{
-				AActor* CurrentTarget = Cast<AActor>(BlackboardComponent->GetValue<UBlackboardKeyType_Object>(TEXT("Target")));
-
+				ACharacterController* CurrentTarget = Cast<ACharacterController>(BlackboardComponent->GetValue<UBlackboardKeyType_Object>(TEXT("Target")));
 			
 			//if (!BrainComponent->GetBlackboardComponent())
 			//{
@@ -106,7 +130,7 @@ bool AEnemy::bIsAttacking()
 					const float CurrentDistance = FVector::Dist(CurrentTargetLocation, MyLocation);
 					//UE_LOG(LogTemp, Warning, TEXT("CurrentTargetLocation is %s"),  *CurrentTargetLocation.ToString());
 					//UE_LOG(LogTemp, Warning, TEXT("MyLocation is %s"), *MyLocation.ToString());
-					UE_LOG(LogTemp, Warning, TEXT("CurrentDistance is %f"), CurrentDistance);
+					//UE_LOG(LogTemp, Warning, TEXT("CurrentDistance is %f"), CurrentDistance);
 					return CurrentDistance < MeleeRange;
 	
 				}
@@ -178,6 +202,18 @@ void AEnemy::Skill2(Effects effect, float Range)
 	//attack has effect application
 
 	//range also gets applied for specific attack
+
+}
+
+void AEnemy::EquipKnife()
+{
+
+	CurrentlyEquippedWeapon = GetWorld()->SpawnActor<AWeapon>(DefaultWeapon);
+
+	CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(0.f, 0.f, 0.f));
+
+	CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("WeaponSocket"));
+
 
 }
 

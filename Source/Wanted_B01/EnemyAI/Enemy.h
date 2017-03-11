@@ -4,7 +4,9 @@
 #pragma once
 
 #include "GameFramework/Character.h"
+#include "Weapons/Weapon.h"
 #include "Enemy.generated.h"
+
 
 UENUM(BlueprintType)
 enum class EState : uint8
@@ -86,7 +88,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enum)
 		EState EnemyState;
 
-		FVector PlayerLocation();
+
+		TSubclassOf<AWeapon> DefaultWeapon;
+		AWeapon* CurrentlyEquippedWeapon;
 
 	UPROPERTY(EditAnywhere)
 		float isInRange;
@@ -105,6 +109,8 @@ protected:
 
 	//enemy's 1st skill, will include an input for status effect application
 	void Skill2(Effects effect, float Range);
+
+	void EquipKnife();
 
 	friend class UEnemyAnimInstance;
 

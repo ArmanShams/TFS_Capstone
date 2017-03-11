@@ -16,11 +16,15 @@ public:
 
 protected:
 	UPROPERTY(VisibleAnywhere)
+		class UMeshComponent* Knife;
+
+
+	UPROPERTY(VisibleAnywhere)
 		class UCapsuleComponent* Collider;
 
 	UPROPERTY(EditDefaultsOnly)
 		float Damage;
-
+	
 	bool bIsSwinging;
 
 private:
@@ -29,7 +33,5 @@ private:
 
 protected:
 	virtual void OnMeleeWeaponHit(AActor* HitActor);
-
-
 };
 
