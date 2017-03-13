@@ -1,58 +1,42 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Wanted_B01.h"
-#include "Weapons/RangedAIProjectile.h"
+#include "Weapons/Weapon_Ranged.h"
 #include "RangedAI.h"
 
 
 ARangedAI::ARangedAI()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
-	// Set the root component
-	RangedAIMesh = GetMesh();
-	RangedAIMesh->GetComponentLocation();
-	RangedAIMesh->GetComponentRotation();
-	RootComponent = RangedAIMesh;
-
-	// Attach the weapon mesh to the character mesh component
-	WeaponMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WeaponMesh"));
-	WeaponMesh->SetupAttachment(RangedAIMesh);
 	
-	// Attach the spawn point for the projectile to the weapon
-	ProjectileSpawnPoint = CreateDefaultSubobject<USceneComponent>(TEXT("ProjectileSpawnPoint"));
-	ProjectileSpawnPoint->SetupAttachment(WeaponMesh);
-	// ProjectileSpawnPoint->SetRelativeLocation(FVector(0.f, 0.f, 0.f));
-	// ProjectileSpawnPoint->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
+	RootComponent = GetMesh();
+	
+	// Weapon Socket
+	const USkeletalMeshSocket* GunSocket;
+	GunSocket = GetMesh()->GetSocketByName(FName("Gun"));
+	FName GunFName = GunSocket->GetFName();
+
+	ConstructorHelpers::FClassFinder<AWeapon_Ranged>WeaponAsset(TEXT("Blueprint'/Game/Blueprints/Enemies/RangedAI/Weapon_RifleBP.Weapon_RifleBP_C'"));
+	if (WeaponAsset.Class)
+	{
+		UE_LOG(LogTemp, Display, TEXT("Enemy Equipped Rifle"));
+		// RifleClass = (UClass*)WeaponAsset.Class;
+	}
 }
 
 void ARangedAI::BeginPlay()
 {
 	Super::BeginPlay();
+	OnFire();
 }
 
 void ARangedAI::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
-}
-
-void ARangedAI::StartSimulation()
-{
-	OnFire();
-}
-
-void ARangedAI::EndSimulation()
-{
+	// FVector::Dist(this->GetComponentLocation(), PlayerReference->GetWorldLocation());
 }
 
 void ARangedAI::OnFire()
 {
-	GEngine->AddOnScreenDebugMessage(-2, 1.f, FColor::White, FString::Printf(TEXT("Attack Triggered!")));
-	// GetWorld()->SpawnActor<ARangedAI>();
-	const FRotator SpawnRotation = ProjectileSpawnPoint->GetComponentRotation();
-	const FVector SpawnLocation = ProjectileSpawnPoint->GetComponentLocation();
 
-	if (ProjectileClassSpawned != NULL) {
-		ARangedAIProjectile* RangedAIProjectile = GetWorld()->SpawnActor<ARangedAIProjectile>(ProjectileClassSpawned, SpawnLocation, SpawnRotation);
-	}
 }

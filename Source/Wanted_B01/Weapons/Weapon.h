@@ -14,25 +14,29 @@ public:
 	// Sets default values for this actor's properties
 	AWeapon();
 
-	UPROPERTY(EditAnywhere)
-	uint8 magCapacity;
-
-	UPROPERTY(EditAnywhere)
-	uint8 currentAmmo;
-
-	UPROPERTY(EditAnywhere)
-	uint8 totalAmmo;
-
-	UPROPERTY(EditAnywhere)
-	float rateOfFire;
-
-	UPROPERTY(EditAnywhere)
-	uint8 damagePerShot;
-
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	
+
 	// Called every frame
-	virtual void Tick( float DeltaSeconds ) override;
+	virtual void Tick(float DeltaSeconds) override;
+
+	virtual bool Fire();
+
+	virtual bool AltFire();
+
+	bool bOwnedByPlayer;
+
+protected:
+	UPROPERTY(EditDefaultsOnly)
+	float RateOfFire;
+
+	float TimeSinceLastFire;
+
+	UPROPERTY(EditDefaultsOnly)
+	float DamagePerAttack;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite)
+	class UStaticMeshComponent* MeshComponent;
+
 	
 };
