@@ -156,6 +156,11 @@ float ACharacterController::TakeDamage(float DamageAmount, struct FDamageEvent c
 
 	Health = NewHealth;
 
+	if (NewHealth <= 0.f)
+	{
+		SetLifeSpan(0.1f);
+	}
+
 	return Health;
 }
 

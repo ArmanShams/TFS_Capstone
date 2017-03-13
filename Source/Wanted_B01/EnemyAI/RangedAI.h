@@ -13,13 +13,14 @@ class WANTED_B01_API ARangedAI : public ACharacter
 
 public:
 	ARangedAI();
+
 	virtual void BeginPlay() override;
+
 	virtual void Tick( float DeltaSeconds ) override;
 
-	// Get the temporary gun class
-	// UPROPERTY(EditDefaultsOnly, Category = Weapon)
-	// TSubclassOf<class ARanged_Weapon> RifleClass;
+	virtual float ARangedAI::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
+protected:
 	// Enemy Weapon Mesh
 	UPROPERTY(VisibleDefaultsOnly, Category = Weapon)
 	class UStaticMeshComponent* WeaponMesh;
@@ -29,10 +30,15 @@ public:
 	class USoundBase* FireSFX;
 
 	// Wseapon's offset location from the character's location
-	UPROPERTY(EditAnywhere, Category = Weapon)
-	FVector WeaponOffset;
+	//UPROPERTY(EditAnywhere, Category = Weapon)
+	//FVector WeaponOffset;
+	float Health;
+	const float MAXHEALTH = 100.f;
 
-protected:
-	void OnFire();
+	// Get the temporary gun class
+	//UPROPERTY(EditDefaultsOnly, Category = Weapon)
+	TSubclassOf<class AWeapon> DefaultWeaponClass;
+	AWeapon* CurrentlyEquippedWeapon;
+
 
 };

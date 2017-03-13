@@ -16,27 +16,63 @@ ARangedAI::ARangedAI()
 	GunSocket = GetMesh()->GetSocketByName(FName("Gun"));
 	FName GunFName = GunSocket->GetFName();
 
-	ConstructorHelpers::FClassFinder<AWeapon_Ranged>WeaponAsset(TEXT("Blueprint'/Game/Blueprints/Enemies/RangedAI/Weapon_RifleBP.Weapon_RifleBP_C'"));
+	
+	Health = MAXHEALTH;
+	
+	ConstructorHelpers::FClassFinder<AWeapon>WeaponAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/Weapon_RifleBP.Weapon_RifleBP_C'"));
 	if (WeaponAsset.Class)
 	{
-		UE_LOG(LogTemp, Display, TEXT("Enemy Equipped Rifle"));
-		// RifleClass = (UClass*)WeaponAsset.Class;
+		
+		DefaultWeaponClass = (UClass*)WeaponAsset.Class;
 	}
 }
+
+float ARangedAI::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
+{
+	float NewHealth = Health;
+	NewHealth -= DamageAmount;
+
+	if (NewHealth > MAXHEALTH)
+	{
+		NewHealth = MAXHEALTH;
+	}
+
+	UE_LOG(LogTemp, Display, TEXT("Player health modified, health is now: %f"), Health);
+
+	Health = NewHealth;
+
+	if (NewHealth <= 0.f)
+	{
+		CurrentlyEquippedWeapon->SetLifeSpan(0.1f);
+		SetLifeSpan(0.1f);
+	}
+
+	return Health;
+}
+
+
+
 
 void ARangedAI::BeginPlay()
 {
 	Super::BeginPlay();
-	OnFire();
+
+	if (DefaultWeaponClass != NULL)
+	{
+		UE_LOG(LogTemp, Display, TEXT("Enemy Equipped Rifle"));
+		CurrentlyEquippedWeapon = GetWorld()->SpawnActor<AWeapon>(DefaultWeaponClass);
+		CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("RightHand"));
+		CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(0.f, 270.f, 0.f));
+
+	}
 }
 
 void ARangedAI::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
+
+
+	CurrentlyEquippedWeapon->Fire();
+
 	// FVector::Dist(this->GetComponentLocation(), PlayerReference->GetWorldLocation());
-}
-
-void ARangedAI::OnFire()
-{
-
 }
