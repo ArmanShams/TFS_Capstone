@@ -60,5 +60,12 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, U
 	UE_LOG(LogTemp, Display, TEXT("PROJECTILE HIT A THING %s"), *OtherActor->GetName());
 	// OtherComp->AddImpulseAtLocation(GetVelocity() * BulletImpulse, GetActorLocation());
 	UGameplayStatics::ApplyDamage(OtherActor, Damage, GetWorld()->GetFirstPlayerController(), this, TSubclassOf<UDamageType>());
+
+	if (Cast<class ACharacterController>(WeaponSpawnedThis->OwnerCharacter))
+	{
+		UE_LOG(LogTemp, Display, TEXT("Owned by a player"));
+	}
+	
+
 	Destroy();
 }

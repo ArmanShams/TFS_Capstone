@@ -38,5 +38,5 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite)
 	class UStaticMeshComponent* MeshComponent;
 
-	
+
 };

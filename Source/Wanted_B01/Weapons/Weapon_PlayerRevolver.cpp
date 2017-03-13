@@ -77,3 +77,4 @@ void AWeapon_PlayerRevolver::Reload()
 	Super::Reload();
 	bFanFiring = false;
 }
+

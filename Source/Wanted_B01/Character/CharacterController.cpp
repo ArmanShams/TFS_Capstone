@@ -136,6 +136,8 @@ void ACharacterController::SetupPlayerInputComponent(class UInputComponent* InIn
 	InInputComponent->BindAction(TEXT("AltShoot"), IE_Pressed, this, &ThisClass::OnAltShootPressed);
 	InInputComponent->BindAction(TEXT("AltShoot"), IE_Released, this, &ThisClass::OnAltShootReleased);
 	InInputComponent->BindAction(TEXT("Roll"), IE_Pressed, this, &ThisClass::OnRollPressed);
+
+	// Debug keybinding, remove later.
 	InInputComponent->BindAction(TEXT("DebugRage"), IE_Pressed, this, &ThisClass::OnDebugRagePressed);
 
 }
@@ -171,7 +173,7 @@ void ACharacterController::EquipNewWeapon(AWeapon* newWeapon)
 
 void ACharacterController::OnMoveForward(float scale)
 {
-	if (CharacterState != State::ROLLING)
+	if (CharacterState != State::ROLLING || CharacterState != State::ROLLING_WOLF)
 	{
 		GetMovementComponent()->AddInputVector(GetActorForwardVector() * scale * MoveSpeed);
 	}
@@ -179,7 +181,7 @@ void ACharacterController::OnMoveForward(float scale)
 
 void ACharacterController::OnMoveRight(float scale)
 {
-	if (CharacterState != State::ROLLING)
+	if (CharacterState != State::ROLLING || CharacterState != State::ROLLING_WOLF)
 	{
 		GetMovementComponent()->AddInputVector(GetActorRightVector() * scale * MoveSpeed);
 	}

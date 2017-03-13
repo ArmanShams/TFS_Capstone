@@ -62,6 +62,7 @@ bool AWeapon_Ranged::Fire()
 			{
 				AProjectile* Temp = GetWorld()->SpawnActor<AProjectile>(ProjectileToFire, MeshComponent->GetSocketLocation(FName("BarrelSocket")), MeshComponent->GetSocketRotation(FName("BarrelSocket")));
 				Temp->Damage = DamagePerAttack;
+				Temp->WeaponSpawnedThis = this;
 
 				if (bOwnedByPlayer)
 				{

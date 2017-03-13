@@ -45,8 +45,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Projectile)
 	float BulletImpulse = 100.0f;
 
-
 	float Damage;
+
+	class AWeapon_Ranged* WeaponSpawnedThis;
 
 	// Called when projectile hits something 
 	UFUNCTION()
