@@ -28,5 +28,6 @@ protected:
 
 	UFUNCTION()
 	void AnimNotify_AttackEnd();
+
 	
 };

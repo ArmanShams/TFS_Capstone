@@ -5,10 +5,8 @@
 
 InteractableTorch::InteractableTorch()
 {
-
 }
 
 InteractableTorch::~InteractableTorch()
 {
-
 }
