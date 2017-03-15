@@ -158,16 +158,26 @@ float ACharacterController::TakeDamage(float DamageAmount, struct FDamageEvent c
 
 	if (NewHealth <= 0.f)
 	{
-		SetLifeSpan(0.1f);
+		UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()), false);
+		//SetLifeSpan(0.1f);
 	}
 
 	return Health;
 }
 
-void ACharacterController::ModifyHealth(float mod)
+
+void ACharacterController::AddRage(float RageToAdd)
 {
-	// Prevention of adding health greater than the maximum currently disabled.
+	float NewRage = Rage;
+	NewRage += RageToAdd;
 	
+	if (NewRage > MAXRAGE)
+	{
+		NewRage = MAXRAGE;
+	}
+
+	Rage = NewRage;
+	UE_LOG(LogTemp, Display, TEXT("Modifying rage: %f"), Rage);
 }
 
 void ACharacterController::EquipNewWeapon(AWeapon* newWeapon)

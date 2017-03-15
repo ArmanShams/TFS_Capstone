@@ -79,15 +79,27 @@ float AEnemy::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEv
 		NewHealth = MAXHEALTH;
 	}
 
-	UE_LOG(LogTemp, Display, TEXT("Player health modified, health is now: %f"), Health);
+	UE_LOG(LogTemp, Display, TEXT("Enemy health modified, health is now: %f"), Health);
 
 	Health = NewHealth;
 
+	// Modify player's rage based on the amount of damage dealt.
+	float RageGeneratedFromDamage = DamageAmount / 2.4f;
+	//RageGeneratedFromDamage 
+
+	ACharacterController* player = Cast<ACharacterController>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	player->AddRage(RageGeneratedFromDamage);
+
 	if (NewHealth <= 0.f)
 	{
+		player->AddRage(RageGeneratedFromDamage * 0.65f);
 		CurrentlyEquippedWeapon->SetLifeSpan(0.1f);
 		SetLifeSpan(0.1f);
 	}
+
+
+
+
 
 	return Health;
 }

@@ -3,6 +3,7 @@
 #include "Wanted_B01.h"
 #include "BTService_FindTarget.h"
 #include "AIController.h"
+#include "Character/CharacterController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/PlayerState.h"
 #include "Perception/AIPerceptionComponent.h"
@@ -28,8 +29,20 @@ void UBTService_FindTarget::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* N
 			OwnerComp.GetAIOwner()->StopMovement();
 			test = 0;
 		}
-		AActor* HostileActor = HostileActors[0];
-		OwnerComp.GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), HostileActor);
+		AActor* HostileActor = NULL; //= HostileActors[0];
+		
+		for (int i = 0; i < HostileActors.Num(); i++)
+		{
+			if (Cast<ACharacterController>(HostileActors[i]))
+			{
+				HostileActor = HostileActors[i];
+			}
+		}
+
+		if (HostileActor != NULL)
+		{
+			OwnerComp.GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), Cast<AActor>(HostileActor));
+		}
 		return;
 	}
 

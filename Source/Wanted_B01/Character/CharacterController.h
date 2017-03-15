@@ -39,10 +39,10 @@ public:
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
-	void ModifyHealth(float mod);
-
+	virtual void AddRage(float RageToAdd);
+	
 	void EquipNewWeapon(AWeapon* newWeapon);
-
+	
 
 
 protected:
