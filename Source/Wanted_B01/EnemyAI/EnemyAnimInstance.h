@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings
 
 #pragma once
 
@@ -11,12 +11,19 @@ class WANTED_B01_API UEnemyAnimInstance : public UAnimInstance
 	GENERATED_BODY()
 	
 public:
-
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	bool bIsAttacking;
-	
+	bool bCanAttack;
+
+protected:
+	UFUNCTION()
+		void AnimNotify_MeleeAtkStart();
+
+	UFUNCTION()
+		void AnimNotify_MeleeAtkEnd();
+
+
 	friend class AEnemy;
 };

@@ -19,7 +19,7 @@ AEnemy::AEnemy()
 	PrimaryActorTick.bCanEverTick = true;
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
-	Health = 100;
+	Health = MAXHEALTH;
 
 	MoveSpeed = .04f;
 
@@ -68,6 +68,31 @@ void AEnemy::BeginPlay()
 
 	}
 }
+
+float AEnemy::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
+{
+	float NewHealth = Health;
+	NewHealth -= DamageAmount;
+
+	if (NewHealth > MAXHEALTH)
+	{
+		NewHealth = MAXHEALTH;
+	}
+
+	UE_LOG(LogTemp, Display, TEXT("Player health modified, health is now: %f"), Health);
+
+	Health = NewHealth;
+
+	if (NewHealth <= 0.f)
+	{
+		CurrentlyEquippedWeapon->SetLifeSpan(0.1f);
+		SetLifeSpan(0.1f);
+	}
+
+	return Health;
+}
+
+
 
 // Called every frame
 void AEnemy::Tick(float DeltaTime)

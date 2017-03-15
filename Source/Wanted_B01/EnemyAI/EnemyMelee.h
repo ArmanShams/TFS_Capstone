@@ -12,18 +12,20 @@ class WANTED_B01_API AEnemyMelee : public AWeapon
 
 public:
 	AEnemyMelee();
-	virtual void Fire() override;
+	
+	virtual bool Fire() override;
+
+	
 
 protected:
 	UPROPERTY(VisibleAnywhere)
-		class UMeshComponent* Knife;
-
+	class UMeshComponent* Knife;
 
 	UPROPERTY(VisibleAnywhere)
-		class UCapsuleComponent* Collider;
+	class UCapsuleComponent* Collider;
 
 	UPROPERTY(EditDefaultsOnly)
-		float Damage;
+	float Damage;
 	
 	bool bIsSwinging;
 

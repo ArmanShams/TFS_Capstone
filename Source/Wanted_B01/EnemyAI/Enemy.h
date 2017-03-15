@@ -48,6 +48,9 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
+
 	void Enemy();
 
 	UPROPERTY(EditInstanceOnly)
@@ -57,7 +60,7 @@ public:
 	
 protected:
 	UPROPERTY(EditAnywhere)
-		uint8 Health;
+		float Health;
 
 	UPROPERTY(EditAnywhere)
 		float MoveSpeed;
@@ -113,5 +116,8 @@ protected:
 	void EquipKnife();
 
 	friend class UEnemyAnimInstance;
+
+private:
+	const float MAXHEALTH = 100.f;
 
 };
