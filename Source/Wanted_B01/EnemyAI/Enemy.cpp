@@ -247,7 +247,7 @@ void AEnemy::EquipKnife()
 
 	CurrentlyEquippedWeapon = GetWorld()->SpawnActor<AWeapon>(DefaultWeapon);
 
-	CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(0.f, 0.f, 0.f));
+	CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(25.199892f, -90.000732f, 89.999687f));
 
 	CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("WeaponSocket"));
 

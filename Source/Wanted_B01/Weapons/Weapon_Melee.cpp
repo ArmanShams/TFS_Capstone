@@ -10,7 +10,7 @@ AWeapon_Melee::AWeapon_Melee()
 {
 	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("ColliderComponent"));
 	CapsuleComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
-	CapsuleComponent->OnComponentHit.AddDynamic(this, &ThisClass::OnHit);
+	CapsuleComponent->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnMeleeWeaponOverlapBegin);
 }
 
 void AWeapon_Melee::BeginPlay()
@@ -44,8 +44,9 @@ bool AWeapon_Melee::AltFire()
 	return false;
 }
 
-void AWeapon_Melee::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+void AWeapon_Melee::OnMeleeWeaponOverlapBegin(UPrimitiveComponent * HitComponent, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
 {
 	UGameplayStatics::ApplyDamage(OtherActor, DamagePerAttack, GetWorld()->GetFirstPlayerController(), this, TSubclassOf<UDamageType>());
 }
+
 
