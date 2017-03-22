@@ -92,11 +92,11 @@ protected:
 		EState EnemyState;
 
 
-		TSubclassOf<AWeapon> DefaultWeapon;
-		AWeapon* CurrentlyEquippedWeapon;
+	TSubclassOf<AWeapon> DefaultWeapon;
+	AWeapon* CurrentlyEquippedWeapon;
 
 	UPROPERTY(EditAnywhere)
-		float isInRange;
+	float isInRange;
 
 	int32 AttackType;
 

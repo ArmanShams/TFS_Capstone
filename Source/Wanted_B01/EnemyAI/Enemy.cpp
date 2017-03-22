@@ -10,7 +10,8 @@
 #include "EnemyMelee.h"
 #include "Character/CharacterController.h"
 #include "Weapons/Weapon.h"
-
+#include "Weapons/Weapon_Melee.h"
+#include "Weapons/Weapon_Ranged.h"
 
 // Sets default values
 AEnemy::AEnemy()
@@ -34,16 +35,13 @@ AEnemy::AEnemy()
 	MeleeRange = 150.0f;
 
 
-	ConstructorHelpers::FClassFinder<AWeapon>WeaponAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/KnifeBP.KnifeBP_C'"));
+	ConstructorHelpers::FClassFinder<AWeapon>WeaponAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/KnifeBP_Arman.KnifeBP_Arman_C'"));
 
 	if (WeaponAsset.Class)
-
 	{
-
 		UE_LOG(LogTemp, Display, TEXT("WE HAVE FOUND THE CLASS"));
 
 		DefaultWeapon = (UClass*)WeaponAsset.Class;
-
 	}
 }
 
@@ -61,7 +59,6 @@ void AEnemy::BeginPlay()
 	EquipKnife();
 
 	if (CurrentlyEquippedWeapon != NULL)
-
 	{
 
 		UE_LOG(LogTemp, Display, TEXT("Knife Equipped"));
@@ -96,10 +93,6 @@ float AEnemy::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEv
 		CurrentlyEquippedWeapon->SetLifeSpan(0.1f);
 		SetLifeSpan(0.1f);
 	}
-
-
-
-
 
 	return Health;
 }

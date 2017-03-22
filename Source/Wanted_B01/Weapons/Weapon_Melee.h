@@ -27,6 +27,12 @@ public:
 
 	virtual bool AltFire() override;
 
+	virtual void ToggleCollider();
+
+	UPROPERTY(EditDefaultsOnly)
+	bool bMultiTap;
+
+	bool bHasHit;
 
 protected:
 	UFUNCTION()
@@ -35,4 +41,10 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite)
 	class UCapsuleComponent* CapsuleComponent;
 	
+	FName CollisionProfileString;
+
+	bool bCollisionEnabled;
+
+	
+
 };

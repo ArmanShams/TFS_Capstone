@@ -72,7 +72,7 @@ void ARangedAI::Tick( float DeltaTime )
 	Super::Tick( DeltaTime );
 
 
-	CurrentlyEquippedWeapon->Fire();
+	//CurrentlyEquippedWeapon->Fire();
 
 	// FVector::Dist(this->GetComponentLocation(), PlayerReference->GetWorldLocation());
 }

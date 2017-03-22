@@ -75,10 +75,14 @@ void ACharacterController::Tick( float DeltaSeconds )
 		CharacterState = State::IDLE_WOLF;
 		UE_LOG(LogTemp, Display, TEXT("Player 'Transformed' to wolf"));
 
-		USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(NULL, TEXT("SkeletalMesh'/Game/Geometry/Characters/Werewolf/M_Werewolf.M_Werewolf'"), NULL, LOAD_None, NULL);
+		//USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(NULL, TEXT("SkeletalMesh'/Game/Geometry/Characters/Werewolf/M_Werewolf.M_Werewolf'"), NULL, LOAD_None, NULL);
+
+		USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(NULL, TEXT("SkeletalMesh'/Game/MixamoAnimPack/Mixamo_Vanguard/Mesh/Vanguard_by_T__Choonyung.Vanguard_by_T__Choonyung'"), NULL, LOAD_None, NULL);
+		
 		if (NewMesh)
 		{
 			GetMesh()->SetSkeletalMesh(NewMesh);
+			//GetMesh()->SetAnimInstanceClass();
 		}
 	}
 
@@ -152,7 +156,7 @@ float ACharacterController::TakeDamage(float DamageAmount, struct FDamageEvent c
 		NewHealth = MAXHEALTH;
 	}
 
-	UE_LOG(LogTemp, Display, TEXT("Player health modified, health is now: %f"), Health);
+	UE_LOG(LogTemp, Display, TEXT("Player health modified, health is now: %f"), NewHealth);
 
 	Health = NewHealth;
 

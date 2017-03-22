@@ -82,6 +82,7 @@ protected:
 
 
 	TSubclassOf<AWeapon> DefaultWeapon;
+	TSubclassOf<AWeapon> WolfWeapon;
 	AWeapon* CurrentlyEquippedWeapon;
 
 protected:
