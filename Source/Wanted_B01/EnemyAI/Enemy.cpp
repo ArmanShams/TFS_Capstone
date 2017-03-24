@@ -40,7 +40,6 @@ AEnemy::AEnemy()
 	if (WeaponAsset.Class)
 	{
 		UE_LOG(LogTemp, Display, TEXT("WE HAVE FOUND THE CLASS"));
-
 		DefaultWeapon = (UClass*)WeaponAsset.Class;
 	}
 }
@@ -69,6 +68,7 @@ void AEnemy::BeginPlay()
 float AEnemy::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
 {
 	float NewHealth = Health;
+	
 	NewHealth -= DamageAmount;
 
 	if (NewHealth > MAXHEALTH)
@@ -76,7 +76,7 @@ float AEnemy::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEv
 		NewHealth = MAXHEALTH;
 	}
 
-	UE_LOG(LogTemp, Display, TEXT("Enemy health modified, health is now: %f"), Health);
+	UE_LOG(LogTemp, Display, TEXT("Enemy health modified, health was %f, now: %f"), Health, NewHealth);
 
 	Health = NewHealth;
 
@@ -139,7 +139,6 @@ bool AEnemy::bIsAttacking()
 {
 	if (AAIController* AIController = Cast<AAIController>(GetController()))
 	{
-
 		if (UBrainComponent* BrainComponent = AIController->GetBrainComponent())
 		{
 			if (UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent()) 

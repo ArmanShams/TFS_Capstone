@@ -25,7 +25,13 @@ public:
 
 	virtual bool Fire() override;
 
+	virtual bool Fire(AttackTypes::MeleeAttackType NewAttackType);
+
 	virtual bool AltFire() override;
+
+	virtual bool AltFire(AttackTypes::MeleeAttackType NewAttackType);
+
+	virtual void SetAttackType(AttackTypes::MeleeAttackType NewAttackType);
 
 	virtual void ToggleCollider();
 
@@ -40,7 +46,9 @@ protected:
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite)
 	class UCapsuleComponent* CapsuleComponent;
-	
+
+	AttackTypes::MeleeAttackType AttackType;
+
 	FName CollisionProfileString;
 
 	bool bCollisionEnabled;

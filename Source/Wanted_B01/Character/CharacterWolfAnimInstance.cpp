@@ -18,7 +18,8 @@ void UCharacterWolfAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	if (CharacterController)
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("I can attack now"));
-		//bCanAttack = CharacterController->bIsAttacking();
+		bCanAttack = CharacterController->bIsMeleeAttacking;
+		CurrentMeleeAttackType = CharacterController->CurrentMeleeAttackType;
 	}
 }
 
@@ -31,6 +32,7 @@ void UCharacterWolfAnimInstance::AnimNotify_MeleeAtkStart()
 		if (Cast<AWeapon_Melee>(CharacterController->CurrentlyEquippedWeapon))
 		{
 			Cast<AWeapon_Melee>(CharacterController->CurrentlyEquippedWeapon)->ToggleCollider();
+			Cast<AWeapon_Melee>(CharacterController->CurrentlyEquippedWeapon)->SetAttackType(CurrentMeleeAttackType);
 		}
 	}
 }
@@ -43,6 +45,9 @@ void UCharacterWolfAnimInstance::AnimNotify_MeleeAtkEnd()
 	{
 		Cast<AWeapon_Melee>(CharacterController->CurrentlyEquippedWeapon)->ToggleCollider();
 		Cast<AWeapon_Melee>(CharacterController->CurrentlyEquippedWeapon)->bHasHit = false;
+		Cast<AWeapon_Melee>(CharacterController->CurrentlyEquippedWeapon)->SetAttackType(AttackTypes::NONE);
+		CharacterController->CurrentMeleeAttackType = AttackTypes::NONE;
+		CharacterController->bIsMeleeAttacking = false;
 	}
 	//call a function on our character to disable colliders on melee weapons
 }

@@ -13,22 +13,26 @@ class WANTED_B01_API UCharacterWolfAnimInstance : public UAnimInstance
 {
 	GENERATED_BODY()
 	
-	public:
-		virtual void NativeUpdateAnimation(float DeltaSeconds) override;
+public:
+	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
-	protected:
-		UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-			bool bCanAttack;
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool bCanAttack;
 
-	protected:
-		UFUNCTION()
-			void AnimNotify_MeleeAtkStart();
+	AttackTypes::MeleeAttackType CurrentMeleeAttackType;
 
-		UFUNCTION()
-			void AnimNotify_MeleeAtkEnd();
+protected:
+	UFUNCTION()
+	void AnimNotify_MeleeAtkStart();
 
-		class ACharacterController* CharacterController;
+	UFUNCTION()
+	void AnimNotify_MeleeAtkEnd();
 
-		friend class ACharacterController;
+
+
+	class ACharacterController* CharacterController;
+
+	friend class ACharacterController;
 
 };

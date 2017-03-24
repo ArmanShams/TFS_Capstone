@@ -7,6 +7,8 @@
 
 #include "CharacterController.generated.h"
 
+
+
 UENUM(BlueprintType)
 enum class State : uint8
 {
@@ -16,6 +18,7 @@ enum class State : uint8
 	ROLLING_WOLF	UMETA(DisplayName = "Rolling_Wolf")
 
 };
+
 
 UCLASS(Blueprintable)
 class WANTED_B01_API ACharacterController : public ACharacter
@@ -43,7 +46,7 @@ public:
 	
 	void EquipNewWeapon(AWeapon* newWeapon);
 	
-
+	//virtual bool bIsAttacking();
 
 protected:
 	UPROPERTY(Category = Camera, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -70,8 +73,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	float RageDrainPerSecond;
 
+	bool bIsMeleeAttacking;
+
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enum)
 	State CharacterState;
+	AttackTypes::MeleeAttackType CurrentMeleeAttackType;
 
 	UPROPERTY(Category = Collision, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UCapsuleComponent* CapsuleCollider;
@@ -108,6 +114,8 @@ protected:
 	void Roll();
 
 	void EquipRevolver();
+
+	friend class UCharacterWolfAnimInstance;
 
 private:
 	const float MAXHEALTH = 100.f;

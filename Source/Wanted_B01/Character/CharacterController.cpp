@@ -39,13 +39,20 @@ ACharacterController::ACharacterController()
 	CameraComponent->AttachToComponent(CameraBoom, FAttachmentTransformRules::KeepRelativeTransform);
 
 
-	ConstructorHelpers::FClassFinder<AWeapon>WeaponAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/PlayerRevolverBlueprint.PlayerRevolverBlueprint_C'"));
-	if (WeaponAsset.Class)
+	ConstructorHelpers::FClassFinder<AWeapon>RangedWeaponAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/PlayerRevolverBlueprint.PlayerRevolverBlueprint_C'"));
+	if (RangedWeaponAsset.Class)
 	{
-		UE_LOG(LogTemp, Display, TEXT("WE HAVE FOUND THE CLASS"));
-		DefaultWeapon = (UClass*)WeaponAsset.Class;
+		UE_LOG(LogTemp, Display, TEXT("WE HAVE FOUND THE REVOLVER CLASS"));
+		DefaultWeapon = (UClass*)RangedWeaponAsset.Class;
 	}
-
+	ConstructorHelpers::FClassFinder<AWeapon>WolfMeleeWeaponAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/WolfMeleeWeapon.WolfMeleeWeapon_C'"));
+	if (WolfMeleeWeaponAsset.Class)
+	{
+		UE_LOG(LogTemp, Display, TEXT("WE HAVE FOUND THE WOLF MELEE CLASS"));
+		WolfWeapon = (UClass*)WolfMeleeWeaponAsset.Class;
+	}
+	CurrentMeleeAttackType = AttackTypes::NONE;
+	bIsMeleeAttacking = false;
 }
 
 
@@ -77,12 +84,17 @@ void ACharacterController::Tick( float DeltaSeconds )
 
 		//USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(NULL, TEXT("SkeletalMesh'/Game/Geometry/Characters/Werewolf/M_Werewolf.M_Werewolf'"), NULL, LOAD_None, NULL);
 
-		USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(NULL, TEXT("SkeletalMesh'/Game/MixamoAnimPack/Mixamo_Vanguard/Mesh/Vanguard_by_T__Choonyung.Vanguard_by_T__Choonyung'"), NULL, LOAD_None, NULL);
-		
+		USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(NULL, TEXT("SkeletalMesh'/Game/MixamoAnimPack/Mixamo_Adam/Mesh/Maximo_Adam.Maximo_Adam'"), NULL, LOAD_None, NULL);
+		UAnimBlueprint* NewAnimInstance = LoadObject<UAnimBlueprint>(NULL, TEXT("AnimBlueprint'/Game/Blueprints/Player/CharacterControllerWolfPlacehonder.CharacterControllerWolfPlacehonder'"), NULL, LOAD_None, NULL);
 		if (NewMesh)
 		{
 			GetMesh()->SetSkeletalMesh(NewMesh);
-			//GetMesh()->SetAnimInstanceClass();
+			GetMesh()->SetAnimInstanceClass(NewAnimInstance->GetAnimBlueprintGeneratedClass());
+
+			CurrentlyEquippedWeapon = GetWorld()->SpawnActor<AWeapon>(WolfWeapon);
+			//CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(90.f, 180.f, 0.f));
+			CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("WeaponSocket"));
+			CurrentlyEquippedWeapon->bOwnedByPlayer = true;
 		}
 	}
 
@@ -96,6 +108,8 @@ void ACharacterController::Tick( float DeltaSeconds )
 		{
 			GetMesh()->SetSkeletalMesh(NewMesh);
 		}
+		EquipRevolver();
+		Rage = 0.0f;
 	}
 
 	if (CharacterState == State::IDLE_WOLF || CharacterState == State::ROLLING_WOLF)
@@ -169,7 +183,6 @@ float ACharacterController::TakeDamage(float DamageAmount, struct FDamageEvent c
 	return Health;
 }
 
-
 void ACharacterController::AddRage(float RageToAdd)
 {
 	float NewRage = Rage;
@@ -188,7 +201,6 @@ void ACharacterController::EquipNewWeapon(AWeapon* newWeapon)
 {
 	//CurrentlyEquippedWeapon = newWeapon;
 }
-
 
 void ACharacterController::OnMoveForward(float scale)
 {
@@ -287,7 +299,12 @@ void ACharacterController::OnShootPressed()
 	{
 		CurrentlyEquippedWeapon->Fire();
 	}
-	
+	if (CharacterState == State::IDLE_WOLF)
+	{
+		bIsMeleeAttacking = true;
+		CurrentMeleeAttackType = AttackTypes::LIGHT;
+		//Cast<UCharacterWolfAnimInstance>()->bCanAttack = true;
+	}
 }
 
 void ACharacterController::OnShootReleased()
@@ -301,6 +318,12 @@ void ACharacterController::OnAltShootPressed()
 	{
 		CurrentlyEquippedWeapon->AltFire();
 	}
+	if (CharacterState == State::IDLE_WOLF)
+	{
+		bIsMeleeAttacking = true;
+		CurrentMeleeAttackType = AttackTypes::HEAVY;
+		//Cast<UCharacterWolfAnimInstance>()->bCanAttack = true;
+	}
 }
 
 void ACharacterController::OnAltShootReleased()
@@ -310,7 +333,7 @@ void ACharacterController::OnAltShootReleased()
 
 void ACharacterController::OnDebugRagePressed()
 {
-	if (Rage < MAXRAGE)
+	if (Rage <= MAXRAGE - 1.0f)
 	{
 		Rage = MAXRAGE;
 		UE_LOG(LogTemp, Display, TEXT("Rage has been set to maximum %f"), Rage);
