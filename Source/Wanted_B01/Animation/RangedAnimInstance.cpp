@@ -9,22 +9,18 @@ void URangedAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	Super::NativeUpdateAnimation(DeltaSeconds);
 	{
 		//	TryGetPawnOwner: Targets the AnimInstance Reference and returns the value of pawn reference 
-
-		ARangedAI* RangedAI = Cast<ARangedAI>(TryGetPawnOwner());
-
-		if (RangedAI)
-		{
-			bIsShooting = RangedAI->Aim();
+		if (ARangedAI* RangedAI = Cast<ARangedAI>(TryGetPawnOwner())) {
+			MovementSpeed = RangedAI->GetVelocity().Size();
 		}
 	}
 }
 
 void URangedAnimInstance::AnimNotify_StartShooting()
 {
-	bIsShooting = true;
+	UE_LOG(LogTemp, Warning, TEXT("RangedAI AnimNotify_StartShooting"));
 }
 
 void URangedAnimInstance::AnimNotify_StopShooting()
 {
-	bIsShooting = false;
+	UE_LOG(LogTemp, Warning, TEXT("RangedAI AnimNotify_StartShooting"));
 }

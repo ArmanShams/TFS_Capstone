@@ -17,6 +17,7 @@ AProjectile::AProjectile()
 	CollisionComponent->OnComponentHit.AddDynamic(this, &ThisClass::OnHit);
 	CollisionComponent->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Ignore);
 
+
 	// Root Component
 	RootComponent = CollisionComponent;
 
@@ -27,12 +28,13 @@ AProjectile::AProjectile()
 	MeshComponent->SetStaticMesh(sphere.Object);
 	MeshComponent->SetupAttachment(RootComponent);
 
+
 	// ProjectileMovementComponent used to regulate the projectile's movement 
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
 	ProjectileMovementComponent->UpdatedComponent = RootComponent;
 	ProjectileMovementComponent->ProjectileGravityScale = 0.f;
-	ProjectileMovementComponent->InitialSpeed = 500.f;
-	ProjectileMovementComponent->MaxSpeed = 550.f;
+	ProjectileMovementComponent->InitialSpeed = InitSpeed;
+	ProjectileMovementComponent->MaxSpeed = MaxSpeed;
 	ProjectileMovementComponent->bRotationFollowsVelocity = true;
 	ProjectileMovementComponent->bShouldBounce = false;
 
@@ -55,7 +57,8 @@ void AProjectile::Tick( float DeltaTime )
 void AProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	//GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::White, FString::Printf(TEXT("Projectile hit something")));
-	// UE_LOG(LogTemp, Display, TEXT("PROJECTILE HIT A THING %s"), *OtherActor->GetName());
+	UE_LOG(LogTemp, Display, TEXT("PROJECTILE HIT A THING %s"), *OtherActor->GetName());
+	// OtherComp->AddImpulseAtLocation(GetVelocity() * BulletImpulse, GetActorLocation());
 	UGameplayStatics::ApplyDamage(OtherActor, Damage, GetWorld()->GetFirstPlayerController(), this, TSubclassOf<UDamageType>());
 
 	//if (Cast<class ACharacterController>(WeaponSpawnedThis->OwnerCharacter))

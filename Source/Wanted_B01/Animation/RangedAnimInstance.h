@@ -14,10 +14,10 @@ public:
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly)
 	float MovementSpeed;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly)
 	bool bIsShooting;
 
 	UFUNCTION()
@@ -25,7 +25,5 @@ protected:
 
 	UFUNCTION()
 	void AnimNotify_StopShooting();
-
-	friend class URangedAI;
 
 };
