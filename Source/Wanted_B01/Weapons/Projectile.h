@@ -34,16 +34,7 @@ protected:
 	float SphereRadius = 5.0f;
 
 	UPROPERTY(EditAnywhere, Category = Projectile)
-	float InitSpeed = 100.0f;
-
-	UPROPERTY(EditAnywhere, Category = Projectile)
-	float MaxSpeed = 100.0f;
-
-	UPROPERTY(EditAnywhere, Category = Projectile)
 	float LifeTime = 3.0f;
-
-	UPROPERTY(EditAnywhere, Category = Projectile)
-	float BulletImpulse = 100.0f;
 
 	float Damage;
 

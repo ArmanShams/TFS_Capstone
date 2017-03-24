@@ -6,7 +6,8 @@
 #define ECC_Interactable ECC_GameTraceChannel1
 
 #include "Engine.h"
-
+#include "Runtime/UMG/Public/UMG.h"
+#include "SlateBasics.h"
 
 #define ECC_Interactable ECC_GameTraceChannel1;
 

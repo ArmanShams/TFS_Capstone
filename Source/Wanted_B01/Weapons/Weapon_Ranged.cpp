@@ -50,7 +50,7 @@ void AWeapon_Ranged::Tick( float DeltaSeconds )
 
 bool AWeapon_Ranged::Fire()
 {
-	UE_LOG(LogTemp, Display, TEXT("Current ammo: %u"), CurrentAmmo);
+	// UE_LOG(LogTemp, Display, TEXT("Current ammo: %u"), CurrentAmmo);
 
 	if (Super::Fire())
 	{
@@ -71,17 +71,17 @@ bool AWeapon_Ranged::Fire()
 			}
 			else
 			{
-				UE_LOG(LogTemp, Warning, TEXT("A weapon's static mesh doesn't have a 'BarrelSocket' socket. Please add one"));
+				// UE_LOG(LogTemp, Warning, TEXT("A weapon's static mesh doesn't have a 'BarrelSocket' socket. Please add one"));
 			}
 
 			//UE_LOG(LogTemp, Display, TEXT("Rate of fire: %f"), RateOfFire);
-			UE_LOG(LogTemp, Display, TEXT("Calling Fire on a ranged weapon"));
-			UE_LOG(LogTemp, Display, TEXT("Current ammo after firing: %u"), CurrentAmmo);
+			// UE_LOG(LogTemp, Display, TEXT("Calling Fire on a ranged weapon"));
+			// UE_LOG(LogTemp, Display, TEXT("Current ammo after firing: %u"), CurrentAmmo);
 
 		}
 		if (CurrentAmmo == 0)
 		{
-			UE_LOG(LogTemp, Display, TEXT("Ran out of ammo after firing"));
+			// UE_LOG(LogTemp, Display, TEXT("Ran out of ammo after firing"));
 			Reload();
 		}
 		return true;
@@ -104,7 +104,7 @@ bool AWeapon_Ranged::AltFire()
 
 void AWeapon_Ranged::Reload()
 {
-	UE_LOG(LogTemp, Display, TEXT("Reloading"));
+	// UE_LOG(LogTemp, Display, TEXT("Reloading"));
 	if (MAXIMUM_TOTAL_AMMO != 0)
 	{
 		int8 AmmoNeededToFillMagazine = MagazineCapacity - CurrentAmmo;
@@ -120,13 +120,13 @@ void AWeapon_Ranged::Reload()
 		CurrentAmmo = NewCurrentAmmo;
 		TotalAmmo = NewTotalAmmo;
 
-		UE_LOG(LogTemp, Display, TEXT("Ammo To Add: %i"), AmmoNeededToFillMagazine);
-		UE_LOG(LogTemp, Display, TEXT("Current ammo: %u"), CurrentAmmo);
-		UE_LOG(LogTemp, Display, TEXT("Total ammo: %i"), TotalAmmo);
+		// UE_LOG(LogTemp, Display, TEXT("Ammo To Add: %i"), AmmoNeededToFillMagazine);
+		// UE_LOG(LogTemp, Display, TEXT("Current ammo: %u"), CurrentAmmo);
+		// UE_LOG(LogTemp, Display, TEXT("Total ammo: %i"), TotalAmmo);
 	}
 	else
 	{
-		UE_LOG(LogTemp, Display, TEXT("Weapon has infinite reserve ammo"));
+		// UE_LOG(LogTemp, Display, TEXT("Weapon has infinite reserve ammo"));
 		CurrentAmmo = MagazineCapacity;
 	}
 	

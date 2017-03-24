@@ -12,6 +12,12 @@ AWanted_B01GameMode::AWanted_B01GameMode(const FObjectInitializer& ObjectInitial
 	{
 		DefaultPawnClass = CharacterClassAsset.Class;
 	}
+	
+	//ConstructorHelpers::FClassFinder<UUserWidget>HUDAsset(TEXT("WidgetBlueprint'/Game/Blueprints/Player/HUD.HUD_C'"));
+	//if (HUDAsset.Class)
+	//{
+	//	HUDClass = HUDAsset.Class;
+	//}
+	// 
 
 }
-

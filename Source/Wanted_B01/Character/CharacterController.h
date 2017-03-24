@@ -52,6 +52,13 @@ protected:
 	UPROPERTY(Category = Camera, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
+	TSubclassOf<class UUserWidget> wInGameHud;
+
+	// Variable to hold the widget After Creating it.
+	UUserWidget* InGameHud;
+
+
 	UPROPERTY(EditDefaultsOnly)
 	float MoveSpeed;
 
@@ -111,4 +118,6 @@ protected:
 private:
 	const float MAXHEALTH = 100.f;
 	const float MAXRAGE = 100.f;
+
+	friend class UUIWidget;
 };

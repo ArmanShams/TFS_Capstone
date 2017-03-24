@@ -46,5 +46,5 @@ protected:
 	
 	friend class AProjectle;
 
-	
+	friend class UUIWidget;
 };
