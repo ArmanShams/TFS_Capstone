@@ -37,7 +37,7 @@ float ARangedAI::TakeDamage(float DamageAmount, struct FDamageEvent const& Damag
 		NewHealth = MAXHEALTH;
 	}
 
-	UE_LOG(LogTemp, Display, TEXT("Player health modified, health is now: %f"), Health);
+	UE_LOG(LogTemp, Display, TEXT("Enemy health modified, health is now: %f"), Health);
 
 	Health = NewHealth;
 
@@ -72,7 +72,7 @@ void ARangedAI::Tick( float DeltaTime )
 	Super::Tick( DeltaTime );
 
 
-	CurrentlyEquippedWeapon->Fire();
+	//CurrentlyEquippedWeapon->Fire();
 
 	// FVector::Dist(this->GetComponentLocation(), PlayerReference->GetWorldLocation());
 }

@@ -10,7 +10,8 @@
 #include "EnemyMelee.h"
 #include "Character/CharacterController.h"
 #include "Weapons/Weapon.h"
-
+#include "Weapons/Weapon_Melee.h"
+#include "Weapons/Weapon_Ranged.h"
 
 // Sets default values
 AEnemy::AEnemy()
@@ -34,16 +35,12 @@ AEnemy::AEnemy()
 	MeleeRange = 150.0f;
 
 
-	ConstructorHelpers::FClassFinder<AWeapon>WeaponAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/KnifeBP.KnifeBP_C'"));
+	ConstructorHelpers::FClassFinder<AWeapon>WeaponAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/KnifeBP_Arman.KnifeBP_Arman_C'"));
 
 	if (WeaponAsset.Class)
-
 	{
-
 		UE_LOG(LogTemp, Display, TEXT("WE HAVE FOUND THE CLASS"));
-
 		DefaultWeapon = (UClass*)WeaponAsset.Class;
-
 	}
 }
 
@@ -61,7 +58,6 @@ void AEnemy::BeginPlay()
 	EquipKnife();
 
 	if (CurrentlyEquippedWeapon != NULL)
-
 	{
 
 		UE_LOG(LogTemp, Display, TEXT("Knife Equipped"));
@@ -72,6 +68,7 @@ void AEnemy::BeginPlay()
 float AEnemy::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
 {
 	float NewHealth = Health;
+	
 	NewHealth -= DamageAmount;
 
 	if (NewHealth > MAXHEALTH)
@@ -79,7 +76,7 @@ float AEnemy::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEv
 		NewHealth = MAXHEALTH;
 	}
 
-	UE_LOG(LogTemp, Display, TEXT("Enemy health modified, health is now: %f"), Health);
+	UE_LOG(LogTemp, Display, TEXT("Enemy health modified, health was %f, now: %f"), Health, NewHealth);
 
 	Health = NewHealth;
 
@@ -96,10 +93,6 @@ float AEnemy::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEv
 		CurrentlyEquippedWeapon->SetLifeSpan(0.1f);
 		SetLifeSpan(0.1f);
 	}
-
-
-
-
 
 	return Health;
 }
@@ -146,7 +139,6 @@ bool AEnemy::bIsAttacking()
 {
 	if (AAIController* AIController = Cast<AAIController>(GetController()))
 	{
-
 		if (UBrainComponent* BrainComponent = AIController->GetBrainComponent())
 		{
 			if (UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent()) 
@@ -247,7 +239,7 @@ void AEnemy::EquipKnife()
 
 	CurrentlyEquippedWeapon = GetWorld()->SpawnActor<AWeapon>(DefaultWeapon);
 
-	CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(0.f, 0.f, 0.f));
+	CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(25.199892f, -90.000732f, 89.999687f));
 
 	CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("WeaponSocket"));
 
