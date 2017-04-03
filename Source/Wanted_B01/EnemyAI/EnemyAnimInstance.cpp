@@ -18,7 +18,7 @@ void UEnemyAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	if (EnemyCharacter)
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("I can attack now"));
-		bCanAttack = EnemyCharacter->bIsAttacking();
+		bCanAttack = EnemyCharacter->bIsInRange();
 	}
 }
 

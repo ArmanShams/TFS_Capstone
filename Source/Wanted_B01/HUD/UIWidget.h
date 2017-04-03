@@ -18,32 +18,32 @@ public:
 	virtual void NativeTick(const FGeometry& MyGeometry, float DeltaSeconds) override;
 
 	UFUNCTION(BlueprintCallable, category = "UI")
-		float GetHealthPercent();
+	float GetHealthPercent();
 
 	UFUNCTION(BlueprintCallable, category = "UI")
-		float GetRagePercent();
+	float GetRagePercent();
 
 	UFUNCTION(BlueprintCallable, category = "UI")
-	FString GetAmmoValue();
+	FText GetAmmoValue();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "My New User Widget")
-		FString UIWidget;
+	// The speed at which the progress bars on screen smoothly 'slide'
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player UI")
+	float InterpolationSpeed;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player UI")
-		float Health;
+	UPROPERTY(BlueprintReadOnly, Category = "Player UI")
+	float Health;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player UI")
-		float Rage;
+	UPROPERTY(BlueprintReadOnly, Category = "Player UI")
+	float Rage;
 
-	//UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player UI")
-		uint16 AmmoCount;
+	uint16 AmmoCount;
 
-	//UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player UI")
-		uint16 MagazineCount;
+	uint16 MagazineCount;
 
-	ACharacterController* Player;
-	AWeapon_Ranged* PlayerWeapon;
+	class ACharacterController* Player;
+	class AWeapon_Ranged* PlayerWeapon;
 
 	friend class ACharacterController;
+
 	friend class AWeapon_Ranged;
 };

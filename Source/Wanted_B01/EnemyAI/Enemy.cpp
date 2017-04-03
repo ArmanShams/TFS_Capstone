@@ -18,6 +18,7 @@ AEnemy::AEnemy()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
 	Health = MAXHEALTH;
@@ -32,8 +33,7 @@ AEnemy::AEnemy()
 
 	isInRange = 5.0f;
 
-	MeleeRange = 150.0f;
-
+	AttackRange = 150.0f;
 
 	ConstructorHelpers::FClassFinder<AWeapon>WeaponAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/KnifeBP_Arman.KnifeBP_Arman_C'"));
 
@@ -59,10 +59,9 @@ void AEnemy::BeginPlay()
 
 	if (CurrentlyEquippedWeapon != NULL)
 	{
-
 		UE_LOG(LogTemp, Display, TEXT("Knife Equipped"));
-
 	}
+
 }
 
 float AEnemy::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
@@ -109,48 +108,41 @@ void AEnemy::Tick(float DeltaTime)
 	Skill1Cooldown += DeltaTime;
 	Skill2Cooldown += DeltaTime;
 
-	bIsAttacking();
-	//if (bIsAttacking && LastAttacked >= AttackFrequency && isInRange)
-	//{
-	//	AttackType = FMath::RandRange(0, 2);
+	//bIsAttacking();
 
-	//	Attack(AttackType);
-	//}
 }
 
 // Called to bind functionality to input
 void AEnemy::SetupPlayerInputComponent(class UInputComponent* InputComponent)
 {
 	Super::SetupPlayerInputComponent(InputComponent);
-
 }
 
-
-void AEnemy::Enemy()
+// Returns true if the distance between the Enemy and it's Target is less than AttackRange
+// Uses the enemies default AttackRange
+bool AEnemy::bIsInRange()
 {
-	//kills nothing, does nothing. 
-	//if (isPhil == true)
-	//{
-	//philbertSuspended = PhilbertDoesStupid + ArmanFlipsShit;
-	//}
+	return bIsInRange(AttackRange);
 }
-
-bool AEnemy::bIsAttacking()
+// Returns true if the distance between the Enemy and it's Target is less than the specified OveriddenDesiredRange
+bool AEnemy::bIsInRange(float OveriddenDesiredRange)
 {
+	float DesiredRange = OveriddenDesiredRange;
+
 	if (AAIController* AIController = Cast<AAIController>(GetController()))
 	{
 		if (UBrainComponent* BrainComponent = AIController->GetBrainComponent())
 		{
-			if (UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent()) 
+			if (UBlackboardComponent* BlackboardComponent = BrainComponent->GetBlackboardComponent())
 			{
 				ACharacterController* CurrentTarget = Cast<ACharacterController>(BlackboardComponent->GetValue<UBlackboardKeyType_Object>(TEXT("Target")));
-			
-			//if (!BrainComponent->GetBlackboardComponent())
-			//{
-			//	UE_LOG(LogTemp, Warning, TEXT("broken here"));
-			//}
 
-			//AActor* CurrentTarget = Cast<AActor>(BrainComponent->GetBlackboardComponent()->GetValue<UBlackboardKeyType_Object>(TEXT("Target")));
+				//if (!BrainComponent->GetBlackboardComponent())
+				//{
+				//	UE_LOG(LogTemp, Warning, TEXT("broken here"));
+				//}
+
+				//AActor* CurrentTarget = Cast<AActor>(BrainComponent->GetBlackboardComponent()->GetValue<UBlackboardKeyType_Object>(TEXT("Target")));
 
 				if (CurrentTarget)
 				{
@@ -160,8 +152,8 @@ bool AEnemy::bIsAttacking()
 					//UE_LOG(LogTemp, Warning, TEXT("CurrentTargetLocation is %s"),  *CurrentTargetLocation.ToString());
 					//UE_LOG(LogTemp, Warning, TEXT("MyLocation is %s"), *MyLocation.ToString());
 					//UE_LOG(LogTemp, Warning, TEXT("CurrentDistance is %f"), CurrentDistance);
-					return CurrentDistance < MeleeRange;
-	
+					return CurrentDistance < DesiredRange;
+
 				}
 			}
 		}
@@ -169,6 +161,7 @@ bool AEnemy::bIsAttacking()
 
 	return false;
 }
+
 
 void AEnemy::Attack(int32 AttackType)
 {

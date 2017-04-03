@@ -50,47 +50,44 @@ public:
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
-
-	void Enemy();
-
 	UPROPERTY(EditInstanceOnly)
 	TArray<class ATargetPoint*> PatrolPoints;
 
-	bool bIsAttacking();
-	
+	virtual bool bIsInRange();
+	virtual bool bIsInRange(float OveriddenDesiredRange);
+
 protected:
 	UPROPERTY(EditAnywhere)
-		float Health;
+	float Health;
 
 	UPROPERTY(EditAnywhere)
-		float MoveSpeed;
+	float MoveSpeed;
 
 	UPROPERTY(EditAnywhere)
-		float TurnRate;
+	float TurnRate;
 
 	UPROPERTY(EditDefaultsOnly)
-		float MaxRange = 100.0f;
+	float MaxRange;
 
 	UPROPERTY(EditAnywhere)
-		float LastAttacked;
+	float LastAttacked;
 
 	UPROPERTY(EditAnywhere)
-		float AttackFrequency;
+	float AttackFrequency;
 
 	UPROPERTY(EditAnywhere)
-		float MeleeRange = 150.0f;
-
-	// cooldown for how frequently the skills can be used
-	UPROPERTY(EditAnywhere)
-		float Skill1Cooldown;
+	float AttackRange = 150.0f;
 
 	// cooldown for how frequently the skills can be used
 	UPROPERTY(EditAnywhere)
-		float Skill2Cooldown;
+	float Skill1Cooldown;
+
+	// cooldown for how frequently the skills can be used
+	UPROPERTY(EditAnywhere)
+	float Skill2Cooldown;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enum)
-		EState EnemyState;
-
+	EState EnemyState;
 
 	TSubclassOf<AWeapon> DefaultWeapon;
 	AWeapon* CurrentlyEquippedWeapon;
