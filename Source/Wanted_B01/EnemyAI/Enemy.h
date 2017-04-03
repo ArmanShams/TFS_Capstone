@@ -39,45 +39,54 @@ public:
 	// Sets default values for this character's properties
 	AEnemy();
 
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	
-	// Called every frame
-	virtual void Tick( float DeltaSeconds ) override;
-
-	// Called to bind functionality to input
+	virtual void Tick(float DeltaSeconds) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
-	UPROPERTY(EditInstanceOnly)
-	TArray<class ATargetPoint*> PatrolPoints;
-
 	virtual bool bIsInRange();
 	virtual bool bIsInRange(float OveriddenDesiredRange);
 
+	UPROPERTY(EditInstanceOnly)
+	TArray<class ATargetPoint*> PatrolPoints;
+
 protected:
-	UPROPERTY(EditAnywhere)
+	virtual void EquipWeapon(TSubclassOf<AWeapon> WeaponToEquip);
+
+	UPROPERTY(EditDefaultsOnly)
 	float Health;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly)
 	float MoveSpeed;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly)
 	float TurnRate;
 
 	UPROPERTY(EditDefaultsOnly)
 	float MaxRange;
 
-	UPROPERTY(EditAnywhere)
-	float LastAttacked;
+	UPROPERTY(EditDefaultsOnly)
+	float TimeSinceLastAttack;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly)
 	float AttackFrequency;
 
-	UPROPERTY(EditAnywhere)
-	float AttackRange = 150.0f;
+	UPROPERTY(EditDefaultsOnly)
+	float AttackRange;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enum)
+	EState EnemyState;
+
+	TSubclassOf<AWeapon> DefaultWeapon;
+	AWeapon* CurrentlyEquippedWeapon;
+
+	friend class UEnemyAnimInstance;
+
+	const float MAXHEALTH = 100.f;
+
+	//Unused variables
+	/*
 	// cooldown for how frequently the skills can be used
 	UPROPERTY(EditAnywhere)
 	float Skill1Cooldown;
@@ -86,15 +95,12 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float Skill2Cooldown;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enum)
-	EState EnemyState;
-
-	TSubclassOf<AWeapon> DefaultWeapon;
-	AWeapon* CurrentlyEquippedWeapon;
-
 	UPROPERTY(EditAnywhere)
 	float isInRange;
+	*/
 
+	// Unused functionality
+	/*
 	int32 AttackType;
 
 	void Attack(int32 AttackType);
@@ -109,12 +115,8 @@ protected:
 
 	//enemy's 1st skill, will include an input for status effect application
 	void Skill2(Effects effect, float Range);
+	*/
 
-	void EquipKnife();
-
-	friend class UEnemyAnimInstance;
-
-private:
-	const float MAXHEALTH = 100.f;
+	
 
 };

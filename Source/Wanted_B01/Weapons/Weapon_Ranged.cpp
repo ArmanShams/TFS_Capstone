@@ -25,7 +25,7 @@ void AWeapon_Ranged::BeginPlay()
 	Super::BeginPlay();
 
 	
-	UE_LOG(LogTemp, Display, TEXT("ProjectileSpawnLocation: %s"), *MeshComponent->GetSocketRotation(FName("BarrelSocket")).ToString());
+	//UE_LOG(LogTemp, Display, TEXT("ProjectileSpawnLocation: %s"), *MeshComponent->GetSocketRotation(FName("BarrelSocket")).ToString());
 
 
 	//MeshComponent->SetStaticMesh(Mesh);
@@ -50,10 +50,9 @@ void AWeapon_Ranged::Tick( float DeltaSeconds )
 
 bool AWeapon_Ranged::Fire()
 {
-	UE_LOG(LogTemp, Display, TEXT("Current ammo: %u"), CurrentAmmo);
-
 	if (Super::Fire())
 	{
+		//UE_LOG(LogTemp, Display, TEXT("Current ammo: %u"), CurrentAmmo);
 		if (CurrentAmmo > 0)
 		{
 			CurrentAmmo--;
@@ -75,8 +74,8 @@ bool AWeapon_Ranged::Fire()
 			}
 
 			//UE_LOG(LogTemp, Display, TEXT("Rate of fire: %f"), RateOfFire);
-			UE_LOG(LogTemp, Display, TEXT("Calling Fire on a ranged weapon"));
-			UE_LOG(LogTemp, Display, TEXT("Current ammo after firing: %u"), CurrentAmmo);
+			//UE_LOG(LogTemp, Display, TEXT("Calling Fire on a ranged weapon"));
+			//UE_LOG(LogTemp, Display, TEXT("Current ammo after firing: %u"), CurrentAmmo);
 
 		}
 		if (CurrentAmmo == 0)
@@ -120,13 +119,13 @@ void AWeapon_Ranged::Reload()
 		CurrentAmmo = NewCurrentAmmo;
 		TotalAmmo = NewTotalAmmo;
 
-		UE_LOG(LogTemp, Display, TEXT("Ammo To Add: %i"), AmmoNeededToFillMagazine);
-		UE_LOG(LogTemp, Display, TEXT("Current ammo: %u"), CurrentAmmo);
-		UE_LOG(LogTemp, Display, TEXT("Total ammo: %i"), TotalAmmo);
+		//UE_LOG(LogTemp, Display, TEXT("Ammo To Add: %i"), AmmoNeededToFillMagazine);
+		//UE_LOG(LogTemp, Display, TEXT("Current ammo: %u"), CurrentAmmo);
+		//UE_LOG(LogTemp, Display, TEXT("Total ammo: %i"), TotalAmmo);
 	}
 	else
 	{
-		UE_LOG(LogTemp, Display, TEXT("Weapon has infinite reserve ammo"));
+		//UE_LOG(LogTemp, Display, TEXT("Weapon has infinite reserve ammo"));
 		CurrentAmmo = MagazineCapacity;
 	}
 	
