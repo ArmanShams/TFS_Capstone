@@ -5,7 +5,7 @@
 #include "Weapons/Weapon_Ranged.h"
 #include "Weapons/Weapon_PlayerRevolver.h"
 #include "Environment/Interactable.h"
-
+#include "Blueprint/UserWidget.h"
 
 // Sets default values
 ACharacterController::ACharacterController()
@@ -69,7 +69,28 @@ void ACharacterController::BeginPlay()
 		UE_LOG(LogTemp, Display, TEXT("HasGun"));
 	}
 
-	
+	wInGameHud = LoadClass<UUserWidget>(NULL, TEXT("WidgetBlueprint'/Game/Blueprints/HUD/HUD.HUD_C'"), NULL, LOAD_None, NULL);
+
+	if (wInGameHud) // Check if the Asset is assigned in the blueprint.
+	{
+		// Create the widget and store it.
+		InGameHud = CreateWidget<UUserWidget>(GetWorld(), wInGameHud);
+
+		// now you can use the widget directly since you have a referance for it.
+		// Extra check to  make sure the pointer holds the widget.
+		if (!InGameHud->GetIsVisible())
+		{
+			//UE_LOG(LogTemp, Display, TEXT("We are in the beam!!!!!!!!!!!!!"));
+			//let add it to the view port
+			//InGameHud->AddToPlayerScreen();
+			InGameHud->AddToViewport(80);
+		}
+
+		//Show the Cursor.
+		//bShowMouseCursor = true;
+	}
+
+
 }
 
 // Called every frame
