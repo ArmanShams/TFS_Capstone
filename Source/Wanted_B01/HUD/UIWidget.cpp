@@ -59,6 +59,7 @@ FText UUIWidget::GetAmmoValue()
 	{
 		Arguments.Add("TotalAmmo", FText::AsNumber(PlayerWeapon->TotalAmmo));
 	}
+
 	FText AmmoValue = FText::Format(NSLOCTEXT("UINameSpace", "Ammo", "Ammo: {CurrentAmmo}/{MaxAmmo} \n					{TotalAmmo}"), Arguments);
 	return AmmoValue;
 }

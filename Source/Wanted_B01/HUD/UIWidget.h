@@ -27,7 +27,7 @@ public:
 	FText GetAmmoValue();
 
 	// The speed at which the progress bars on screen smoothly 'slide'
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player UI")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player UI")
 	float InterpolationSpeed;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Player UI")
@@ -44,6 +44,5 @@ public:
 	class AWeapon_Ranged* PlayerWeapon;
 
 	friend class ACharacterController;
-
 	friend class AWeapon_Ranged;
 };
