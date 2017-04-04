@@ -31,8 +31,6 @@ AEnemy::AEnemy()
 
 	AttackFrequency = 5.f;
 
-	isInRange = 5.0f;
-
 	AttackRange = 150.0f;
 
 	ConstructorHelpers::FClassFinder<AWeapon>WeaponAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/KnifeBP_Arman.KnifeBP_Arman_C'"));
@@ -51,11 +49,11 @@ void AEnemy::BeginPlay()
 
 	EnemyState = EState::Idle;
 
-	LastAttacked = MAX_FLT;
-	Skill1Cooldown = MAX_FLT;
-	Skill2Cooldown = MAX_FLT;
-
-	EquipKnife();
+	TimeSinceLastAttack = 0.0f;
+	//Skill1Cooldown = MAX_FLT;
+	//Skill2Cooldown = MAX_FLT;
+	
+	EquipWeapon(DefaultWeapon);
 
 	if (CurrentlyEquippedWeapon != NULL)
 	{
@@ -96,23 +94,19 @@ float AEnemy::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEv
 	return Health;
 }
 
-
-
-// Called every frame
 void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	LastAttacked += DeltaTime;
+	TimeSinceLastAttack += DeltaTime;
 
-	Skill1Cooldown += DeltaTime;
-	Skill2Cooldown += DeltaTime;
+	//Skill1Cooldown += DeltaTime;
+	//Skill2Cooldown += DeltaTime;
 
 	//bIsAttacking();
 
 }
 
-// Called to bind functionality to input
 void AEnemy::SetupPlayerInputComponent(class UInputComponent* InputComponent)
 {
 	Super::SetupPlayerInputComponent(InputComponent);
@@ -162,77 +156,77 @@ bool AEnemy::bIsInRange(float OveriddenDesiredRange)
 	return false;
 }
 
+//
+//void AEnemy::Attack(int32 AttackType)
+//{
+//	LastAttacked = 0.f;
+//
+//
+//	if (AttackType == 0)
+//	{
+//		//BasicAttack();
+//	}
+//
+//	else if ((AttackType == 1) && (Skill1Cooldown >= 10.f))
+//	{
+//		//Skill1();
+//	}
+//
+//	else if ((AttackType == 2) && (Skill2Cooldown >= 10.f))
+//	{
+//		//Skill2();
+//	}
+//
+//	else
+//	{
+//		//BasicAttack();
+//	}
+//
+//}
+//
+//void AEnemy::BasicAttack(Effects effect, float Range)
+//{
+//	//bIsAttacking = true;
+//
+//	//attack has effect application
+//
+//	//range also gets applied for specific attack
+//
+//}
+//
+//void AEnemy::AttackEnd()
+//{
+//	//bIsAttacking = false;
+//}
+//
+//void AEnemy::Skill1(Effects effect, float Range)
+//{
+//	//bIsAttacking = true;
+//
+//	Skill1Cooldown = 0.f;
+//	//attack has effect application
+//
+//	//range also gets applied for specific attack
+//
+//}
+//
+//void AEnemy::Skill2(Effects effect, float Range)
+//{
+//	//bIsAttacking = true;
+//
+//	Skill2Cooldown = 0.f;
+//	//attack has effect application
+//
+//	//range also gets applied for specific attack
+//
+//}
 
-void AEnemy::Attack(int32 AttackType)
+void AEnemy::EquipWeapon(TSubclassOf<AWeapon> WeaponToEquip)
 {
-	LastAttacked = 0.f;
 
+	CurrentlyEquippedWeapon = GetWorld()->SpawnActor<AWeapon>(WeaponToEquip);
 
-	if (AttackType == 0)
-	{
-		//BasicAttack();
-	}
-
-	else if ((AttackType == 1) && (Skill1Cooldown >= 10.f))
-	{
-		//Skill1();
-	}
-
-	else if ((AttackType == 2) && (Skill2Cooldown >= 10.f))
-	{
-		//Skill2();
-	}
-
-	else
-	{
-		//BasicAttack();
-	}
-
-}
-
-void AEnemy::BasicAttack(Effects effect, float Range)
-{
-	//bIsAttacking = true;
-
-	//attack has effect application
-
-	//range also gets applied for specific attack
-
-}
-
-void AEnemy::AttackEnd()
-{
-	//bIsAttacking = false;
-}
-
-void AEnemy::Skill1(Effects effect, float Range)
-{
-	//bIsAttacking = true;
-
-	Skill1Cooldown = 0.f;
-	//attack has effect application
-
-	//range also gets applied for specific attack
-
-}
-
-void AEnemy::Skill2(Effects effect, float Range)
-{
-	//bIsAttacking = true;
-
-	Skill2Cooldown = 0.f;
-	//attack has effect application
-
-	//range also gets applied for specific attack
-
-}
-
-void AEnemy::EquipKnife()
-{
-
-	CurrentlyEquippedWeapon = GetWorld()->SpawnActor<AWeapon>(DefaultWeapon);
-
-	CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(25.199892f, -90.000732f, 89.999687f));
+	CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(25.f, -90.f, 90.f));
 
 	CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("WeaponSocket"));
 
