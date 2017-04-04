@@ -22,6 +22,12 @@ AMinerAI::AMinerAI()
 
 	AttackRange = 150.0f;
 
+	ChargeCooldown = 12.0f;
+
+	TimeSinceLastCharge = ChargeCooldown;
+
+	DistanceToUseCharge = 1500.f;
+
 	// Replace with new weapon asset for respective enemy type.
 	ConstructorHelpers::FClassFinder<AWeapon>WeaponAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/KnifeBP_Arman.KnifeBP_Arman_C'"));
 
@@ -40,6 +46,16 @@ void AMinerAI::BeginPlay()
 void AMinerAI::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+
+	if (TimeSinceLastCharge <= ChargeCooldown)
+	{
+		TimeSinceLastCharge += DeltaSeconds;
+	}
+	
+	if (TimeSinceLastCharge >= ChargeCooldown && bIsInRange(DistanceToUseCharge))
+	{
+		UE_LOG(LogTemp, Display, TEXT("A miner is in range to use the charge."));
+	}
 }
 
 void AMinerAI::SetupPlayerInputComponent(class UInputComponent* InputComponent)

@@ -22,8 +22,17 @@ public:
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 	virtual bool bIsInRange() override;
 	virtual bool bIsInRange(float OveriddenDesiredRange) override;
+
+	// How often in seconds the Miner can use his charge.
+	UPROPERTY(EditDefaultsOnly)
+	float ChargeCooldown;
+
+	// The distance the Miner will be able to use the Charge, not the length of the charge itself.
+	UPROPERTY(EditDefaultsOnly)
+	float DistanceToUseCharge;
 	
 protected:
+	float TimeSinceLastCharge;
 	//virtual void EquipWeapon() override;
 
 };
