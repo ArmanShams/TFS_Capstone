@@ -37,7 +37,7 @@ bool AWeapon::Fire()
 {
 	if (TimeSinceLastFire > RateOfFire)
 	{
-		UE_LOG(LogTemp, Display, TEXT("Trying to call fire on a base class weapon."));
+		//UE_LOG(LogTemp, Display, TEXT("Trying to call fire on a base class weapon."));
 		TimeSinceLastFire = 0.f;
 		return true;
 	}
