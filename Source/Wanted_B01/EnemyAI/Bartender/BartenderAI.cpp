@@ -36,13 +36,13 @@ ABartenderAI::ABartenderAI()
 	FireDOT = 5.f;
 
 	// Replace with new weapon asset for respective enemy type.
-	ConstructorHelpers::FClassFinder<AWeapon>WeaponAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/KnifeBP_Arman.KnifeBP_Arman_C'"));
+	//ConstructorHelpers::FClassFinder<AWeapon>WeaponAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/KnifeBP_Arman.KnifeBP_Arman_C'"));
 
-	if (WeaponAsset.Class)
-	{
-		UE_LOG(LogTemp, Display, TEXT("WE HAVE FOUND THE CLASS"));
-		DefaultWeapon = (UClass*)WeaponAsset.Class;
-	}
+	//if (WeaponAsset.Class)
+	//{
+	//	UE_LOG(LogTemp, Display, TEXT("WE HAVE FOUND THE CLASS"));
+	//	DefaultWeapon = (UClass*)WeaponAsset.Class;
+	//}
 }
 
 void ABartenderAI::BeginPlay()
