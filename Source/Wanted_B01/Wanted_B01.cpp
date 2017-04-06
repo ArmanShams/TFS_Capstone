@@ -5,6 +5,6 @@
 
 IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, Wanted_B01, "Wanted_B01" );
 
-DEFINE_LOG_CATEGORY(LogWanted_B01)
-DEFINE_LOG_CATEGORY(PlayerControl)
+//DEFINE_LOG_CATEGORY(LogWanted_B01)
+//DEFINE_LOG_CATEGORY(PlayerControl)
  

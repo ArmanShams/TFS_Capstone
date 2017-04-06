@@ -7,11 +7,8 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyAllTypes.h"
 #include "BrainComponent.h"
-#include "EnemyMelee.h"
 #include "Character/CharacterController.h"
-#include "Weapons/Weapon.h"
-#include "Weapons/Weapon_Melee.h"
-#include "Weapons/Weapon_Ranged.h"
+
 
 // Sets default values
 AEnemy::AEnemy()
@@ -37,7 +34,7 @@ AEnemy::AEnemy()
 
 	if (WeaponAsset.Class)
 	{
-		UE_LOG(LogTemp, Display, TEXT("WE HAVE FOUND THE CLASS"));
+		//UE_LOG(LogTemp, Display, TEXT("WE HAVE FOUND THE CLASS"));
 		DefaultWeapon = (UClass*)WeaponAsset.Class;
 	}
 }
@@ -94,6 +91,11 @@ float AEnemy::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEv
 	return Health;
 }
 
+AWeapon* AEnemy::GetEquippedWeapon()
+{
+	return CurrentlyEquippedWeapon;
+}
+
 void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -131,13 +133,6 @@ bool AEnemy::bIsInRange(float OveriddenDesiredRange)
 			{
 				ACharacterController* CurrentTarget = Cast<ACharacterController>(BlackboardComponent->GetValue<UBlackboardKeyType_Object>(TEXT("Target")));
 
-				//if (!BrainComponent->GetBlackboardComponent())
-				//{
-				//	UE_LOG(LogTemp, Warning, TEXT("broken here"));
-				//}
-
-				//AActor* CurrentTarget = Cast<AActor>(BrainComponent->GetBlackboardComponent()->GetValue<UBlackboardKeyType_Object>(TEXT("Target")));
-
 				if (CurrentTarget)
 				{
 					const FVector CurrentTargetLocation = CurrentTarget->GetActorLocation();
@@ -156,70 +151,42 @@ bool AEnemy::bIsInRange(float OveriddenDesiredRange)
 	return false;
 }
 
-//
-//void AEnemy::Attack(int32 AttackType)
-//{
-//	LastAttacked = 0.f;
-//
-//
-//	if (AttackType == 0)
-//	{
-//		//BasicAttack();
-//	}
-//
-//	else if ((AttackType == 1) && (Skill1Cooldown >= 10.f))
-//	{
-//		//Skill1();
-//	}
-//
-//	else if ((AttackType == 2) && (Skill2Cooldown >= 10.f))
-//	{
-//		//Skill2();
-//	}
-//
-//	else
-//	{
-//		//BasicAttack();
-//	}
-//
-//}
-//
-//void AEnemy::BasicAttack(Effects effect, float Range)
-//{
-//	//bIsAttacking = true;
-//
-//	//attack has effect application
-//
-//	//range also gets applied for specific attack
-//
-//}
-//
-//void AEnemy::AttackEnd()
-//{
-//	//bIsAttacking = false;
-//}
-//
-//void AEnemy::Skill1(Effects effect, float Range)
-//{
-//	//bIsAttacking = true;
-//
-//	Skill1Cooldown = 0.f;
-//	//attack has effect application
-//
-//	//range also gets applied for specific attack
-//
-//}
-//
-//void AEnemy::Skill2(Effects effect, float Range)
-//{
-//	//bIsAttacking = true;
-//
-//	Skill2Cooldown = 0.f;
-//	//attack has effect application
-//
-//	//range also gets applied for specific attack
-//
-//}
+bool AEnemy::bIsSoftCC()
+{
+	switch (Effects)
+	{
+	case CharacterState::SNARE:
+		return true;
+		break;
+
+	default:
+		return false;
+		break;
+	}
+}
+
+bool AEnemy::bIsHardCC()
+{
+	switch (Effects)
+	{
+	case CharacterState::STUN:
+		return true;
+		break;
+
+	case CharacterState::KNOCKDOWN:
+		return true;
+		break;
+
+	default:
+		return false;
+		break;
+	}
+}
+
+CharacterState::StatusEffect AEnemy::GetStatusEffect()
+{
+	return Effects;
+}
 
 void AEnemy::EquipWeapon(TSubclassOf<AWeapon> WeaponToEquip)
 {
@@ -232,6 +199,12 @@ void AEnemy::EquipWeapon(TSubclassOf<AWeapon> WeaponToEquip)
 
 
 }
+
+void AEnemy::SetStatusEffect(CharacterState::StatusEffect NewStatusEffect)
+{
+	Effects = NewStatusEffect;
+}
+
 
 
 

@@ -2,8 +2,9 @@
 
 #include "Wanted_B01.h"
 #include "CharacterController.h"
+#include "Weapons/Weapon.h"
 #include "Weapons/Weapon_Ranged.h"
-#include "Weapons/Weapon_PlayerRevolver.h"
+//#include "Weapons/Weapon_PlayerRevolver.h"
 #include "Environment/Interactable.h"
 #include "Blueprint/UserWidget.h"
 
@@ -18,6 +19,7 @@ ACharacterController::ACharacterController()
 	Health = 100.f;
 	Rage = 0.f;
 	RageDrainPerSecond = 4.f;
+	bIsRolling = false;
 
 	if (TurnRate == 0.0f)
 	{
@@ -25,7 +27,7 @@ ACharacterController::ACharacterController()
 	}
 
 	//UE_LOG(LogTemp, Display, TEXT("%s"), *RootComponent->GetName());
-
+	//Bind dynamic delegates
 	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &ThisClass::OnCollision);
 
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -34,7 +36,6 @@ ACharacterController::ACharacterController()
 	CameraBoom->TargetArmLength = 600.f;
 	CameraBoom->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
 
-	// Create a camera...
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	CameraComponent->AttachToComponent(CameraBoom, FAttachmentTransformRules::KeepRelativeTransform);
 
@@ -51,18 +52,19 @@ ACharacterController::ACharacterController()
 		UE_LOG(LogTemp, Display, TEXT("WE HAVE FOUND THE WOLF MELEE CLASS"));
 		WolfWeapon = (UClass*)WolfMeleeWeaponAsset.Class;
 	}
+	Effects = CharacterState::NONE;
 	CurrentMeleeAttackType = AttackTypes::NONE;
+	CurrentForm = TransformationState::HUMAN;
+	bIsRolling = false;
 	bIsMeleeAttacking = false;
 }
 
 
-// Called when the game starts or when spawned
 void ACharacterController::BeginPlay()
 {
 	Super::BeginPlay();
-	CharacterState = State::IDLE_HUMAN;
-	
-	EquipRevolver();
+
+	EquipNewWeapon(DefaultWeapon);
 
 	if (CurrentlyEquippedWeapon != NULL)
 	{
@@ -76,31 +78,25 @@ void ACharacterController::BeginPlay()
 		// Create the widget and store it.
 		InGameHud = CreateWidget<UUserWidget>(GetWorld(), wInGameHud);
 
-		// now you can use the widget directly since you have a referance for it.
+		// now you can use the widget directly since you have a reference for it.
 		// Extra check to  make sure the pointer holds the widget.
 		if (!InGameHud->GetIsVisible())
 		{
-			//UE_LOG(LogTemp, Display, TEXT("We are in the beam!!!!!!!!!!!!!"));
-			//let add it to the view port
+
+			//Add it to viewport, Z 
 			//InGameHud->AddToPlayerScreen();
 			InGameHud->AddToViewport(80);
 		}
-
-		//Show the Cursor.
-		//bShowMouseCursor = true;
 	}
-
-
 }
 
-// Called every frame
 void ACharacterController::Tick( float DeltaSeconds )
 {
 	Super::Tick(DeltaSeconds);
 
-	if (Rage >= MAXRAGE && CharacterState == State::IDLE_HUMAN)
+	if (Rage >= MAXRAGE && CurrentForm == TransformationState::HUMAN)
 	{
-		CharacterState = State::IDLE_WOLF;
+		CurrentForm = TransformationState::WOLF;
 		UE_LOG(LogTemp, Display, TEXT("Player 'Transformed' to wolf"));
 
 		//USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(NULL, TEXT("SkeletalMesh'/Game/Geometry/Characters/Werewolf/M_Werewolf.M_Werewolf'"), NULL, LOAD_None, NULL);
@@ -119,48 +115,56 @@ void ACharacterController::Tick( float DeltaSeconds )
 		}
 	}
 
-	if (Rage <= 0.1f && CharacterState == State::IDLE_WOLF)
-	{
-		CharacterState = State::IDLE_HUMAN;
-		UE_LOG(LogTemp, Display, TEXT("Player 'Transformed' to human"));
 
-		USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(NULL, TEXT("SkeletalMesh'/Game/Geometry/Characters/VincentArgo/SK_Vincent_Proxy.SK_Vincent_Proxy'"), NULL, LOAD_None, NULL);
-		if (NewMesh)
-		{
-			GetMesh()->SetSkeletalMesh(NewMesh);
-		}
-		EquipRevolver();
-		Rage = 0.0f;
-	}
-
-	if (CharacterState == State::IDLE_WOLF || CharacterState == State::ROLLING_WOLF)
+	if (CurrentForm == TransformationState::WOLF)
 	{
 		Rage -= RageDrainPerSecond * DeltaSeconds;
-	}
-	
-	switch (CharacterState)
-	{
-	default:
-		break;
 
-	case State::ROLLING:
+		if (Rage <= 0.1f)
+		{
+			CurrentForm = TransformationState::WOLF;
+			UE_LOG(LogTemp, Display, TEXT("Player 'Transformed' to human"));
+
+			USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(NULL, TEXT("SkeletalMesh'/Game/Geometry/Characters/VincentArgo/SK_Vincent_Proxy.SK_Vincent_Proxy'"), NULL, LOAD_None, NULL);
+			if (NewMesh)
+			{
+				GetMesh()->SetSkeletalMesh(NewMesh);
+			}
+			EquipRevolver();
+			Rage = 0.0f;
+		}
+	}
+
+	// Tune to be dependent on Anim notifies in the future.
+	if (bIsRolling)
+	{
 		FVector CurrentPosition = (FMath::Lerp(RootComponent->RelativeLocation, RollDestination, 25.f * DeltaSeconds) - RootComponent->RelativeLocation);
 
 		//RootComponent->SetWorldLocation(FMath::Lerp(RootComponent->RelativeLocation, RollDestination, 0.25f));
 		GetMovementComponent()->AddInputVector(CurrentPosition);
 
-		//if (RootComponent->RelativeLocation.Y >= RollDestination.Y - 5.3f && RootComponent->RelativeLocation.X >= RollDestination.X - 5.3f
-		//	&& RootComponent->RelativeLocation.Y <= RollDestination.Y + 5.3f && RootComponent->RelativeLocation.X <= RollDestination.X + 5.3f)
-		if (FVector::Dist(RootComponent->RelativeLocation, RollDestination) <= 5.3f)
+		if (bIsRolling && FVector::Dist(RootComponent->RelativeLocation, RollDestination) <= 5.3f)
 		{
 			GetMovementComponent()->StopActiveMovement();
-			UE_LOG(LogTemp, Display, TEXT("Setting state to idle."));
-			CharacterState = State::IDLE_HUMAN;
+			UE_LOG(LogTemp, Display, TEXT("End roll"));
+			bIsRolling = false;
 		}
+	}
+
+	
+
+	switch (CurrentForm)
+	{
+	default:
+		break;
+
+	case TransformationState::HUMAN:
+		
+
 		break;
 	}
 }
-// Called to bind functionality to input
+
 void ACharacterController::SetupPlayerInputComponent(class UInputComponent* InInputComponent)
 {
 	Super::SetupPlayerInputComponent(InInputComponent);
@@ -179,6 +183,19 @@ void ACharacterController::SetupPlayerInputComponent(class UInputComponent* InIn
 	// Debug keybinding, remove later.
 	InInputComponent->BindAction(TEXT("DebugRage"), IE_Pressed, this, &ThisClass::OnDebugRagePressed);
 
+}
+void ACharacterController::AddRage(float RageToAdd)
+{
+	float NewRage = Rage;
+	NewRage += RageToAdd;
+
+	if (NewRage > MAXRAGE)
+	{
+		NewRage = MAXRAGE;
+	}
+
+	Rage = NewRage;
+	UE_LOG(LogTemp, Display, TEXT("Modifying rage: %f"), Rage);
 }
 
 float ACharacterController::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
@@ -204,28 +221,24 @@ float ACharacterController::TakeDamage(float DamageAmount, struct FDamageEvent c
 	return Health;
 }
 
-void ACharacterController::AddRage(float RageToAdd)
-{
-	float NewRage = Rage;
-	NewRage += RageToAdd;
-	
-	if (NewRage > MAXRAGE)
-	{
-		NewRage = MAXRAGE;
-	}
 
-	Rage = NewRage;
-	UE_LOG(LogTemp, Display, TEXT("Modifying rage: %f"), Rage);
+void ACharacterController::EquipNewWeapon(TSubclassOf<AWeapon> WeaponToEquip)
+{
+	CurrentlyEquippedWeapon = GetWorld()->SpawnActor<AWeapon>(WeaponToEquip);
+	CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(90.f, 180.f, 0.f));;
+	CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("hand_r"));
+	CurrentlyEquippedWeapon->bOwnedByPlayer = true;
+	
 }
 
-void ACharacterController::EquipNewWeapon(AWeapon* newWeapon)
+CharacterState::StatusEffect ACharacterController::GetStatusEffect()
 {
-	//CurrentlyEquippedWeapon = newWeapon;
+	return Effects;
 }
 
 void ACharacterController::OnMoveForward(float scale)
 {
-	if (CharacterState != State::ROLLING || CharacterState != State::ROLLING_WOLF)
+	if (!bIsRolling)
 	{
 		GetMovementComponent()->AddInputVector(GetActorForwardVector() * scale * MoveSpeed);
 	}
@@ -233,7 +246,7 @@ void ACharacterController::OnMoveForward(float scale)
 
 void ACharacterController::OnMoveRight(float scale)
 {
-	if (CharacterState != State::ROLLING || CharacterState != State::ROLLING_WOLF)
+	if (!bIsRolling)
 	{
 		GetMovementComponent()->AddInputVector(GetActorRightVector() * scale * MoveSpeed);
 	}
@@ -282,16 +295,17 @@ void ACharacterController::OnInteractReleased()
 
 void ACharacterController::OnRollPressed()
 {
-	if (CharacterState == State::IDLE_HUMAN)
+	
+	if (!bIsRolling)
 	{
-		CharacterState = State::ROLLING;
-		RollStartingPoint = RootComponent->RelativeLocation;
 		FVector MovementVector = GetLastMovementInputVector();
 
 		if (MovementVector != FVector::ZeroVector)
 		{
+			RollStartingPoint = RootComponent->RelativeLocation;
 			UE_LOG(LogTemp, Display, TEXT("Rolling!"));
 			RollDestination = FVector(RollStartingPoint.X + (MovementVector.X * RollDistance), RollStartingPoint.Y + (MovementVector.Y * RollDistance), RollStartingPoint.Z);
+			bIsRolling = true;
 		}
 		else
 		{
@@ -316,11 +330,11 @@ void ACharacterController::EquipRevolver()
 
 void ACharacterController::OnShootPressed()
 {
-	if (CharacterState == State::IDLE_HUMAN)
+	if (CurrentForm == TransformationState::HUMAN)
 	{
 		CurrentlyEquippedWeapon->Fire();
 	}
-	if (CharacterState == State::IDLE_WOLF)
+	if (CurrentForm == TransformationState::WOLF)
 	{
 		bIsMeleeAttacking = true;
 		CurrentMeleeAttackType = AttackTypes::LIGHT;
@@ -335,11 +349,11 @@ void ACharacterController::OnShootReleased()
 
 void ACharacterController::OnAltShootPressed()
 {
-	if (CharacterState == State::IDLE_HUMAN)
+	if (CurrentForm == TransformationState::HUMAN)
 	{
 		CurrentlyEquippedWeapon->AltFire();
 	}
-	if (CharacterState == State::IDLE_WOLF)
+	if (CurrentForm == TransformationState::WOLF)
 	{
 		bIsMeleeAttacking = true;
 		CurrentMeleeAttackType = AttackTypes::HEAVY;
@@ -354,7 +368,7 @@ void ACharacterController::OnAltShootReleased()
 
 void ACharacterController::OnDebugRagePressed()
 {
-	if (Rage <= MAXRAGE - 1.0f)
+	if (Rage <= MAXRAGE - 0.5f)
 	{
 		Rage = MAXRAGE;
 		UE_LOG(LogTemp, Display, TEXT("Rage has been set to maximum %f"), Rage);
@@ -370,14 +384,21 @@ void ACharacterController::OnDebugRagePressed()
 void ACharacterController::OnCollision(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	//UE_LOG(LogTemp, Display, TEXT("WE ARE IN THE BEAM"));
-	switch(CharacterState)
+
+	if (bIsRolling)
 	{
-	case State::ROLLING:
-		//UE_LOG(LogTemp, Display, TEXT("Returning the player to the starting point of the roll, setting state to idle."));
-		//CharacterState = State::IDLE_HUMAN;
-		//FVector ReturnPoint = FVector(RollStartingPoint.X - Hit.Location.X, RollStartingPoint.Y - Hit.Location.Y, RollStartingPoint.Z);
-		//UE_LOG(LogTemp, Display, TEXT("Roll Starting Point: %s"), *RollStartingPoint.ToString())
 		RollDestination = RootComponent->RelativeLocation;
-	break;
+		bIsRolling = false;
 	}
 }
+
+bool ACharacterController::IsRolling()
+{
+	return bIsRolling;
+}
+
+bool ACharacterController::IsMeleeAttacking()
+{
+	return bIsMeleeAttacking;
+}
+

@@ -3,22 +3,17 @@
 #pragma once
 
 #include "GameFramework/Pawn.h"
-#include "Weapons/Weapon.h"
+
 
 #include "CharacterController.generated.h"
 
 
-
 UENUM(BlueprintType)
-enum class State : uint8
+enum class TransformationState : uint8
 {
-	IDLE_HUMAN		UMETA(DisplayName = "Idle"),
-	IDLE_WOLF		UMETA(DisplayName = "Idle_Wolf"),
-	ROLLING			UMETA(DisplayName = "Rolling"),
-	ROLLING_WOLF	UMETA(DisplayName = "Rolling_Wolf")
-
+	HUMAN		UMETA(DisplayName = "Human"),
+	WOLF		UMETA(DisplayName = "Wolf")
 };
-
 
 UCLASS(Blueprintable)
 class WANTED_B01_API ACharacterController : public ACharacter
@@ -27,78 +22,19 @@ class WANTED_B01_API ACharacterController : public ACharacter
 	GENERATED_BODY()
 
 public:
-
-	// Sets default values for this pawn's properties
 	ACharacterController();
-
-	// Called when the game starts or when spawned
+	
 	virtual void BeginPlay() override;
-
-	// Called every frame
 	virtual void Tick(float DeltaSeconds) override;
-
-	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* InInputComponent) override;
-
+	virtual void AddRage(float RageToAdd);
+	virtual void EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip);
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
-	virtual void AddRage(float RageToAdd);
-	
-	void EquipNewWeapon(AWeapon* newWeapon);
+	virtual CharacterState::StatusEffect GetStatusEffect();
 	
 	//virtual bool bIsAttacking();
 
-protected:
-	UPROPERTY(Category = Camera, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	class UCameraComponent* CameraComponent;
-
-	UPROPERTY(Category = Camera, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	class USpringArmComponent* CameraBoom;
-
-	UPROPERTY(EditDefaultsOnly)
-	float MoveSpeed;
-
-	UPROPERTY(EditDefaultsOnly)
-	float TurnRate;
-
-	UPROPERTY(EditDefaultsOnly)
-	float RollDistance;
-
-	UPROPERTY(EditDefaultsOnly)
-	float Health;
-
-	UPROPERTY(EditDefaultsOnly)
-	float Rage;
-
-	UPROPERTY(EditDefaultsOnly)
-	float RageDrainPerSecond;
-
-	bool bIsMeleeAttacking;
-
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enum)
-	State CharacterState;
-	AttackTypes::MeleeAttackType CurrentMeleeAttackType;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
-	TSubclassOf<class UUserWidget> wInGameHud;
-
-	// Variable to hold the widget After Creating it.
-	UUserWidget* InGameHud;
-
-
-	UPROPERTY(Category = Collision, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	class UCapsuleComponent* CapsuleCollider;
-
-	
-	FVector RollStartingPoint;
-	FVector RollDestination;
-
-
-	TSubclassOf<AWeapon> DefaultWeapon;
-	TSubclassOf<AWeapon> WolfWeapon;
-	AWeapon* CurrentlyEquippedWeapon;
-
-protected:
 	void OnMoveForward(float scale);
 	void OnMoveRight(float scale);
 	void OnMouseMove(float scale);
@@ -111,6 +47,10 @@ protected:
 	void OnAltShootPressed();
 	void OnAltShootReleased();
 	void OnDebugRagePressed();
+	void Roll();
+
+	// SOON TO BE REMOVED
+	void EquipRevolver();
 
 	//UFUNCTION()
 	//void OnComponentBeginOverlap(AActor* other);
@@ -118,15 +58,64 @@ protected:
 	UFUNCTION()
 	void OnCollision(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
-	void Roll();
+protected:
+	bool IsRolling();
+	bool IsMeleeAttacking();
 
-	void EquipRevolver();
+	UPROPERTY(EditDefaultsOnly)
+	float MoveSpeed;
 
-	friend class UCharacterWolfAnimInstance;
+	UPROPERTY(EditDefaultsOnly)
+	float TurnRate;
+
+	// SOON TO BE REMOVED WHEN ROLL ANIMATION IS IMPLEMENTED
+	UPROPERTY(EditDefaultsOnly)
+	float RollDistance;
+
+	UPROPERTY(EditDefaultsOnly)
+	float Health;
+
+	UPROPERTY(EditDefaultsOnly)
+	float Rage;
+
+	UPROPERTY(EditDefaultsOnly)
+	float RageDrainPerSecond;
+	
+	bool bIsMeleeAttacking;
+	bool bIsRolling;
+
+	UPROPERTY(Category = Camera, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class UCameraComponent* CameraComponent;
+
+	UPROPERTY(Category = Camera, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class USpringArmComponent* CameraBoom;
+
+	UPROPERTY(Category = Collision, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class UCapsuleComponent* CapsuleCollider;
+
+	TSubclassOf<class AWeapon> DefaultWeapon;
+	TSubclassOf<class AWeapon> WolfWeapon;
+	class AWeapon* CurrentlyEquippedWeapon;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
+	TSubclassOf<class UUserWidget> wInGameHud;
+
+	// Variable to store the widget after creating it.
+	class UUserWidget* InGameHud;
+
+
+	TransformationState CurrentForm;
+	AttackTypes::MeleeAttackType CurrentMeleeAttackType;
+	CharacterState::StatusEffect Effects;
+
+	// Remove when Roll animation is added, tie to anim notifies to start and end the roll	
+	FVector RollStartingPoint;
+	FVector RollDestination;
 
 private:
 	const float MAXHEALTH = 100.f;
 	const float MAXRAGE = 100.f;
 
+	friend class UCharacterWolfAnimInstance;
 	friend class UUIWidget;
 };

@@ -5,6 +5,8 @@
 
 #include "GameFramework/Character.h"
 #include "Weapons/Weapon.h"
+#include "Weapons/Weapon_Melee.h"
+#include "Weapons/Weapon_Ranged.h"
 #include "Enemy.generated.h"
 
 
@@ -15,22 +17,9 @@ enum class EState : uint8
 	Search			UMETA(DisplayName = "Search"),
 	Attack			UMETA(DisplayName = "Attack"),
 	Flee			UMETA(DisplayName = "Flee")
-
-
 };
 
-UENUM(BlueprintType)
-enum class Effects : uint8
-{
-	Stun			UMETA(DisplayName = "Stun"),
-	DOT				UMETA(DisplayName = "DOT"),
-	Slow			UMETA(DisplayName = "Slow"),
-	Null			UMETA(DisplayName = "Null")
-
-
-};
-
-UCLASS()
+UCLASS(Blueprintable)
 class WANTED_B01_API AEnemy : public ACharacter
 {
 	GENERATED_BODY()
@@ -42,17 +31,25 @@ public:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
-
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
-
+	virtual AWeapon* GetEquippedWeapon();
 	virtual bool bIsInRange();
 	virtual bool bIsInRange(float OveriddenDesiredRange);
+	// Returns true if the actor's Status Effects is a 'softCC'. Defined in Design Document
+	virtual bool bIsSoftCC();
+	// Returns true if the actor's Status Effects is a 'hardCC'. Defined in Design Document
+	virtual bool bIsHardCC();
+	
+
+
+	virtual CharacterState::StatusEffect GetStatusEffect();
 
 	UPROPERTY(EditInstanceOnly)
 	TArray<class ATargetPoint*> PatrolPoints;
 
 protected:
 	virtual void EquipWeapon(TSubclassOf<AWeapon> WeaponToEquip);
+	virtual void SetStatusEffect(CharacterState::StatusEffect NewStatusEffect);
 
 	UPROPERTY(EditDefaultsOnly)
 	float Health;
@@ -78,10 +75,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enum)
 	EState EnemyState;
 
+	CharacterState::StatusEffect Effects;
 	TSubclassOf<AWeapon> DefaultWeapon;
-	AWeapon* CurrentlyEquippedWeapon;
+	class AWeapon* CurrentlyEquippedWeapon;
 
 	friend class UEnemyAnimInstance;
+	friend class UMinerAnimInstance;
 
 	const float MAXHEALTH = 100.f;
 

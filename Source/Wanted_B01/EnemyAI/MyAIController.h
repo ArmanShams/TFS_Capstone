@@ -18,8 +18,6 @@ public:
 
 	ETeamAttitude::Type GetTeamAttitudeTowards(const AActor& Other) const override;
 
-
-
 protected:
 
 	UPROPERTY(EditDefaultsOnly)
