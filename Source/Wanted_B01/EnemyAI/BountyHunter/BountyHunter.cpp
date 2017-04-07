@@ -37,6 +37,7 @@ void ABountyHunter::BeginPlay()
 	if (BearTrapClass != NULL)
 	{
 		BearTrapPlaced = GetWorld()->SpawnActor<ABearTrap>(BearTrapClass);
+		BearTrapPlaced->SetActorRelativeLocation(FVector(0.f, 0.f, 0.f));
 	}
 }
 
@@ -71,6 +72,7 @@ void ABountyHunter::SetBearTrap()
 	if (BearTrapClass != NULL)
 	{
 		BearTrapPlaced = GetWorld()->SpawnActor<ABearTrap>(BearTrapClass);
+		BearTrapPlaced->SetActorRelativeLocation(FVector(0.f,0.f,0.f));
 	}
 }
 
