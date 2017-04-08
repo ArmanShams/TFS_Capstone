@@ -23,15 +23,22 @@ public:
 	virtual bool bIsInRange() override;
 	virtual bool bIsInRange(float OveriddenDesiredRange) override;
 
+	
 
 private:
 	void BasicAttack();
+
+	UFUNCTION()
 	void SetBearTrap();
+
+	UFUNCTION()
+	void OnActorBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
 
 protected:
 	TSubclassOf<class ABearTrap> BearTrapClass;
 	ABearTrap* BearTrapPlaced;
 
 	virtual void EquipWeapon(TSubclassOf<AWeapon> WeaponToEquip);
-	void OnActorBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
 };

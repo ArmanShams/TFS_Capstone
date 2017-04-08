@@ -3,12 +3,15 @@
 #include "Wanted_B01.h"
 #include "Environment/BearTrap.h"
 #include "BountyHunter.h"
+#include "Engine.h"
 
 ABountyHunter::ABountyHunter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	RootComponent = GetCapsuleComponent();
 	GetMesh()->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+
+	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ABountyHunter::OnActorBeginOverlap);
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 	Health = MAXHEALTH;
@@ -34,11 +37,8 @@ ABountyHunter::ABountyHunter()
 void ABountyHunter::BeginPlay()
 {
 	Super::BeginPlay();
-	if (BearTrapClass != NULL)
-	{
-		BearTrapPlaced = GetWorld()->SpawnActor<ABearTrap>(BearTrapClass);
-		BearTrapPlaced->SetActorRelativeLocation(FVector(0.f, 0.f, 0.f));
-	}
+
+	SetBearTrap();
 }
 
 void ABountyHunter::Tick(float DeltaTime)
@@ -72,7 +72,16 @@ void ABountyHunter::SetBearTrap()
 	if (BearTrapClass != NULL)
 	{
 		BearTrapPlaced = GetWorld()->SpawnActor<ABearTrap>(BearTrapClass);
-		BearTrapPlaced->SetActorRelativeLocation(FVector(0.f,0.f,0.f));
+		BearTrapPlaced->SetActorRelativeLocation(GetMesh()->GetSocketLocation("RightToe_End"));
+	}
+}
+
+void ABountyHunter::OnActorBeginOverlap(UPrimitiveComponent * OverlappedComp, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
+{ 
+	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr))
+	{
+		UE_LOG(LogTemp, Display, TEXT("Bounty Hunter placed a Bear Trap"));
+		SetBearTrap();
 	}
 }
 
@@ -83,9 +92,3 @@ void ABountyHunter::EquipWeapon(TSubclassOf<AWeapon> WeaponToEquip)
 	CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(180.f, 180.f, 0.f));
 
 }
-
-void ABountyHunter::OnActorBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	SetBearTrap();
-}
-

@@ -7,6 +7,7 @@
 #include "GenericTeamAgentInterface.h"
 #include "BountyHunterAIController.h"
 
+
 ABountyHunterAIController::ABountyHunterAIController()
 {
 	PerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("PerceptionComponent"));
