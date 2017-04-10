@@ -19,6 +19,7 @@ void UBTService_FindTarget::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* N
 	UAIPerceptionComponent* PerceptionComponent = OwnerComp.GetAIOwner()->GetPerceptionComponent();
 
 	TArray<ATargetPoint*> PatrolPoints = Cast<AEnemy>(OwnerComp.GetAIOwner()->GetPawn())->PatrolPoints;
+	bool SetPatrol = Cast<AEnemy>(OwnerComp.GetAIOwner()->GetPawn())->SetPatrol;
 	TArray<AActor*> HostileActors;
 	PerceptionComponent->GetPerceivedHostileActors(HostileActors);
 
@@ -46,18 +47,49 @@ void UBTService_FindTarget::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* N
 		return;
 	}
 
-	if (HostileActors.Num() == 0 && PatrolPoints.Num() > 0)
+	if (SetPatrol)
 	{
-		if (test == 0)
+		if (HostileActors.Num() == 0 && PatrolPoints.Num() > 0)
 		{
-			OwnerComp.GetAIOwner()->StopMovement();
-			test = 1;
+			if (test == 0)
+			{
+				OwnerComp.GetAIOwner()->StopMovement();
+				test = 1;
+			}
+			RangePoint = FMath::RandRange(0, PatrolPoints.Num() - 1);
+			AActor* PatrolPoint = PatrolPoints[RangePoint];
+			OwnerComp.GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), PatrolPoint);
+			return;
 		}
-		RangePoint = FMath::RandRange(0, PatrolPoints.Num() - 1);
-		AActor* PatrolPoint = PatrolPoints[RangePoint];
-		OwnerComp.GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), PatrolPoint);
-		return;
 	}
+	if (!SetPatrol)
+	{
+		if (HostileActors.Num() == 0 && PatrolPoints.Num() > 0)
+		{
+			if (test == 0)
+			{
+				OwnerComp.GetAIOwner()->StopMovement();
+				test = 1;
+			}
+			if (CurrentPoint == PatrolPoints.Num() - 1)
+			{
+				RangePoint = 0;
+				CurrentPoint = 0;
+			}
+			else
+			{
+				RangePoint = CurrentPoint + 1;
+				CurrentPoint = RangePoint;
+			}
+			
+			UE_LOG(LogTemp, Warning, TEXT("CurrentPoint is is %i"), CurrentPoint);
+
+			AActor* PatrolPoint = PatrolPoints[RangePoint];
+			OwnerComp.GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), PatrolPoint);
+			return;
+		}
+	}
+
 
 	OwnerComp.GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), NULL);
 	OwnerComp.GetAIOwner()->StopMovement();

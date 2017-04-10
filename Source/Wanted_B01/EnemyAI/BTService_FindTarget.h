@@ -19,4 +19,7 @@ protected:
 
 	int32 test = 0;
 
+	int32 CurrentPoint = 0;
+	
+	
 };

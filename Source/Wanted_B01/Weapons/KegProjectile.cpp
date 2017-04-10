@@ -69,6 +69,6 @@ void AKegProjectile::OnHit(UPrimitiveComponent * HitComponent, AActor * OtherAct
 	//}
 	//
 
-	/*Destroy();*/
+	Destroy();
 }
 

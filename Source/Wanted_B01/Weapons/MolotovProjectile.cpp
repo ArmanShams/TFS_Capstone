@@ -7,8 +7,40 @@
 // Sets default values
 AMolotovProjectile::AMolotovProjectile()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	// Sphere collider for the projectile
+	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("SphereCollisionComponent"));
+	CollisionComponent->InitSphereRadius(SphereRadius);
+	//CollisionComponent->BodyInstance.SetCollisionProfileName("Projectile");
+	CollisionComponent->OnComponentHit.AddDynamic(this, &ThisClass::OnHit);
+	CollisionComponent->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Ignore);
+
+
+	// Root Component
+	RootComponent = CollisionComponent;
+
+	ConstructorHelpers::FObjectFinder<UStaticMesh>sphere(TEXT("StaticMesh'/Engine/BasicShapes/Sphere.Sphere'"));
+
+	// Mesh Component for the projectile
+	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
+	MeshComponent->SetStaticMesh(sphere.Object);
+	MeshComponent->SetupAttachment(RootComponent);
+
+
+	// ProjectileMovementComponent used to regulate the projectile's movement 
+	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
+	ProjectileMovementComponent->UpdatedComponent = RootComponent;
+	ProjectileMovementComponent->ProjectileGravityScale = 3.f;
+	ProjectileMovementComponent->Velocity.Z = 15.f;
+	ProjectileMovementComponent->InitialSpeed = InitSpeed;
+	ProjectileMovementComponent->MaxSpeed = MaxSpeed;
+	ProjectileMovementComponent->bRotationFollowsVelocity = true;
+	ProjectileMovementComponent->bIsSliding = false;
+
+	// Deconstruct after X seconds as a default
+	InitialLifeSpan = LifeTime;
 
 }
 
@@ -28,5 +60,17 @@ void AMolotovProjectile::Tick( float DeltaTime )
 
 void AMolotovProjectile::OnHit(UPrimitiveComponent * HitComponent, AActor * OtherActor, UPrimitiveComponent * OtherComp, FVector NormalImpulse, const FHitResult & Hit)
 {
+	//GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::White, FString::Printf(TEXT("Projectile hit something")));
+	UE_LOG(LogTemp, Display, TEXT("MOLOTOV HIT A THING %s"), *OtherActor->GetName());
+	// OtherComp->AddImpulseAtLocation(GetVelocity() * BulletImpulse, GetActorLocation());
+	UGameplayStatics::ApplyDamage(OtherActor, Damage, GetWorld()->GetFirstPlayerController(), this, TSubclassOf<UDamageType>());
+
+	//if (Cast<class ACharacterController>(WeaponSpawnedThis->OwnerCharacter))
+	//{
+	//	UE_LOG(LogTemp, Display, TEXT("Owned by a player"));
+	//}
+	//
+
+	Destroy();
 }
 

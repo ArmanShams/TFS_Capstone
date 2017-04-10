@@ -51,6 +51,9 @@ public:
 	UPROPERTY(EditInstanceOnly)
 	TArray<class ATargetPoint*> PatrolPoints;
 
+	UPROPERTY(EditInstanceOnly)
+	bool SetPatrol;
+
 protected:
 	virtual void EquipWeapon(TSubclassOf<AWeapon> WeaponToEquip);
 
