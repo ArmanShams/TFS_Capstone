@@ -20,8 +20,13 @@ public:
 	float damage;
 	float rootDurationInSeconds;
 	
+	// virtual void SetOwner() override; 
 	
 protected:
+	class ABountyHunter* BountyHunterRef;
+
+	virtual void BeginDestroy() override;
+
 	void damageToPlayer();
 	void effectToPlayer();
 
@@ -31,4 +36,5 @@ protected:
 	UFUNCTION()
 		void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+	friend class ABountyHunter;
 };

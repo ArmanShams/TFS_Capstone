@@ -2,12 +2,14 @@
 
 #include "Wanted_B01.h"
 #include "BearTrap.h"
+#include "EnemyAI/BountyHunter/BountyHunter.h"
 #include "Engine.h"
 
 
 ABearTrap::ABearTrap()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	BountyHunterRef = Cast<ABountyHunter>(GetClass());
 }
 
 void ABearTrap::BeginPlay()
@@ -36,5 +38,4 @@ void ABearTrap::OnOverlapBegin(UPrimitiveComponent * OverlappedComp, AActor * Ot
 void ABearTrap::OnOverlapEnd(UPrimitiveComponent * OverlappedComp, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
 {
 	UE_LOG(LogTemp, Display, TEXT("The trap activated"));
-	// UGameplayStatics::ApplyDamage(OtherActor, Damage, GetWorld()->GetFirstPlayerController(), this, TSubclassOf<UDamageType>());
 }

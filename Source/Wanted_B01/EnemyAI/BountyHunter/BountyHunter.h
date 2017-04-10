@@ -23,7 +23,7 @@ public:
 	virtual bool bIsInRange() override;
 	virtual bool bIsInRange(float OveriddenDesiredRange) override;
 
-	
+	void RemoveBearTrap();
 
 private:
 	void BasicAttack();
@@ -34,11 +34,16 @@ private:
 	UFUNCTION()
 	void OnActorBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-
 protected:
+	UPROPERTY(EditDefaultsOnly)
+	uint8 MaximumTrapsAllowed;
+
 	TSubclassOf<class ABearTrap> BearTrapClass;
 	ABearTrap* BearTrapPlaced;
 
+	TArray<AActor*> TrapArray;
+
 	virtual void EquipWeapon(TSubclassOf<AWeapon> WeaponToEquip);
 
+	friend class ABearTrap;
 };

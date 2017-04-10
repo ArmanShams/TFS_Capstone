@@ -20,12 +20,15 @@ ABountyHunter::ABountyHunter()
 	MaxRange = 300.0f;
 	AttackFrequency = 1.f;
 	AttackRange = 300.0f;
+	MaximumTrapsAllowed = 2;
 
 	ConstructorHelpers::FClassFinder<AWeapon>WeaponAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/Weapon_RifleBP.Weapon_RifleBP_C'"));
 	if (WeaponAsset.Class)
 	{
 		DefaultWeapon = (UClass*)WeaponAsset.Class;
 	}
+	//TrapArray = new TArray<AActor*>();
+	//TrapArray.SetNum(2);
 
 	ConstructorHelpers::FClassFinder<ABearTrap>TrapAsset(TEXT("Blueprint'/Game/Blueprints/Enemies/BountyHunter/BearTrapBP.BearTrapBP_C'"));
 	if (TrapAsset.Class)
@@ -37,13 +40,16 @@ ABountyHunter::ABountyHunter()
 void ABountyHunter::BeginPlay()
 {
 	Super::BeginPlay();
-
 	SetBearTrap();
 }
 
 void ABountyHunter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if (bIsInRange())
+	{
+		BasicAttack();
+	}
 
 }
 
@@ -71,17 +77,32 @@ void ABountyHunter::SetBearTrap()
 {
 	if (BearTrapClass != NULL)
 	{
+		if (TrapArray.Num() >= MaximumTrapsAllowed)
+		{
+			AActor* TrapToDelete = TrapArray.Pop();
+			TrapToDelete->SetLifeSpan(0.1f);
+
+			UE_LOG(LogTemp, Display, TEXT("POP"));
+		}
 		BearTrapPlaced = GetWorld()->SpawnActor<ABearTrap>(BearTrapClass);
 		BearTrapPlaced->SetActorRelativeLocation(GetMesh()->GetSocketLocation("RightToe_End"));
+		// BearTrapPlaced->SetLifeSpan();
+		TrapArray.Add(BearTrapPlaced);
+		UE_LOG(LogTemp, Display, TEXT("Bounty Hunter set a bear trap, trap added to array list"));
 	}
+
+}
+
+void ABountyHunter::RemoveBearTrap()
+{
+	TrapArray.Pop();
 }
 
 void ABountyHunter::OnActorBeginOverlap(UPrimitiveComponent * OverlappedComp, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
 { 
-	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr))
+//	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr))
 	{
-		UE_LOG(LogTemp, Display, TEXT("Bounty Hunter placed a Bear Trap"));
-		SetBearTrap();
+			SetBearTrap();
 	}
 }
 
@@ -92,3 +113,4 @@ void ABountyHunter::EquipWeapon(TSubclassOf<AWeapon> WeaponToEquip)
 	CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(180.f, 180.f, 0.f));
 
 }
+
