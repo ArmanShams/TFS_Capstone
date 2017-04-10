@@ -23,8 +23,6 @@ public:
 	virtual bool bIsInRange() override;
 	virtual bool bIsInRange(float OveriddenDesiredRange) override;
 
-	void RemoveBearTrap();
-
 private:
 	void BasicAttack();
 

@@ -16,25 +16,25 @@ public:
 	virtual void Tick( float DeltaSeconds ) override;
 
 	UPROPERTY(EditAnywhere)
-	float triggerRadius;
-	float damage;
-	float rootDurationInSeconds;
-	
-	// virtual void SetOwner() override; 
+	float radius;
+	float Damage;
+
+	bool bTrapActive;
+
+	virtual void SetOwner(AActor* NewOwner) override;
 	
 protected:
-	class ABountyHunter* BountyHunterRef;
+	UPROPERTY(EditAnywhere, Category = "Collision")
+		USphereComponent* TrapCollider;
 
-	virtual void BeginDestroy() override;
-
-	void damageToPlayer();
-	void effectToPlayer();
+private:
+	UFUNCTION()
+	void OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION()
-	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	void OnComponentEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
-	UFUNCTION()
-		void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	class ABountyHunter* BountyHunter;
 
 	friend class ABountyHunter;
 };

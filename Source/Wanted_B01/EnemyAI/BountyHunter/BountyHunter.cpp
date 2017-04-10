@@ -10,7 +10,6 @@ ABountyHunter::ABountyHunter()
 	PrimaryActorTick.bCanEverTick = true;
 	RootComponent = GetCapsuleComponent();
 	GetMesh()->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
-
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ABountyHunter::OnActorBeginOverlap);
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
@@ -20,15 +19,13 @@ ABountyHunter::ABountyHunter()
 	MaxRange = 300.0f;
 	AttackFrequency = 1.f;
 	AttackRange = 300.0f;
-	MaximumTrapsAllowed = 2;
+	MaximumTrapsAllowed = 3;
 
 	ConstructorHelpers::FClassFinder<AWeapon>WeaponAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/Weapon_RifleBP.Weapon_RifleBP_C'"));
 	if (WeaponAsset.Class)
 	{
 		DefaultWeapon = (UClass*)WeaponAsset.Class;
 	}
-	//TrapArray = new TArray<AActor*>();
-	//TrapArray.SetNum(2);
 
 	ConstructorHelpers::FClassFinder<ABearTrap>TrapAsset(TEXT("Blueprint'/Game/Blueprints/Enemies/BountyHunter/BearTrapBP.BearTrapBP_C'"));
 	if (TrapAsset.Class)
@@ -40,7 +37,6 @@ ABountyHunter::ABountyHunter()
 void ABountyHunter::BeginPlay()
 {
 	Super::BeginPlay();
-	SetBearTrap();
 }
 
 void ABountyHunter::Tick(float DeltaTime)
@@ -50,7 +46,6 @@ void ABountyHunter::Tick(float DeltaTime)
 	{
 		BasicAttack();
 	}
-
 }
 
 float ABountyHunter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
@@ -80,7 +75,7 @@ void ABountyHunter::SetBearTrap()
 		if (TrapArray.Num() >= MaximumTrapsAllowed)
 		{
 			AActor* TrapToDelete = TrapArray.Pop();
-			TrapToDelete->SetLifeSpan(0.1f);
+			TrapToDelete->SetLifeSpan(0.01f);
 
 			UE_LOG(LogTemp, Display, TEXT("POP"));
 		}
@@ -93,16 +88,11 @@ void ABountyHunter::SetBearTrap()
 
 }
 
-void ABountyHunter::RemoveBearTrap()
-{
-	TrapArray.Pop();
-}
-
 void ABountyHunter::OnActorBeginOverlap(UPrimitiveComponent * OverlappedComp, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
 { 
 //	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr))
 	{
-			SetBearTrap();
+		SetBearTrap();
 	}
 }
 
@@ -111,6 +101,5 @@ void ABountyHunter::EquipWeapon(TSubclassOf<AWeapon> WeaponToEquip)
 	Super::EquipWeapon(WeaponToEquip);
 	CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("RightHand"));
 	CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(180.f, 180.f, 0.f));
-
 }
 
