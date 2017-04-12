@@ -8,6 +8,7 @@
 #include "BehaviorTree/Blackboard/BlackboardKeyAllTypes.h"
 #include "BrainComponent.h"
 #include "Character/PlayerCharacter/CharacterController.h"
+#include "Character/StatusEffects/StatusEffect_HardCrowdControl.h"
 
 AMinerAI::AMinerAI()
 {
@@ -43,9 +44,9 @@ AMinerAI::AMinerAI()
 
 	ChargeLaunchDistance = 20.f;
 
+	StompStunDuration = 1.5f;
 
-
-	//bShouldRadialDamageFallOff = false;
+	PostChargeSelfStunDuration = 7.0f;
 
 	bChargeHasDamagedPlayer = false;
 
@@ -159,17 +160,26 @@ void AMinerAI::Tick(float DeltaSeconds)
 		{
 			BlackboardComponent->SetValueAsBool(TEXT("MarkedToReturnToIdleState"), false);
 		}
-		if (!bIsHardCC())
+		if (bIsHardCC())
 		{
-			//UE_LOG(LogTemp, Display, TEXT("I AIN'T HARD CC"));
+			//UE_LOG(LogTemp, Display, TEXT("I AM HARD CC"));
 		}
-
 	}
 }
 
 void AMinerAI::SetupPlayerInputComponent(class UInputComponent* InputComponent)
 {
 	Super::SetupPlayerInputComponent(InputComponent);
+}
+
+void AMinerAI::AddStatusEffect(TSubclassOf<class UStatusEffectBase> ClassToCreateFrom, bool bShouldPerformTickAction, float LifeTime, float TickRate, ALoneWolfCharacter* CharacterThatInflictedStatusEffect)
+{
+	Super::AddStatusEffect(ClassToCreateFrom, bShouldPerformTickAction, LifeTime, TickRate, CharacterThatInflictedStatusEffect);
+}
+
+void AMinerAI::AddStatusEffect(TSubclassOf<class UStatusEffectBase> ClassToCreateFrom, bool bShouldPerformTickAction, bool bShouldDealDamage, float LifeTime, float DamageToDeal, float TickRate, ALoneWolfCharacter* CharacterThatInflictedStatusEffect)
+{
+	Super::AddStatusEffect(ClassToCreateFrom, bShouldPerformTickAction, bShouldDealDamage, LifeTime, DamageToDeal, TickRate, CharacterThatInflictedStatusEffect);
 }
 
 float AMinerAI::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
@@ -282,7 +292,19 @@ void AMinerAI::Stomp()
 		StompDecalActor->SetLifeSpan(0.2f);
 		StompDecalActor->SetOwner(NULL);
 		StompDecalActor = NULL;
-		UGameplayStatics::ApplyRadialDamage(this, StompDamage, GetActorLocation(), StompRadius, UDamageType::StaticClass(), TArray<AActor*>(), this, GetController());
+		
+		if (UGameplayStatics::ApplyRadialDamage(this, StompDamage, GetActorLocation(), StompRadius, UDamageType::StaticClass(), TArray<AActor*>(), this, GetController()))
+		{
+			TArray<FOverlapResult> HitResult;
+			GetWorld()->OverlapMultiByObjectType(HitResult, GetActorLocation(), FQuat::Identity, FCollisionObjectQueryParams(FCollisionObjectQueryParams::InitType::AllDynamicObjects), FCollisionShape::MakeSphere(StompRadius), FCollisionQueryParams());
+			DrawDebugSphere(GetWorld(), GetActorLocation(), StompRadius, 32, FColor::Red, false, 1.5f);
+			for (size_t i = 0; i < HitResult.Num(); i++)
+			{
+				Cast<ALoneWolfCharacter>(HitResult[i].GetActor())->AddStatusEffect(UStatusEffect_HardCrowdControl::StaticClass(), false, StompStunDuration, 0.f, this);
+			}
+
+			
+		}
 
 		Effects = CharacterState::NONE;
 		CurrentState = MinerState::IDLE;
@@ -307,23 +329,28 @@ void AMinerAI::OnCollision(UPrimitiveComponent* HitComponent, AActor* OtherActor
 
 	if (CurrentState == MinerState::CHARGING)
 	{
-		if (GetWorld()->LineTraceSingleByChannel(OutHit, GetActorLocation(), GetActorForwardVector() * 15.f, ECC_GameTraceChannel5, Params, ResponseParam))
+		if (GetWorld()->LineTraceSingleByChannel(OutHit, GetActorLocation(), OtherActor->GetActorLocation(), ECC_GameTraceChannel5, Params, ResponseParam))
 		{
 			// REPLACE WITH ENTERING STUN LATER
 
 			
 			//Effects = CharacterState::NONE;
+			//DrawDebugLine(GetWorld(), GetActorLocation(), GetMesh()->GetForwardVector() * 15.f, FColor(255, 0, 0), true, -1, 0, 12.333);
+			DrawDebugLine(GetWorld(), GetActorLocation(), OutHit.GetActor()->GetActorLocation(), FColor(0, 255, 0), true, -1, 0, 12.333);
+
 
 			if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
 			{
 				BlackboardComponent->SetValueAsBool(TEXT("MarkedToReturnToIdleState"), true);
-				UE_LOG(LogTemp, Display, TEXT("Miner hit a %s"), *OtherActor->GetName());
+				UE_LOG(LogTemp, Display, TEXT("Miner hit a %s"), *OutHit.GetActor()->GetName());
 				CurrentState = MinerState::IDLE;
-				SetActorRelativeRotation(FRotator(GetActorRotation().Pitch, -GetActorRotation().Yaw, GetActorRotation().Roll));
+				//SetActorRelativeRotation(FRotator(GetActorRotation().Pitch, -GetActorRotation().Yaw, GetActorRotation().Roll));
 				GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Block);
 				GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel4, ECR_Block);
 				GetMovementComponent()->StopActiveMovement();
 				Cast<UCharacterMovementComponent>(GetMovementComponent())->MaxWalkSpeed = DefaultMoveSpeed;
+
+				AddStatusEffect(UStatusEffect_HardCrowdControl::StaticClass(), false, PostChargeSelfStunDuration, 0.f, this);
 			}
 		}
 	}
@@ -337,10 +364,11 @@ void AMinerAI::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComp, AAct
 		Cast<ACharacter>(OtherActor)->LaunchCharacter(DirectionToLaunch * ChargeLaunchDistance, true, true);
 		if (ACharacterController* CastedAsPlayer = Cast<ACharacterController>(OtherActor))
 		{
-			UE_LOG(LogTemp, Display, TEXT("The miner ran into something."));
+			UE_LOG(LogTemp, Display, TEXT("The miner overlapped something."));
 			UGameplayStatics::ApplyDamage(OtherActor, ChargeDamage, GetController(), this, TSubclassOf<UDamageType>());
 			bChargeHasDamagedPlayer = true;
 			//DirectionToLaunch.Normalize();
+
 		}
 
 		if (bChargeHasDamagedPlayer)

@@ -35,7 +35,7 @@ void UStatusEffectBase::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 		TimeAlive += DeltaTime;
 		if (TimeAlive >= LifeTimeInSeconds)
 		{
-			DestroyComponent(false);
+			DestroyComponent(true);
 		}
 	}
 }

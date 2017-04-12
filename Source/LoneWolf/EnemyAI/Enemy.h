@@ -33,13 +33,15 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+	virtual void AddStatusEffect(TSubclassOf<class UStatusEffectBase> ClassToCreateFrom, bool bShouldPerformTickAction, float LifeTime, float TickRate, ALoneWolfCharacter* CharacterThatInflictedStatusEffect) override;
+	virtual void AddStatusEffect(TSubclassOf<class UStatusEffectBase> ClassToCreateFrom, bool bShouldPerformTickAction, bool bShouldDealDamage, float LifeTime, float DamageToDeal, float TickRate, ALoneWolfCharacter* CharacterThatInflictedStatusEffect) override;
 	virtual AWeapon* GetEquippedWeapon();
 	virtual bool bIsInRange();
 	virtual bool bIsInRange(float OveriddenDesiredRange);
 	// Returns true if the actor's Status Effects is a 'softCC'. Defined in Design Document
-	virtual bool bIsSoftCC();
+	virtual bool bIsSoftCC() override;
 	// Returns true if the actor's Status Effects is a 'hardCC'. Defined in Design Document
-	virtual bool bIsHardCC();
+	virtual bool bIsHardCC() override;
 	
 
 

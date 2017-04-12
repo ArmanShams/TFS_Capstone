@@ -28,6 +28,8 @@ public:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
+	virtual void AddStatusEffect(TSubclassOf<class UStatusEffectBase> ClassToCreateFrom, bool bShouldPerformTickAction, float LifeTime, float TickRate, ALoneWolfCharacter* CharacterThatInflictedStatusEffect) override;
+	virtual void AddStatusEffect(TSubclassOf<class UStatusEffectBase> ClassToCreateFrom, bool bShouldPerformTickAction, bool bShouldDealDamage, float LifeTime, float DamageToDeal, float TickRate, ALoneWolfCharacter* CharacterThatInflictedStatusEffect) override;
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 	virtual bool bIsInRange() override;
 	virtual bool bIsInRange(float OveriddenDesiredRange) override;
@@ -47,9 +49,12 @@ public:
 	// Radius the stomp will apply damage in.
 	UPROPERTY(EditDefaultsOnly)
 	float StompRadius;
-	//// Whether or not the damage dealt should dissipate based on the distance from the center point of the stomp.
-	//UPROPERTY(EditDefaultsOnly)
-	//bool bShouldRadialDamageFallOff;
+	// Time in seconds the stomp will stun afflicted targets.
+	UPROPERTY(EditDefaultsOnly)
+	float StompStunDuration;
+	// Time in seconds the miner will be stunned after hitting a wall.
+	UPROPERTY(EditDefaultsOnly)
+	float PostChargeSelfStunDuration;
 	// The distance the Miner will be able to use the Charge, not the length of the charge itself.
 	UPROPERTY(EditDefaultsOnly)
 	float DistanceToUseCharge;

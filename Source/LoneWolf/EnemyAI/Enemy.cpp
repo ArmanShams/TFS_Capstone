@@ -44,7 +44,7 @@ void AEnemy::BeginPlay()
 
 	EnemyState = EState::Idle;
 
-	TimeSinceLastAttack = 0.0f;
+	//TimeSinceLastAttack = 0.0f;
 	//Skill1Cooldown = MAX_FLT;
 	//Skill2Cooldown = MAX_FLT;
 	
@@ -76,13 +76,13 @@ float AEnemy::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEv
 	if (ACharacterController* player = Cast<ACharacterController>(DamageCauser))
 	{
 		//UE_LOG(LogTemp, Display, TEXT("We are in the beam."));
-		float RageGeneratedFromDamage = DamageAmount / 2.4f;
+		float RageGeneratedFromDamage = DamageAmount * 1.8f;
 
 		player->AddRage(RageGeneratedFromDamage);
 
 		if (NewHealth <= 0.f)
 		{
-			player->AddRage(RageGeneratedFromDamage * 0.65f);
+			player->AddRage(RageGeneratedFromDamage * 2.0f);
 		}
 	}
 
@@ -93,6 +93,18 @@ float AEnemy::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEv
 	}
 
 	return Health;
+}
+
+void AEnemy::AddStatusEffect(TSubclassOf<class UStatusEffectBase> ClassToCreateFrom, bool bShouldPerformTickAction, float LifeTime, float TickRate, ALoneWolfCharacter* CharacterThatInflictedStatusEffect)
+{
+	Super::AddStatusEffect(ClassToCreateFrom, bShouldPerformTickAction, LifeTime, TickRate, CharacterThatInflictedStatusEffect);
+}
+
+
+void AEnemy::AddStatusEffect(TSubclassOf<class UStatusEffectBase> ClassToCreateFrom, bool bShouldPerformTickAction, bool bShouldDealDamage, float LifeTime, float DamageToDeal, float TickRate, ALoneWolfCharacter* CharacterThatInflictedStatusEffect)
+{
+	Super::AddStatusEffect(ClassToCreateFrom, bShouldPerformTickAction, bShouldDealDamage, LifeTime, DamageToDeal, TickRate, CharacterThatInflictedStatusEffect);
+
 }
 
 AWeapon* AEnemy::GetEquippedWeapon()
@@ -157,36 +169,36 @@ bool AEnemy::bIsInRange(float OveriddenDesiredRange)
 
 bool AEnemy::bIsSoftCC()
 {
-	Super::bIsSoftCC();
-	switch (Effects)
-	{
-	case CharacterState::SNARE:
-		return true;
-		break;
+	return Super::bIsSoftCC();
+	//switch (Effects)
+	//{
+	//case CharacterState::SNARE:
+	//	return true;
+	//	break;
 
-	default:
-		return false;
-		break;
-	}
+	//default:
+	//	return false;
+	//	break;
+	//}
 }
 
 bool AEnemy::bIsHardCC()
 {
-	//Super::bIsHardCC();
-	switch (Effects)
-	{
-	case CharacterState::STUN:
-		return true;
-		break;
+	return Super::bIsHardCC();
+	//switch (Effects)
+	//{
+	//case CharacterState::STUN:
+	//	return true;
+	//	break;
 
-	case CharacterState::KNOCKDOWN:
-		return true;
-		break;
+	//case CharacterState::KNOCKDOWN:
+	//	return true;
+	//	break;
 
-	default:
-		return false;
-		break;
-	}
+	//default:
+	//	return false;
+	//	break;
+	//}
 }
 
 CharacterState::StatusEffect AEnemy::GetStatusEffect()

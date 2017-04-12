@@ -92,7 +92,7 @@ void ACharacterController::Tick( float DeltaSeconds )
 
 	if (bIsHardCC())
 	{
-		UE_LOG(LogTemp, Display, TEXT("I AM IN HARD CC MY EYES HURT PLEASE SEND HELP"));
+		//UE_LOG(LogTemp, Display, TEXT("I AM IN HARD CC MY EYES HURT PLEASE SEND HELP"));
 	}
 	
 
@@ -189,7 +189,7 @@ void ACharacterController::SetupPlayerInputComponent(class UInputComponent* InIn
 		InInputComponent->BindAction(TEXT("Roll"), IE_Pressed, this, &ThisClass::OnRollPressed);
 
 		// Debug keybinding, remove later.
-		InInputComponent->BindAction(TEXT("DebugRage"), IE_Pressed, this, &ThisClass::OnDebugRagePressed);
+		//InInputComponent->BindAction(TEXT("DebugRage"), IE_Pressed, this, &ThisClass::OnDebugRagePressed);
 	}
 	
 
