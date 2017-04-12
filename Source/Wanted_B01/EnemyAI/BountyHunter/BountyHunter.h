@@ -5,9 +5,6 @@
 #include "EnemyAI/Enemy.h"
 #include "BountyHunter.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class WANTED_B01_API ABountyHunter : public AEnemy
 {
@@ -24,10 +21,8 @@ public:
 	virtual bool bIsInRange(float OveriddenDesiredRange) override;
 
 private:
-	void BasicAttack();
-
 	UFUNCTION()
-	void SetBearTrap();
+	void SetBearTrap(ATrapLocations* NewTrapLocation, const FHitResult & SweepResult);
 
 	UFUNCTION()
 	void OnActorBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);

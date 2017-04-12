@@ -2,6 +2,7 @@
 
 #include "Wanted_B01.h"
 #include "Environment/BearTrap.h"
+#include "TrapLocations.h"
 #include "BountyHunter.h"
 #include "Engine.h"
 
@@ -18,7 +19,7 @@ ABountyHunter::ABountyHunter()
 	TurnRate = 0.25f;
 	MaxRange = 300.0f;
 	AttackFrequency = 1.f;
-	AttackRange = 300.0f;
+	AttackRange = 3000.0f;
 	MaximumTrapsAllowed = 3;
 
 	ConstructorHelpers::FClassFinder<AWeapon>WeaponAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/Weapon_RifleBP.Weapon_RifleBP_C'"));
@@ -44,8 +45,12 @@ void ABountyHunter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	if (bIsInRange())
 	{
-		BasicAttack();
+		if (CurrentlyEquippedWeapon != NULL)
+		{
+			CurrentlyEquippedWeapon->Fire();
+		}
 	}
+
 }
 
 float ABountyHunter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
@@ -63,36 +68,39 @@ bool ABountyHunter::bIsInRange(float OveriddenDesiredRange)
 	return Super::bIsInRange(OveriddenDesiredRange);
 }
 
-void ABountyHunter::BasicAttack()
+void ABountyHunter::SetBearTrap(ATrapLocations* NewTrapLocation, const FHitResult& SweepResult)
 {
-	CurrentlyEquippedWeapon->Fire();
-}
-
-void ABountyHunter::SetBearTrap()
-{
-	if (BearTrapClass != NULL)
+	if (!NewTrapLocation->bIsOccupied)
 	{
-		if (TrapArray.Num() >= MaximumTrapsAllowed)
+		UE_LOG(LogTemp, Display, TEXT("The trap location is now occupied"));
+		if (BearTrapClass != NULL)
 		{
-			AActor* TrapToDelete = TrapArray.Pop();
-			TrapToDelete->SetLifeSpan(0.01f);
-
-			UE_LOG(LogTemp, Display, TEXT("POP"));
+			if (TrapArray.Num() >= MaximumTrapsAllowed)
+			{
+				AActor* TrapToDelete = TrapArray.Pop();
+				TrapToDelete->SetLifeSpan(0.1f);
+				UE_LOG(LogTemp, Display, TEXT("Element popped from Trap Array"));
+			}
+			BearTrapPlaced = GetWorld()->SpawnActor<ABearTrap>(BearTrapClass);
+			BearTrapPlaced->SetActorRelativeLocation(GetMesh()->GetSocketLocation("RightToe_End"));
+			// BearTrapPlaced->SetLifeSpan(5.0f);
+			BearTrapPlaced->SetLocationBeingOccupied(NewTrapLocation);
+			TrapArray.Add(BearTrapPlaced);
+			UE_LOG(LogTemp, Display, TEXT("Bounty Hunter set a bear trap, trap added to array list"));
 		}
-		BearTrapPlaced = GetWorld()->SpawnActor<ABearTrap>(BearTrapClass);
-		BearTrapPlaced->SetActorRelativeLocation(GetMesh()->GetSocketLocation("RightToe_End"));
-		// BearTrapPlaced->SetLifeSpan();
-		TrapArray.Add(BearTrapPlaced);
-		UE_LOG(LogTemp, Display, TEXT("Bounty Hunter set a bear trap, trap added to array list"));
 	}
-
+	else
+	{
+		UE_LOG(LogTemp, Display, TEXT("The Trap Location is already occupied, the bounty hunter will not try to place a trap here"));
+	}
 }
 
 void ABountyHunter::OnActorBeginOverlap(UPrimitiveComponent * OverlappedComp, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
 { 
-//	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr))
+	if (ATrapLocations* RecastedOverlappingActor = Cast<ATrapLocations>(OtherActor))
 	{
-		SetBearTrap();
+		SetBearTrap(RecastedOverlappingActor, SweepResult);
+		RecastedOverlappingActor->bIsOccupied = true;
 	}
 }
 
@@ -102,4 +110,3 @@ void ABountyHunter::EquipWeapon(TSubclassOf<AWeapon> WeaponToEquip)
 	CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("RightHand"));
 	CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(180.f, 180.f, 0.f));
 }
-

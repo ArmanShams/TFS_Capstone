@@ -19,11 +19,20 @@ public:
 	float radius;
 	float Damage;
 
+	UPROPERTY(EditAnywhere)
+	bool bIsVisible;
+
 	virtual void SetOwner(AActor* NewOwner) override;
-	
+
+	virtual void Destroyed() override;
+
 protected:
 	UPROPERTY(EditAnywhere, Category = "Collision")
 		USphereComponent* TrapCollider;
+
+	class ATrapLocations* LocationBeingOccupied;
+
+	virtual void SetLocationBeingOccupied(class ATrapLocations* NewLocationBeingOccupied);
 
 private:
 	UFUNCTION()

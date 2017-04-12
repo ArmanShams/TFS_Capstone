@@ -3,6 +3,7 @@
 #include "Wanted_B01.h"
 #include "BearTrap.h"
 #include "EnemyAI/BountyHunter/BountyHunter.h"
+#include "EnemyAI/BountyHunter/TrapLocations.h"
 #include "Character/CharacterController.h"
 #include "Engine.h"
 
@@ -18,40 +19,62 @@ ABearTrap::ABearTrap()
 	TrapCollider->SetSphereRadius(radius);
 	TrapCollider->OnComponentBeginOverlap.AddDynamic(this, &ABearTrap::OnComponentBeginOverlap);
 	TrapCollider->OnComponentEndOverlap.AddDynamic(this, &ABearTrap::OnComponentEndOverlap);
-
-	BountyHunter = Cast<ABountyHunter>(GetClass());
+	bIsVisible = false;
+	BountyHunter = NULL;
 }
 
 void ABearTrap::BeginPlay()
 {
 	Super::BeginPlay();
-	SetOwner(BountyHunter);
+
+	
 }
 
 void ABearTrap::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
-	// UE_LOG(LogTemp, Display, TEXT("The bear trap has been hidden"));
-	// this->SetActorHiddenInGame(true);
+	if (bIsVisible)
+	{
+		this->SetActorHiddenInGame(false);
+	}
 }
-
 
 void ABearTrap::SetOwner(AActor* NewOwner)
 {
-	UE_LOG(LogTemp, Display, TEXT("The new owner of the Bear Trap is now the Bounty Hunter"));
 	NewOwner = BountyHunter;
+}
+
+void ABearTrap::Destroyed()
+{
+	if (LocationBeingOccupied != NULL) 
+	{
+		LocationBeingOccupied->bIsOccupied = false;
+	}
+	Super::Destroyed();
+}
+
+void ABearTrap::SetLocationBeingOccupied(class ATrapLocations* NewLocationBeingOccupied)
+{
+	LocationBeingOccupied = NewLocationBeingOccupied;
 }
 
 void ABearTrap::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	// this->SetActorHiddenInGame(false);
+	if (ACharacterController* Player = Cast<ACharacterController>(OtherActor))
+	{
 		UE_LOG(LogTemp, Display, TEXT("You've stepped on a trap"));
+	}
+
 }
 
 void ABearTrap::OnComponentEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-		UE_LOG(LogTemp, Display, TEXT("The trap activated and applied damage to you"));
-		UGameplayStatics::ApplyDamage(OtherActor, Damage, GetWorld()->GetFirstPlayerController(), this, TSubclassOf<UDamageType>());
-		UE_LOG(LogTemp, Display, TEXT("The trap was used and now is destroyed"));
-		Destroy();
+		if (ACharacterController* Player = Cast<ACharacterController>(OtherActor))
+		{
+			bIsVisible = true;
+			this->SetActorHiddenInGame(true);
+			UE_LOG(LogTemp, Display, TEXT("The trap activated and applied damage to you"));
+			UGameplayStatics::ApplyDamage(OtherActor, Damage, GetWorld()->GetFirstPlayerController(), this, TSubclassOf<UDamageType>());
+			Destroy();
+		}
 }
