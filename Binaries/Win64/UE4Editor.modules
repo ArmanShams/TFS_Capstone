@@ -1,8 +1,8 @@
 {
 	"Changelist" : 3172292,
-	"BuildId" : "14adb6cb-94ae-4a8d-8f6c-dd6e42580ebd",
+	"BuildId" : "52c30bd9-e45b-4a8d-949f-d2f115d0aa26",
 	"Modules" : 
 	{
-		"Wanted_B01" : "UE4Editor-Wanted_B01-6419.dll"
+		"Wanted_B01" : "UE4Editor-Wanted_B01-3241.dll"
 	}
 }

@@ -19,8 +19,6 @@ public:
 	float radius;
 	float Damage;
 
-	bool bTrapActive;
-
 	virtual void SetOwner(AActor* NewOwner) override;
 	
 protected:
