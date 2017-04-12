@@ -39,6 +39,7 @@ public:
 	virtual bool GetBTIsInRange();
 	virtual MinerState GetMinerState();
 	virtual CharacterState::StatusEffect GetStatusEffect() override;
+	virtual void Destroyed() override;
 
 	// The distance at which the Miner will be able to use the stomp;
 	UPROPERTY(EditDefaultsOnly)

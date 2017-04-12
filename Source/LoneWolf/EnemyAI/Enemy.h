@@ -42,7 +42,7 @@ public:
 	virtual bool bIsSoftCC() override;
 	// Returns true if the actor's Status Effects is a 'hardCC'. Defined in Design Document
 	virtual bool bIsHardCC() override;
-	
+	virtual void Destroyed() override;
 
 
 	virtual CharacterState::StatusEffect GetStatusEffect();
