@@ -91,6 +91,7 @@ bool ALoneWolfCharacter::bIsSoftCC()
 	return false;
 }
 
+void ALoneWolfCharacter::Destroyed()
 {
 	Super::Destroyed();
 }
