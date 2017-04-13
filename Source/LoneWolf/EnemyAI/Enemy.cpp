@@ -201,6 +201,11 @@ bool AEnemy::bIsHardCC()
 	//}
 }
 
+void AEnemy::Destroyed()
+{
+	Super::Destroyed();
+}
+
 CharacterState::StatusEffect AEnemy::GetStatusEffect()
 {
 	return Effects;

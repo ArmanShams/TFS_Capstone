@@ -91,3 +91,8 @@ bool ALoneWolfCharacter::bIsSoftCC()
 	return false;
 }
 
+{
+	Super::Destroyed();
+}
+
+

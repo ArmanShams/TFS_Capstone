@@ -300,12 +300,12 @@ void AMinerAI::Stomp()
 			DrawDebugSphere(GetWorld(), GetActorLocation(), StompRadius, 32, FColor::Red, false, 1.5f);
 			for (size_t i = 0; i < HitResult.Num(); i++)
 			{
-				Cast<ALoneWolfCharacter>(HitResult[i].GetActor())->AddStatusEffect(UStatusEffect_HardCrowdControl::StaticClass(), false, StompStunDuration, 0.f, this);
+				if (ALoneWolfCharacter* RecastedResult = Cast<ALoneWolfCharacter>(HitResult[i].GetActor()))
+				{
+					RecastedResult->AddStatusEffect(UStatusEffect_HardCrowdControl::StaticClass(), false, StompStunDuration, 0.f, this);
+				}
 			}
-
-			
 		}
-
 		Effects = CharacterState::NONE;
 		CurrentState = MinerState::IDLE;
 	}
@@ -314,6 +314,23 @@ void AMinerAI::Stomp()
 CharacterState::StatusEffect AMinerAI::GetStatusEffect()
 {
 	return Super::GetStatusEffect();
+}
+
+void AMinerAI::Destroyed()
+{
+	if (ArrowDecalActor != NULL)
+	{
+		ArrowDecalActor->SetOwner(NULL);
+		ArrowDecalActor->SetLifeSpan(0.001f);
+		ArrowDecalActor = NULL;
+	}
+	if (StompDecalActor != NULL)
+	{
+		StompDecalActor->SetOwner(NULL);
+		StompDecalActor->SetLifeSpan(0.001f);
+		StompDecalActor = NULL;
+	}
+	Super::Destroyed();
 }
 
 void AMinerAI::EquipWeapon(TSubclassOf<AWeapon> WeaponToEquip)

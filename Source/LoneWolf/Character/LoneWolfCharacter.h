@@ -39,5 +39,6 @@ public:
 	virtual void AddStatusEffect(TSubclassOf<class UStatusEffectBase> ClassToCreateFrom, bool bShouldPerformTickAction, bool bShouldDealDamage, float LifeTime, float DamageToDeal, float TickRate, ALoneWolfCharacter* CharacterThatInflictedStatusEffect);
 	virtual bool bIsHardCC();
 	virtual bool bIsSoftCC();
+	virtual void Destroyed() override;
 
 };
