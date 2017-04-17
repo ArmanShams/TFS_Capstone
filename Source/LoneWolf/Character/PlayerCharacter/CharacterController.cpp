@@ -311,12 +311,17 @@ void ACharacterController::OnMouseMove(float scale)
 				FVector2D CenterPoint;
 				PlayerController->ProjectWorldLocationToScreen(GetMesh()->GetComponentLocation(), CenterPoint);
 
+
 				FVector Diff = FVector(MousePosition.X - CenterPoint.X, MousePosition.Y - CenterPoint.Y, 0.f);
 				GetMesh()->SetRelativeRotation(FMath::RInterpTo(GetMesh()->RelativeRotation, FRotator(0.f, Diff.Rotation().Yaw, 0.f),GetWorld()->GetDeltaSeconds(), TurnRate));
 				if (CurrentlyEquippedWeapon != NULL)
 				{
 					if (Cast<AWeapon_Ranged>(CurrentlyEquippedWeapon))
 					{
+						FRotator DesiredWeaponRotation = GetActorRotation();
+
+
+						FHitResult OutHitResultHorizontalAdjust(ForceInit);
 						if (PlayerController->GetHitResultUnderCursor(ECollisionChannel::ECC_WorldStatic, false, OutHitResultHorizontalAdjust))
 						{
 							FVector DirectionHorizontal = OutHitResultHorizontalAdjust.Location - GetActorLocation();
