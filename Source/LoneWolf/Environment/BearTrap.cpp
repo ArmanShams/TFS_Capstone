@@ -2,43 +2,76 @@
 
 #include "LoneWolf.h"
 #include "BearTrap.h"
+#include "EnemyAI/BountyHunter/BountyHunter.h"
+#include "EnemyAI/BountyHunter/TrapLocations.h"
+#include "Character/PlayerCharacter/CharacterController.h"
 #include "Engine.h"
 
 
-// Sets default values
 ABearTrap::ABearTrap()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
+	TrapCollider = CreateDefaultSubobject<USphereComponent>(TEXT("TrapCollider"));
+	TrapCollider->AttachTo(RootComponent);
+	radius = 30.f;
+	Damage = 5;
+	TrapCollider->SetCollisionProfileName(TEXT("Traps"));
+	TrapCollider->SetSphereRadius(radius);
+	TrapCollider->OnComponentBeginOverlap.AddDynamic(this, &ABearTrap::OnComponentBeginOverlap);
+	TrapCollider->OnComponentEndOverlap.AddDynamic(this, &ABearTrap::OnComponentEndOverlap);
+	bIsVisible = false;
+	BountyHunter = NULL;
 }
 
-// Called when the game starts or when spawned
 void ABearTrap::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
-// Called every frame
-void ABearTrap::Tick( float DeltaTime )
+void ABearTrap::Tick(float DeltaTime)
 {
-	Super::Tick( DeltaTime );
-
-
+	Super::Tick(DeltaTime);
+	if (bIsVisible)
+	{
+		this->SetActorHiddenInGame(false);
+	}
 }
 
-void ABearTrap::damageToPlayer()
+void ABearTrap::SetOwner(AActor* NewOwner)
 {
+	NewOwner = BountyHunter;
 }
 
-void ABearTrap::effectToPlayer()
+void ABearTrap::Destroyed()
 {
+	if (LocationBeingOccupied != NULL)
+	{
+		LocationBeingOccupied->bIsOccupied = false;
+	}
+	Super::Destroyed();
 }
 
-void ABearTrap::OnOverlapBegin(UPrimitiveComponent * OverlappedComp, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
+void ABearTrap::SetLocationBeingOccupied(class ATrapLocations* NewLocationBeingOccupied)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::White, FString::Printf(TEXT("You've stepped on a bear trap!")));
-
+	LocationBeingOccupied = NewLocationBeingOccupied;
 }
 
+void ABearTrap::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (ACharacterController* Player = Cast<ACharacterController>(OtherActor))
+	{
+		UE_LOG(LogTemp, Display, TEXT("You've stepped on a trap"));
+	}
+}
+
+void ABearTrap::OnComponentEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (ACharacterController* Player = Cast<ACharacterController>(OtherActor))
+	{
+		bIsVisible = true;
+		this->SetActorHiddenInGame(true);
+		UE_LOG(LogTemp, Display, TEXT("The trap activated and applied damage to you"));
+		UGameplayStatics::ApplyDamage(OtherActor, Damage, GetWorld()->GetFirstPlayerController(), this, TSubclassOf<UDamageType>());
+		Destroy();
+	}
+}

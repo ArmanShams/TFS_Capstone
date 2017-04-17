@@ -12,8 +12,34 @@ UCLASS()
 class LONEWOLF_API ABountyHunter : public AEnemy
 {
 	GENERATED_BODY()
-	
-	
-	
-	
+
+public:
+	ABountyHunter();
+
+	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaSeconds) override;
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
+	virtual bool bIsInRange() override;
+	virtual bool bIsInRange(float OveriddenDesiredRange) override;
+
+private:
+	UFUNCTION()
+		void SetBearTrap(ATrapLocations* NewTrapLocation, const FHitResult & SweepResult);
+
+	UFUNCTION()
+		void OnActorBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+protected:
+	UPROPERTY(EditDefaultsOnly)
+		uint8 MaximumTrapsAllowed;
+
+	TSubclassOf<class ABearTrap> BearTrapClass;
+	ABearTrap* BearTrapPlaced;
+
+	TArray<AActor*> TrapArray;
+
+	virtual void EquipWeapon(TSubclassOf<AWeapon> WeaponToEquip);
+
+	friend class ABearTrap;
 };

@@ -9,29 +9,39 @@ UCLASS()
 class LONEWOLF_API ABearTrap : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
-	// Sets default values for this actor's properties
-	ABearTrap();
 
-	// Called when the game starts or when spawned
+public:
+	ABearTrap();
 	virtual void BeginPlay() override;
-	
-	// Called every frame
-	virtual void Tick( float DeltaSeconds ) override;
+	virtual void Tick(float DeltaSeconds) override;
 
 	UPROPERTY(EditAnywhere)
-	float triggerRadius;
-	float damage;
-	float rootDurationInSeconds;
-	
-	
+		float radius;
+	float Damage;
+
+	UPROPERTY(EditAnywhere)
+		bool bIsVisible;
+
+	virtual void SetOwner(AActor* NewOwner) override;
+
+	virtual void Destroyed() override;
+
 protected:
-	void damageToPlayer();
-	void effectToPlayer();
+	UPROPERTY(EditAnywhere, Category = "Collision")
+		USphereComponent* TrapCollider;
+
+	class ATrapLocations* LocationBeingOccupied;
+
+	virtual void SetLocationBeingOccupied(class ATrapLocations* NewLocationBeingOccupied);
+
+private:
+	UFUNCTION()
+		void OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION()
-		void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+		void OnComponentEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+	class ABountyHunter* BountyHunter;
 
+	friend class ABountyHunter;
 };
