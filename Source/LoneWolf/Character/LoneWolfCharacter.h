@@ -37,8 +37,12 @@ public:
 		CharacterThatInflictedStatusEffect	-The character that inflicted the status effect.
 	*/
 	virtual void AddStatusEffect(TSubclassOf<class UStatusEffectBase> ClassToCreateFrom, bool bShouldPerformTickAction, bool bShouldDealDamage, float LifeTime, float DamageToDeal, float TickRate, ALoneWolfCharacter* CharacterThatInflictedStatusEffect);
+	virtual void EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip);
 	virtual bool bIsHardCC();
 	virtual bool bIsSoftCC();
 	virtual void Destroyed() override;
+
+protected:
+	class AWeapon* CurrentlyEquippedWeapon;
 
 };

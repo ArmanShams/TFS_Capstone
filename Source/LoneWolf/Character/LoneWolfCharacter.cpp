@@ -5,6 +5,7 @@
 #include "Character/StatusEffects/StatusEffectBase.h"
 #include "Character/StatusEffects/StatusEffect_HardCrowdControl.h"
 #include "Character/StatusEffects/StatusEffect_SoftCrowdControl.h"
+#include "Weapons/Weapon.h"
 
 ALoneWolfCharacter::ALoneWolfCharacter()
 {
@@ -67,11 +68,18 @@ void ALoneWolfCharacter::AddStatusEffect(TSubclassOf<class UStatusEffectBase> Cl
 	Effect->SetUpStatusEffect(bShouldDealDamage, bShouldPerformTickAction, LifeTime, DamageToDeal, TickRate, this, CharacterThatInflictedStatusEffect);
 }
 
+void ALoneWolfCharacter::EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip)
+{
+	CurrentlyEquippedWeapon = GetWorld()->SpawnActor<AWeapon>(WeaponToEquip);
+	CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepWorldTransform, FName("hand_r"));
+	CurrentlyEquippedWeapon->SetActorLocation(GetMesh()->GetSocketLocation(FName("hand_r")));
+	CurrentlyEquippedWeapon->SetOwner(this);
+}
+
 bool ALoneWolfCharacter::bIsHardCC()
 {
 	if (GetComponentByClass(UStatusEffect_HardCrowdControl::StaticClass()))
 	{
-		//UE_LOG(LogTemp, Display, TEXT("WE ARE IN THE CC"));
 		return true;
 	}
 	return false;
@@ -85,7 +93,6 @@ bool ALoneWolfCharacter::bIsSoftCC()
 	}
 	if (GetComponentByClass(UStatusEffect_SoftCrowdControl::StaticClass()))
 	{
-		//UE_LOG(LogTemp, Display, TEXT("WE ARE IN THE CC"));
 		return true;
 	}
 	return false;

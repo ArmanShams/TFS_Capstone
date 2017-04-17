@@ -26,7 +26,7 @@ void UBTService_FindTarget::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* N
 		// Cancels current movement task if the AI is patrolling.
 		if (Cast<ATargetPoint>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(TEXT("Target"))))
 		{
-			UE_LOG(LogTemp, Display, TEXT("We are in the beam"));
+			//UE_LOG(LogTemp, Display, TEXT("We are in the beam"));
 			OwnerComp.GetAIOwner()->StopMovement();
 		}
 		AActor* HostileActor = NULL; 
