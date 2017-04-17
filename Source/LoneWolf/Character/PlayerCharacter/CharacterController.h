@@ -29,7 +29,7 @@ public:
 	virtual void AddRage(float RageToAdd);
 	virtual void AddStatusEffect(TSubclassOf<class UStatusEffectBase> ClassToCreateFrom, bool bShouldPerformTickAction, float LifeTime, float TickRate, ALoneWolfCharacter* CharacterThatInflictedStatusEffect) override;
 	virtual void AddStatusEffect(TSubclassOf<class UStatusEffectBase> ClassToCreateFrom, bool bShouldPerformTickAction, bool bShouldDealDamage, float LifeTime, float DamageToDeal, float TickRate, ALoneWolfCharacter* CharacterThatInflictedStatusEffect) override;
-	virtual void EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip);
+	virtual void EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip) override;
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 	virtual bool bIsHardCC() override;
 	virtual bool bIsSoftCC() override;
@@ -60,7 +60,10 @@ public:
 
 	UFUNCTION()
 	void OnCollision(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
-
+	UFUNCTION()
+	void OnAimSnapBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
+	void OnAimSnapOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 protected:
 	bool IsRolling();
 	bool IsMeleeAttacking();
@@ -84,6 +87,13 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	float RageDrainPerSecond;
 	
+	UPROPERTY(EditDefaultsOnly)
+	float AimSnapHalfHeight;
+	UPROPERTY(EditDefaultsOnly)
+	float AimSnapRadius;
+	//UPROPERTY(EditDefaultsOnly)
+	//	float Health;
+
 	bool bIsMeleeAttacking;
 	bool bIsRolling;
 
@@ -96,10 +106,12 @@ protected:
 	UPROPERTY(Category = Collision, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UCapsuleComponent* CapsuleCollider;
 
+	UPROPERTY(Category = Collision, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class UCapsuleComponent* AimSnapCapsule;
+
 	TSubclassOf<class AWeapon> DefaultWeapon;
 	TSubclassOf<class AWeapon> WolfWeapon;
-	class AWeapon* CurrentlyEquippedWeapon;
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
 	TSubclassOf<class UUserWidget> wInGameHud;
 

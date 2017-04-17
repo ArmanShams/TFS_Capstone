@@ -5,6 +5,7 @@
 #include "Character/StatusEffects/StatusEffectBase.h"
 #include "Character/StatusEffects/StatusEffect_HardCrowdControl.h"
 #include "Character/StatusEffects/StatusEffect_SoftCrowdControl.h"
+#include "Weapons/Weapon.h"
 
 ALoneWolfCharacter::ALoneWolfCharacter()
 {
@@ -65,6 +66,15 @@ void ALoneWolfCharacter::AddStatusEffect(TSubclassOf<class UStatusEffectBase> Cl
 	this->AddOwnedComponent(Effect);
 	Effect->RegisterComponent();
 	Effect->SetUpStatusEffect(bShouldDealDamage, bShouldPerformTickAction, LifeTime, DamageToDeal, TickRate, this, CharacterThatInflictedStatusEffect);
+}
+
+void ALoneWolfCharacter::EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip)
+{
+	CurrentlyEquippedWeapon = GetWorld()->SpawnActor<AWeapon>(WeaponToEquip);
+	//CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(90.f, 180.f, 0.f));;
+	CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepWorldTransform, FName("hand_r"));
+	CurrentlyEquippedWeapon->SetActorLocation(GetMesh()->GetSocketLocation(FName("hand_r")));
+	CurrentlyEquippedWeapon->SetOwner(this);
 }
 
 bool ALoneWolfCharacter::bIsHardCC()
