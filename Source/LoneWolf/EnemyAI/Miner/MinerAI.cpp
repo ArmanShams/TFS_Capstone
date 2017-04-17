@@ -165,6 +165,8 @@ void AMinerAI::Tick(float DeltaSeconds)
 			//UE_LOG(LogTemp, Display, TEXT("I AM HARD CC"));
 		}
 	}
+
+	//DrawDebugLine(GetWorld(), RootComponent->GetComponentLocation(), RootComponent->GetComponentLocation() + GetActorForwardVector() * 50.f , FColor(255, 255, 255), true, -1, 0, 12.333);
 }
 
 void AMinerAI::SetupPlayerInputComponent(class UInputComponent* InputComponent)
@@ -346,15 +348,15 @@ void AMinerAI::OnCollision(UPrimitiveComponent* HitComponent, AActor* OtherActor
 
 	if (CurrentState == MinerState::CHARGING)
 	{
-		if (GetWorld()->LineTraceSingleByChannel(OutHit, GetActorLocation(), OtherActor->GetActorLocation(), ECC_GameTraceChannel5, Params, ResponseParam))
-		{
-			// REPLACE WITH ENTERING STUN LATER
 
-			
+		if (GetWorld()->LineTraceSingleByChannel(OutHit, RootComponent->GetComponentLocation(), RootComponent->GetComponentLocation() + GetActorForwardVector() * 50.f, ECC_GameTraceChannel5, Params, ResponseParam))
+		{
+			DrawDebugLine(GetWorld(), RootComponent->GetComponentLocation(), RootComponent->GetComponentLocation() + GetActorForwardVector() * 50.f, FColor(255, 255, 255), true, -1, 0, 12.333);
+			DrawDebugLine(GetWorld(), RootComponent->GetComponentLocation(), OutHit.Location, FColor(0, 255, 0), true, -1, 0, 12.333);
 			//Effects = CharacterState::NONE;
 			//DrawDebugLine(GetWorld(), GetActorLocation(), GetMesh()->GetForwardVector() * 15.f, FColor(255, 0, 0), true, -1, 0, 12.333);
-			DrawDebugLine(GetWorld(), GetActorLocation(), OutHit.GetActor()->GetActorLocation(), FColor(0, 255, 0), true, -1, 0, 12.333);
-
+			//DrawDebugLine(GetWorld(), RootComponent->GetComponentLocation(), OutHit.Location, FColor(0, 255, 0), true, -1, 0, 12.333);
+			
 
 			if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
 			{
@@ -385,7 +387,6 @@ void AMinerAI::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComp, AAct
 			UGameplayStatics::ApplyDamage(OtherActor, ChargeDamage, GetController(), this, TSubclassOf<UDamageType>());
 			bChargeHasDamagedPlayer = true;
 			//DirectionToLaunch.Normalize();
-
 		}
 
 		if (bChargeHasDamagedPlayer)

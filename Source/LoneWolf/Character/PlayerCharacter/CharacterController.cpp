@@ -9,7 +9,7 @@
 #include "Character/StatusEffects/StatusEffectBase.h"
 #include "Character/StatusEffects/StatusEffect_HardCrowdControl.h"
 #include "Character/StatusEffects/StatusEffect_TestDerivative.h"
-
+#include "AimSnapSurface.h"
 
 ACharacterController::ACharacterController()
 {
@@ -23,8 +23,26 @@ ACharacterController::ACharacterController()
 	bIsRolling = false;
 	TurnRate = 0.25f;
 	
+	AimSnapHalfHeight = 256.f;
+	AimSnapRadius = 128.;
+
+
+	AimSnapCapsule = CreateDefaultSubobject<UCapsuleComponent>(TEXT("AimSnapCapsule"));
+	AimSnapCapsule->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	AimSnapCapsule->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+	ECanBeCharacterBase StepUpResponse = ECanBeCharacterBase::ECB_No;
+	TEnumAsByte<ECanBeCharacterBase> StepUpResponseByte = StepUpResponse;
+	AimSnapCapsule->CanCharacterStepUpOn = StepUpResponseByte;
+	AimSnapCapsule->SetCanEverAffectNavigation(false);
+	AimSnapCapsule->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Overlap);
+	AimSnapCapsule->SetCapsuleHalfHeight(AimSnapHalfHeight);
+	AimSnapCapsule->SetCapsuleRadius(AimSnapRadius);
+
 	//Bind dynamic delegates
 	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &ThisClass::OnCollision);
+	AimSnapCapsule->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnAimSnapBeginOverlap);
+	AimSnapCapsule->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnAimSnapOverlapEnd);
+
 
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
@@ -59,7 +77,8 @@ ACharacterController::ACharacterController()
 void ACharacterController::BeginPlay()
 {
 	Super::BeginPlay();
-
+	AimSnapCapsule->SetCapsuleHalfHeight(AimSnapHalfHeight);
+	AimSnapCapsule->SetCapsuleRadius(AimSnapRadius);
 	if (!NeuteredMode)
 	{
 		EquipNewWeapon(DefaultWeapon);
@@ -90,12 +109,6 @@ void ACharacterController::Tick( float DeltaSeconds )
 {
 	Super::Tick(DeltaSeconds);
 
-	if (bIsHardCC())
-	{
-		//UE_LOG(LogTemp, Display, TEXT("I AM IN HARD CC MY EYES HURT PLEASE SEND HELP"));
-	}
-	
-
 	if (Rage >= MAXRAGE && CurrentForm == TransformationState::HUMAN)
 	{
 		CurrentForm = TransformationState::WOLF;
@@ -118,8 +131,6 @@ void ACharacterController::Tick( float DeltaSeconds )
 			//CurrentlyEquippedWeapon->bOwnedByPlayer = true;
 		}
 	}
-
-
 	if (CurrentForm == TransformationState::WOLF)
 	{
 		Rage -= RageDrainPerSecond * DeltaSeconds;
@@ -167,6 +178,8 @@ void ACharacterController::Tick( float DeltaSeconds )
 
 		break;
 	}
+
+	DrawDebugCapsule(GetWorld(), GetActorLocation(), AimSnapHalfHeight, AimSnapRadius, FQuat::Identity, FColor::Red, false, 0.04f);
 
 }
 
@@ -254,10 +267,12 @@ bool ACharacterController::bIsSoftCC()
 
 void ACharacterController::EquipNewWeapon(TSubclassOf<AWeapon> WeaponToEquip)
 {
-	CurrentlyEquippedWeapon = GetWorld()->SpawnActor<AWeapon>(WeaponToEquip);
-	CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(90.f, 180.f, 0.f));;
-	CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("hand_r"));
-	CurrentlyEquippedWeapon->SetOwner(this);
+	Super::EquipNewWeapon(WeaponToEquip);
+	//FVector Direction = (GetActorForwardVector()) * 128.f + GetActorUpVector() * 128.f - CurrentlyEquippedWeapon->GetActorLocation();
+	////DrawDebugLine(GetWorld(), CurrentlyEquippedWeapon->GetActorLocation(), OutHitResult.ImpactPoint + FVector::UpVector * 20.f, FColor(255, 0, 255), false, 0.05f, 0, 12.333f);
+	////FRotator RotationInDirection = FRotationMatrix::MakeFromX(Direction).Rotator();
+	CurrentlyEquippedWeapon->SetActorRotation(FRotator::ZeroRotator);
+	//CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(0.f, -90.f, 0.f));
 }
 
 CharacterState::StatusEffect ACharacterController::GetStatusEffect()
@@ -291,14 +306,39 @@ void ACharacterController::OnMouseMove(float scale)
 			FVector2D MousePosition;
 			UGameViewportClient* ViewportClient = GetWorld()->GetGameViewport();
 
-			if (ViewportClient && ViewportClient->GetMousePosition(MousePosition))
+			if (ViewportClient && PlayerController->GetMousePosition(MousePosition.X, MousePosition.Y))
 			{
 				FVector2D CenterPoint;
 				PlayerController->ProjectWorldLocationToScreen(GetMesh()->GetComponentLocation(), CenterPoint);
 
 				FVector Diff = FVector(MousePosition.X - CenterPoint.X, MousePosition.Y - CenterPoint.Y, 0.f);
+				GetMesh()->SetRelativeRotation(FMath::RInterpTo(GetMesh()->RelativeRotation, FRotator(0.f, Diff.Rotation().Yaw, 0.f),GetWorld()->GetDeltaSeconds(), TurnRate));
+				if (CurrentlyEquippedWeapon != NULL)
+				{
+					if (Cast<AWeapon_Ranged>(CurrentlyEquippedWeapon))
+					{
+						if (PlayerController->GetHitResultUnderCursor(ECollisionChannel::ECC_WorldStatic, false, OutHitResultHorizontalAdjust))
+						{
+							FVector DirectionHorizontal = OutHitResultHorizontalAdjust.Location - GetActorLocation();
+							DirectionHorizontal.Z = CurrentlyEquippedWeapon->GetActorLocation().Z;
+							if (DirectionHorizontal.Size() > 250.f)
+							{
+								float Magnitude = DirectionHorizontal.Size();							
+								FRotator YawRotation = (OutHitResultHorizontalAdjust.Location - CurrentlyEquippedWeapon->GetActorLocation()).Rotation();
+								DesiredWeaponRotation.Yaw = YawRotation.Yaw;
+							}
+						}
 
-				GetMesh()->SetRelativeRotation(FMath::Lerp(GetMesh()->RelativeRotation, FRotator(0.f, Diff.Rotation().Yaw, 0.f), TurnRate));
+						FHitResult OutHitResultVerticalResult(ForceInit);
+						if (PlayerController->GetHitResultUnderCursor(ECollisionChannel::ECC_GameTraceChannel6, false, OutHitResultVerticalResult))
+						{
+							FVector Direction = OutHitResultVerticalResult.ImpactPoint + FVector::UpVector * 128.f - CurrentlyEquippedWeapon->GetActorLocation();
+							FRotator RotationInDirection = FRotationMatrix::MakeFromX(Direction).Rotator();
+							DesiredWeaponRotation.Pitch = RotationInDirection.Pitch;
+						}
+						CurrentlyEquippedWeapon->SetActorRotation(FMath::RInterpTo(CurrentlyEquippedWeapon->GetActorRotation(), DesiredWeaponRotation, GetWorld()->GetDeltaSeconds(), TurnRate));
+					}
+				}	
 			}
 		}
 	}
@@ -343,11 +383,6 @@ void ACharacterController::OnRollPressed()
 				RollDestination = FVector(RollStartingPoint.X + (MovementVector.X * RollDistance), RollStartingPoint.Y + (MovementVector.Y * RollDistance), RollStartingPoint.Z);
 				bIsRolling = true;
 			}
-			else
-			{
-				//UE_LOG(LogTemp, Warning, TEXT("Defaulting to rolling backwards"));
-				//RollDestination = FVector(RollStartingPoint.X, RollStartingPoint.Y + RollDistance, RollStartingPoint.Z );
-			}
 		}
 	}
 }
@@ -363,7 +398,6 @@ void ACharacterController::EquipRevolver()
 	CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(90.f, 180.f, 0.f));
 	CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("hand_r"));
 	CurrentlyEquippedWeapon->SetOwner(this);
-	//CurrentlyEquippedWeapon->bOwnedByPlayer = true;
 }
 
 void ACharacterController::OnShootPressed()
@@ -378,7 +412,6 @@ void ACharacterController::OnShootPressed()
 		{
 			bIsMeleeAttacking = true;
 			CurrentMeleeAttackType = AttackTypes::LIGHT;
-			//Cast<UCharacterWolfAnimInstance>()->bCanAttack = true;
 		}
 	}
 }
@@ -400,7 +433,6 @@ void ACharacterController::OnAltShootPressed()
 		{
 			bIsMeleeAttacking = true;
 			CurrentMeleeAttackType = AttackTypes::HEAVY;
-			//Cast<UCharacterWolfAnimInstance>()->bCanAttack = true;
 		}
 	}
 }
@@ -427,12 +459,30 @@ void ACharacterController::OnDebugRagePressed()
 
 void ACharacterController::OnCollision(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	//UE_LOG(LogTemp, Display, TEXT("WE ARE IN THE BEAM"));
-
 	if (bIsRolling)
 	{
 		RollDestination = RootComponent->RelativeLocation;
 		bIsRolling = false;
+	}
+}
+
+void ACharacterController::OnAimSnapBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (AAimSnapSurface* RecastedSurface = Cast<AAimSnapSurface>(OtherActor))
+	{
+		UE_LOG(LogTemp, Display, TEXT("Activating an aimsnap area %s"), *OtherActor->GetName());
+		DrawDebugLine(GetWorld(), GetActorLocation(), OtherActor->GetActorLocation(), FColor(0, 255, 0), false, 0.05f, 0, 12.333f);
+		RecastedSurface->SetActive(true);
+	}
+}
+
+void ACharacterController::OnAimSnapOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{	
+	if (AAimSnapSurface* RecastedSurface = Cast<AAimSnapSurface>(OtherActor))
+	{
+		UE_LOG(LogTemp, Display, TEXT("DeActivating an aimsnap area %s"), *OtherActor->GetName());
+		DrawDebugLine(GetWorld(), GetActorLocation(), OtherActor->GetActorLocation(), FColor(255, 0, 0), false, 0.05f, 0, 12.333f);
+		RecastedSurface->SetActive(false);
 	}
 }
 
