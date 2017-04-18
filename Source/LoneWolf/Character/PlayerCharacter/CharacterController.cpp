@@ -180,7 +180,7 @@ void ACharacterController::Tick( float DeltaSeconds )
 		break;
 	}
 
-	DrawDebugCapsule(GetWorld(), GetActorLocation(), AimSnapHalfHeight, AimSnapRadius, FQuat::Identity, FColor::Red, false, 0.04f);
+	//DrawDebugCapsule(GetWorld(), GetActorLocation(), AimSnapHalfHeight, AimSnapRadius, FQuat::Identity, FColor::Red, false, 0.04f);
 
 }
 
