@@ -27,7 +27,7 @@ void UCharacterWolfAnimInstance::AnimNotify_MeleeAtkStart()
 {
 	if (bCanAttack)
 	{
-		UE_LOG(LogTemp, Display, TEXT("We are in the beam"));
+		//UE_LOG(LogTemp, Display, TEXT("We are in the beam"));
 		//call a function on our characters to enable colliders on melee weapons
 		if (Cast<AWeapon_Melee>(CharacterController->CurrentlyEquippedWeapon))
 		{

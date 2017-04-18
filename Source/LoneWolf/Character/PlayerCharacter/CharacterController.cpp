@@ -117,7 +117,7 @@ void ACharacterController::Tick( float DeltaSeconds )
 		//USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(NULL, TEXT("SkeletalMesh'/Game/Geometry/Characters/Werewolf/M_Werewolf.M_Werewolf'"), NULL, LOAD_None, NULL);
 
 		USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(NULL, TEXT("SkeletalMesh'/Game/MixamoAnimPack/Mixamo_Adam/Mesh/Maximo_Adam.Maximo_Adam'"), NULL, LOAD_None, NULL);
-		UAnimBlueprint* NewAnimInstance = LoadObject<UAnimBlueprint>(NULL, TEXT("AnimBlueprint'/Game/Blueprints/Player/CharacterControllerWolfPlacehonder.CharacterControllerWolfPlacehonder'"), NULL, LOAD_None, NULL);
+		UAnimBlueprint* NewAnimInstance = LoadObject<UAnimBlueprint>(NULL, TEXT("AnimBlueprint'/Game/Blueprints/Player/CharacterControllerWolfPlaceholder.CharacterControllerWolfPlaceholder'"), NULL, LOAD_None, NULL);
 		if (NewMesh)
 		{
 			GetMesh()->SetSkeletalMesh(NewMesh);
@@ -144,8 +144,9 @@ void ACharacterController::Tick( float DeltaSeconds )
 			if (NewMesh)
 			{
 				GetMesh()->SetSkeletalMesh(NewMesh);
+				EquipNewWeapon(DefaultWeapon);
 			}
-			EquipRevolver();
+			//EquipRevolver();
 			Rage = 0.0f;
 		}
 	}
@@ -320,16 +321,23 @@ void ACharacterController::OnMouseMove(float scale)
 					{
 						FRotator DesiredWeaponRotation = GetActorRotation();
 
-
 						FHitResult OutHitResultHorizontalAdjust(ForceInit);
-						if (PlayerController->GetHitResultUnderCursor(ECollisionChannel::ECC_WorldStatic, false, OutHitResultHorizontalAdjust))
+						if (PlayerController->GetHitResultUnderCursor(ECollisionChannel::ECC_Camera, false, OutHitResultHorizontalAdjust))
 						{
-							FVector DirectionHorizontal = OutHitResultHorizontalAdjust.Location - GetActorLocation();
-							DirectionHorizontal.Z = CurrentlyEquippedWeapon->GetActorLocation().Z;
-							if (DirectionHorizontal.Size() > 250.f)
+							FVector DirectionHorizontal = FVector(OutHitResultHorizontalAdjust.Location.X - GetActorLocation().X, OutHitResultHorizontalAdjust.Location.Y - GetActorLocation().Y, OutHitResultHorizontalAdjust.Location.Z - GetActorLocation().Z);;
+							//DirectionHorizontal.Z = CurrentlyEquippedWeapon->GetActorLocation().Z;
+							//UE_LOG(LogTemp, Display, TEXT("Distance from player %f"), DirectionHorizontal.Size());
+							if (DirectionHorizontal.Size() > 300.f)
 							{
-								float Magnitude = DirectionHorizontal.Size();							
+								//float Magnitude = DirectionHorizontal.Size();	
+								//UE_LOG(LogTemp, Display, TEXT("Distance from player %f"), DirectionHorizontal.Size());
 								FRotator YawRotation = (OutHitResultHorizontalAdjust.Location - CurrentlyEquippedWeapon->GetActorLocation()).Rotation();
+								DesiredWeaponRotation.Yaw = YawRotation.Yaw;
+							}
+							else
+							{
+								FRotator YawRotation = (GetActorLocation() + (GetMesh()->GetRightVector() * 256.f) - CurrentlyEquippedWeapon->GetActorLocation()).Rotation();
+								//DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + GetMesh()->GetRightVector() * 256.f, FColor(255, 255, 255), false, 0.018f, 8, 12.333f);
 								DesiredWeaponRotation.Yaw = YawRotation.Yaw;
 							}
 						}
@@ -337,9 +345,19 @@ void ACharacterController::OnMouseMove(float scale)
 						FHitResult OutHitResultVerticalResult(ForceInit);
 						if (PlayerController->GetHitResultUnderCursor(ECollisionChannel::ECC_GameTraceChannel6, false, OutHitResultVerticalResult))
 						{
-							FVector Direction = OutHitResultVerticalResult.ImpactPoint + FVector::UpVector * 128.f - CurrentlyEquippedWeapon->GetActorLocation();
-							FRotator RotationInDirection = FRotationMatrix::MakeFromX(Direction).Rotator();
-							DesiredWeaponRotation.Pitch = RotationInDirection.Pitch;
+							FVector DirectionHorizontal = FVector(OutHitResultVerticalResult.Location.X - GetActorLocation().X, OutHitResultVerticalResult.Location.Y - GetActorLocation().Y, OutHitResultVerticalResult.Location.Z - GetActorLocation().Z);
+							//DirectionHorizontal.Z = CurrentlyEquippedWeapon->GetActorLocation().Z;
+							//DirectionHorizontal = OutHitResultVerticalResult.Location - GetActorLocation();
+							//UE_LOG(LogTemp, Display, TEXT("Distance from player %f"), DirectionHorizontal.Size());
+
+							if (DirectionHorizontal.Size() > 140.f)
+							{
+								//UE_LOG(LogTemp, Display, TEXT("Distance from player %f"), DirectionHorizontal.Size());
+								FVector Direction = OutHitResultVerticalResult.Location + FVector::UpVector * 128.f - CurrentlyEquippedWeapon->GetActorLocation();
+								FRotator RotationInDirection = FRotationMatrix::MakeFromX(Direction).Rotator();
+								DesiredWeaponRotation.Pitch = RotationInDirection.Pitch;
+							}
+							//DrawDebugPoint(GetWorld(), OutHitResultVerticalResult.Location, 2.0f, FColor(0, 255, 255), false, 1.0f);
 						}
 						CurrentlyEquippedWeapon->SetActorRotation(FMath::RInterpTo(CurrentlyEquippedWeapon->GetActorRotation(), DesiredWeaponRotation, GetWorld()->GetDeltaSeconds(), TurnRate));
 					}

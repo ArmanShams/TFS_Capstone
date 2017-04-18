@@ -71,7 +71,6 @@ void ALoneWolfCharacter::AddStatusEffect(TSubclassOf<class UStatusEffectBase> Cl
 void ALoneWolfCharacter::EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip)
 {
 	CurrentlyEquippedWeapon = GetWorld()->SpawnActor<AWeapon>(WeaponToEquip);
-	//CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(90.f, 180.f, 0.f));;
 	CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepWorldTransform, FName("hand_r"));
 	CurrentlyEquippedWeapon->SetActorLocation(GetMesh()->GetSocketLocation(FName("hand_r")));
 	CurrentlyEquippedWeapon->SetOwner(this);
@@ -81,7 +80,6 @@ bool ALoneWolfCharacter::bIsHardCC()
 {
 	if (GetComponentByClass(UStatusEffect_HardCrowdControl::StaticClass()))
 	{
-		//UE_LOG(LogTemp, Display, TEXT("WE ARE IN THE CC"));
 		return true;
 	}
 	return false;
@@ -95,7 +93,6 @@ bool ALoneWolfCharacter::bIsSoftCC()
 	}
 	if (GetComponentByClass(UStatusEffect_SoftCrowdControl::StaticClass()))
 	{
-		//UE_LOG(LogTemp, Display, TEXT("WE ARE IN THE CC"));
 		return true;
 	}
 	return false;
