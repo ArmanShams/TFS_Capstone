@@ -24,9 +24,9 @@ void ALoneWolfCharacter::Tick(float DeltaTime)
 
 }
 
-void ALoneWolfCharacter::SetupPlayerInputComponent(class UInputComponent* InputComponent)
+void ALoneWolfCharacter::SetupPlayerInputComponent(class UInputComponent* InInputComponent)
 {
-	Super::SetupPlayerInputComponent(InputComponent);
+	Super::SetupPlayerInputComponent(InInputComponent);
 }
 
 float ALoneWolfCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
@@ -43,11 +43,15 @@ float ALoneWolfCharacter::TakeDamage(float DamageAmount, struct FDamageEvent con
 */
 void ALoneWolfCharacter::AddStatusEffect(TSubclassOf<class UStatusEffectBase> ClassToCreateFrom, bool bShouldPerformTickAction, float LifeTime, float TickRate, ALoneWolfCharacter* CharacterThatInflictedStatusEffect)
 {
-	UStatusEffectBase* Effect = NewObject<UStatusEffectBase>(this, ClassToCreateFrom);
+	if (GetWorld()->HasBegunPlay())
+	{
+		UStatusEffectBase* Effect = NewObject<UStatusEffectBase>(this, ClassToCreateFrom);
 
-	this->AddOwnedComponent(Effect);
-	Effect->RegisterComponent();
-	Effect->SetUpStatusEffect(false, bShouldPerformTickAction, LifeTime, TickRate, this, CharacterThatInflictedStatusEffect);
+		this->AddOwnedComponent(Effect);
+		Effect->RegisterComponent();
+		Effect->SetUpStatusEffect(false, bShouldPerformTickAction, LifeTime, TickRate, this, CharacterThatInflictedStatusEffect);
+	}
+	
 }
 /*
 	Params
@@ -61,19 +65,36 @@ void ALoneWolfCharacter::AddStatusEffect(TSubclassOf<class UStatusEffectBase> Cl
 */
 void ALoneWolfCharacter::AddStatusEffect(TSubclassOf<class UStatusEffectBase> ClassToCreateFrom, bool bShouldPerformTickAction, bool bShouldDealDamage, float LifeTime, float DamageToDeal, float TickRate, ALoneWolfCharacter* CharacterThatInflictedStatusEffect)
 {
-	UStatusEffectBase* Effect = NewObject<UStatusEffectBase>(this, ClassToCreateFrom);
+	if (GetWorld()->HasBegunPlay())
+	{
+		UStatusEffectBase* Effect = NewObject<UStatusEffectBase>(this, ClassToCreateFrom);
 
-	this->AddOwnedComponent(Effect);
-	Effect->RegisterComponent();
-	Effect->SetUpStatusEffect(bShouldDealDamage, bShouldPerformTickAction, LifeTime, DamageToDeal, TickRate, this, CharacterThatInflictedStatusEffect);
+		this->AddOwnedComponent(Effect);
+		Effect->RegisterComponent();
+		Effect->SetUpStatusEffect(bShouldDealDamage, bShouldPerformTickAction, LifeTime, DamageToDeal, TickRate, this, CharacterThatInflictedStatusEffect);
+	}
 }
 
-void ALoneWolfCharacter::EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip)
+AWeapon* ALoneWolfCharacter::EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip)
 {
+	//Super::EquipNewWeapon(WeaponToEquip);
 	CurrentlyEquippedWeapon = GetWorld()->SpawnActor<AWeapon>(WeaponToEquip);
-	CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepWorldTransform, FName("hand_r"));
-	CurrentlyEquippedWeapon->SetActorLocation(GetMesh()->GetSocketLocation(FName("hand_r")));
+	CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("hand_r"));
 	CurrentlyEquippedWeapon->SetOwner(this);
+	return CurrentlyEquippedWeapon;
+	//CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepWorldTransform, FName("hand_r"));
+	//CurrentlyEquippedWeapon->SetActorLocation(GetMesh()->GetSocketLocation(FName("hand_r")));		
+	//CurrentlyEquippedWeapon->SetActorRotation(FRotator::ZeroRotator);
+	
+}
+
+AWeapon* ALoneWolfCharacter::GetEquippedWeapon()
+{
+	if (CurrentlyEquippedWeapon != NULL)
+	{
+		return CurrentlyEquippedWeapon;
+	}
+	return NULL;
 }
 
 bool ALoneWolfCharacter::bIsHardCC()

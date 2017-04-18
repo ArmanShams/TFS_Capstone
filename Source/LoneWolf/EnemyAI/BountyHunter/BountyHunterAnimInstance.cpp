@@ -7,26 +7,46 @@
 void UBountyHunterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
-	BountyHunter = Cast<ABountyHunter>(TryGetPawnOwner());
-
-	if (BountyHunter)
+	if (GetWorld()->HasBegunPlay())
 	{
-		bCanBasicAttack = BountyHunter->bIsInRange();
+		BountyHunter = Cast<ABountyHunter>(TryGetPawnOwner());
+
+		if (BountyHunter)
+		{
+			if (BountyHunter->bIsInRange())
+			{
+				if (BountyHunter->GetEquippedWeapon()->CanFire())
+				{
+					if (bool t = BountyHunter->bCanTriggerRecoilAnimation())
+					{
+						bCanBasicAttack = t;
+					}
+					else
+					{
+						bCanBasicAttack = false;
+					}
+				}
+				else if(AWeapon_Ranged* RecastWeapon = Cast<AWeapon_Ranged>(BountyHunter->GetEquippedWeapon()))
+				{
+					RecastWeapon->Reload();
+				}
+			}
+		}	
 	}
 }
 
-void UBountyHunterAnimInstance::AnimNotify_BasicAttackShot()
+void UBountyHunterAnimInstance::AnimNotify_Shoot()
 {
-	if (bCanBasicAttack)
+	if (GetWorld()->HasBegunPlay())
 	{
-		// Functionality?
+		BountyHunter->GetEquippedWeapon()->Fire();
 	}
 }
 
 void UBountyHunterAnimInstance::AnimNotify_PlaceTrap()
 {
-	if (bCanSetTrap)
+	if (GetWorld()->HasBegunPlay())
 	{
-		// Functionality?
+		//BountyHunter->SetBearTrap();
 	}
 }

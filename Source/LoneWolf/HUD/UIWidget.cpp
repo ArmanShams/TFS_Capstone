@@ -31,6 +31,14 @@ void UUIWidget::NativeTick(const FGeometry& MyGeometry, float DeltaSeconds)
 {
 	Super::NativeTick(MyGeometry, DeltaSeconds);
 
+	if (AWeapon_Ranged* RecastPlayerWeapon = Cast<AWeapon_Ranged>(Player->CurrentlyEquippedWeapon))
+	{
+		PlayerWeapon = Cast<AWeapon_Ranged>(Player->CurrentlyEquippedWeapon);
+	}
+	else
+	{
+		PlayerWeapon = NULL;
+	}
 	Health = FMath::FInterpTo(Health, Player->Health, DeltaSeconds, InterpolationSpeed);
 
 	Rage = FMath::FInterpTo(Rage, Player->Rage, DeltaSeconds, InterpolationSpeed);
@@ -51,17 +59,22 @@ FText UUIWidget::GetAmmoValue()
 	// Old method, doesn't support localization
 	//FString AmmoValue = FString::Printf(TEXT("Ammo: %i/%i"), PlayerWeapon->CurrentAmmo, PlayerWeapon->MagazineCapacity);
 	// New method, supports localization.
-	FFormatNamedArguments Arguments;
-	Arguments.Add("CurrentAmmo", FText::AsNumber(PlayerWeapon->CurrentAmmo));
-	Arguments.Add("MaxAmmo", FText::AsNumber(PlayerWeapon->MagazineCapacity));
-
-	if (PlayerWeapon->MAXIMUM_TOTAL_AMMO > 0)
+	if (PlayerWeapon != NULL)
 	{
-		Arguments.Add("TotalAmmo", FText::AsNumber(PlayerWeapon->TotalAmmo));
-	}
+		FFormatNamedArguments Arguments;
+		Arguments.Add("CurrentAmmo", FText::AsNumber(PlayerWeapon->CurrentAmmo));
+		Arguments.Add("MaxAmmo", FText::AsNumber(PlayerWeapon->MagazineCapacity));
 
-	FText AmmoValue = FText::Format(NSLOCTEXT("UINameSpace", "Ammo", "Ammo: {CurrentAmmo}/{MaxAmmo} \n					{TotalAmmo}"), Arguments);
-	return AmmoValue;
+		if (PlayerWeapon->MAXIMUM_TOTAL_AMMO > 0)
+		{
+			Arguments.Add("TotalAmmo", FText::AsNumber(PlayerWeapon->TotalAmmo));
+			FText AmmoValue = FText::Format(NSLOCTEXT("UINameSpace", "Ammo", "Ammo: {CurrentAmmo}/{MaxAmmo} \n					{TotalAmmo}"), Arguments);
+			return AmmoValue;
+		}
+		FText AmmoValue = FText::Format(NSLOCTEXT("UINameSpace", "Ammo", "Ammo: {CurrentAmmo}/{MaxAmmo}"), Arguments);
+		return AmmoValue;
+	}
+	return FText();
 }
 
 #undef LOCTEXT_NAMESPACE 
