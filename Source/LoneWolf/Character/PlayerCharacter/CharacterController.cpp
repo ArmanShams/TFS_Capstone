@@ -123,6 +123,8 @@ void ACharacterController::Tick( float DeltaSeconds )
 			GetMesh()->SetSkeletalMesh(NewMesh);
 			GetMesh()->SetAnimInstanceClass(NewAnimInstance->GetAnimBlueprintGeneratedClass());
 
+			CurrentlyEquippedWeapon->Destroy();
+			CurrentlyEquippedWeapon = NULL;
 			CurrentlyEquippedWeapon = GetWorld()->SpawnActor<AWeapon>(WolfWeapon);
 			//CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(90.f, 180.f, 0.f));
 			CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("WeaponSocket"));
@@ -143,6 +145,8 @@ void ACharacterController::Tick( float DeltaSeconds )
 			USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(NULL, TEXT("SkeletalMesh'/Game/Geometry/Characters/VincentArgo/SK_Vincent_Proxy.SK_Vincent_Proxy'"), NULL, LOAD_None, NULL);
 			if (NewMesh)
 			{
+				CurrentlyEquippedWeapon->Destroy();
+				CurrentlyEquippedWeapon = NULL;
 				GetMesh()->SetSkeletalMesh(NewMesh);
 				EquipNewWeapon(DefaultWeapon);
 			}
@@ -155,8 +159,6 @@ void ACharacterController::Tick( float DeltaSeconds )
 	if (bIsRolling)
 	{
 		FVector CurrentPosition = (FMath::Lerp(RootComponent->RelativeLocation, RollDestination, 25.f * DeltaSeconds) - RootComponent->RelativeLocation);
-
-		//RootComponent->SetWorldLocation(FMath::Lerp(RootComponent->RelativeLocation, RollDestination, 0.25f));
 		GetMovementComponent()->AddInputVector(CurrentPosition);
 
 		if (bIsRolling && FVector::Dist(RootComponent->RelativeLocation, RollDestination) <= 5.3f)
@@ -166,8 +168,6 @@ void ACharacterController::Tick( float DeltaSeconds )
 			bIsRolling = false;
 		}
 	}
-
-	
 
 	switch (CurrentForm)
 	{
@@ -179,8 +179,6 @@ void ACharacterController::Tick( float DeltaSeconds )
 
 		break;
 	}
-
-	//DrawDebugCapsule(GetWorld(), GetActorLocation(), AimSnapHalfHeight, AimSnapRadius, FQuat::Identity, FColor::Red, false, 0.04f);
 
 }
 
