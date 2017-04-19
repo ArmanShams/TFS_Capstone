@@ -17,19 +17,13 @@ class LONEWOLF_API AWeapon_PlayerRevolver : public AWeapon_Ranged
 public:
 	AWeapon_PlayerRevolver();
 
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-	// Called every frame
 	virtual void Tick(float DeltaSeconds) override;
-
 	virtual bool Fire() override;
-
 	virtual bool AltFire() override;
-
-	virtual void Reload() override;
-	
+	virtual void Reload() override;	
 	virtual void SetOwner(AActor* NewOwner) override;
+	virtual bool CanFire() override;
 
 	UPROPERTY(EditDefaultsOnly)
 	float FanFireInterval;

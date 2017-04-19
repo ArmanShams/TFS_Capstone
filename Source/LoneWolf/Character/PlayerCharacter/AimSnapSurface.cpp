@@ -8,8 +8,8 @@ AAimSnapSurface::AAimSnapSurface()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 	Collider = CreateDefaultSubobject<UBoxComponent>(TEXT("Collider"));
-	Collider->AttachTo(RootComponent);
-	Collider->RegisterComponent();
+	Collider->SetupAttachment(RootComponent);
+	//Collider->RegisterComponent();
 	Collider->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	Collider->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECollisionResponse::ECR_Overlap);
 	Collider->SetCollisionObjectType(ECollisionChannel::ECC_WorldStatic);

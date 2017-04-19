@@ -74,7 +74,6 @@ void UStatusEffectBase::ActionToPerformOnStatusTick()
 
 void UStatusEffectBase::DestroyComponent(bool bReparentChildren)
 {
-
 	Super::UnregisterComponent();
-	Super::DestroyComponent(bReparentChildren);	
+	Super::DestroyComponent(bReparentChildren);
 }

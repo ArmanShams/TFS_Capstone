@@ -16,16 +16,12 @@ public:
 	AWeapon_Ranged();
 
 	virtual void BeginPlay() override;
-	
 	virtual void Tick( float DeltaSeconds ) override;
-	
 	virtual bool Fire() override;
-
 	virtual bool AltFire() override;
-
 	virtual void Reload();
-
 	virtual void SetOwner(AActor* NewOwner) override;
+	virtual bool CanFire() override;
 
 protected:
 	UPROPERTY(EditDefaultsOnly)

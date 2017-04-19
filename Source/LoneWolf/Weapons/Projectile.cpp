@@ -42,13 +42,11 @@ AProjectile::AProjectile()
 	InitialLifeSpan = LifeTime;
 }
 
-// Called when the game starts or when spawned
 void AProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 }
 
-// Called every frame
 void AProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -63,18 +61,14 @@ void AProjectile::SetOwner(AActor* NewOwner)
 
 void AProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::White, FString::Printf(TEXT("Projectile hit something")));
-	UE_LOG(LogTemp, Display, TEXT("PROJECTILE HIT A THING %s"), *OtherActor->GetName());
 	// OtherComp->AddImpulseAtLocation(GetVelocity() * BulletImpulse, GetActorLocation());
-
-	APawn* RecastedOwner = Cast<APawn>(Owner);
-	UGameplayStatics::ApplyDamage(OtherActor, Damage, RecastedOwner->GetController(), Owner, TSubclassOf<UDamageType>());
-
-	//if (Cast<class ACharacterController>(WeaponSpawnedThis->OwnerCharacter))
-	//{
-	//	UE_LOG(LogTemp, Display, TEXT("Owned by a player"));
-	//}
-	//
-
+	if (APawn* RecastedOwner = Cast<APawn>(Owner))
+	{
+		UE_LOG(LogTemp, Display, TEXT("PROJECTILE HIT A THING %s   %s"), *OtherActor->GetName(), *OtherComp->GetName());
+		if (ACharacter* RecastedOtherCharacter = Cast<ACharacter>(OtherActor))
+		{
+			UGameplayStatics::ApplyDamage(OtherActor, Damage, RecastedOwner->GetController(), Owner, TSubclassOf<UDamageType>());
+		}
+	}
 	Destroy();
 }

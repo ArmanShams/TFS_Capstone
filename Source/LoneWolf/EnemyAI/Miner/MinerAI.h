@@ -27,7 +27,7 @@ public:
 
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
-	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
+	virtual void SetupPlayerInputComponent(class UInputComponent* InInputComponent) override;
 	virtual void AddStatusEffect(TSubclassOf<class UStatusEffectBase> ClassToCreateFrom, bool bShouldPerformTickAction, float LifeTime, float TickRate, ALoneWolfCharacter* CharacterThatInflictedStatusEffect) override;
 	virtual void AddStatusEffect(TSubclassOf<class UStatusEffectBase> ClassToCreateFrom, bool bShouldPerformTickAction, bool bShouldDealDamage, float LifeTime, float DamageToDeal, float TickRate, ALoneWolfCharacter* CharacterThatInflictedStatusEffect) override;
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
@@ -78,9 +78,9 @@ public:
 	TSubclassOf<AActor> StompDecalActorClass;
 
 protected:
-	float DefaultMoveSpeed;
 
-	virtual void EquipWeapon(TSubclassOf<AWeapon> WeaponToEquip) override;
+	//virtual void EquipWeapon(TSubclassOf<AWeapon> WeaponToEquip) override;
+	virtual AWeapon* EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip) override;
 	virtual void StartCharge();
 	virtual void Charge();
 	virtual void SetStatusEffect(CharacterState::StatusEffect NewStatusEffect) override;
@@ -95,9 +95,9 @@ protected:
 	UFUNCTION()
 	virtual void OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-
-
 	bool bChargeHasDamagedPlayer;
+
+	float DefaultMoveSpeed;
 
 	MinerState CurrentState;
 

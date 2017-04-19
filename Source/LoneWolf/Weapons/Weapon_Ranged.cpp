@@ -16,6 +16,7 @@ AWeapon_Ranged::AWeapon_Ranged()
 		ProjectileToFire = (UClass*)ProjectileAsset.Class;
 	}
 
+	TimeSinceLastFire = RateOfFire;
 
 }
 
@@ -29,14 +30,20 @@ void AWeapon_Ranged::BeginPlay()
 
 	//MeshComponent->SetStaticMesh(Mesh);
 	
+	//CurrentAmmo = MagazineCapacity;
 	/*
 	CurrentAmmo = 0;
 	RateOfFire = 0.3f;
 	MagazineCapacity = 6;
-
-	MAXIMUM_TOTAL_AMMO = 24;
-	TotalAmmo = MAXIMUM_TOTAL_AMMO;
 	*/
+	//MAXIMUM_TOTAL_AMMO = 24;
+	CurrentAmmo = MagazineCapacity;
+	TotalAmmo = MAXIMUM_TOTAL_AMMO;
+	if (MAXIMUM_TOTAL_AMMO != 0)
+	{
+		TotalAmmo -= CurrentAmmo;
+	}
+	
 }
 
 // Called every frame
@@ -67,6 +74,11 @@ bool AWeapon_Ranged::Fire()
 				{
 					Temp->CollisionComponent->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore);
 				}
+				else
+				{
+					Temp->CollisionComponent->SetCollisionResponseToChannel(ECC_GameTraceChannel4, ECR_Ignore);
+				}
+				return true;
 			}
 			else
 			{
@@ -83,7 +95,7 @@ bool AWeapon_Ranged::Fire()
 			UE_LOG(LogTemp, Display, TEXT("Ran out of ammo after firing"));
 			Reload();
 		}
-		return true;
+		return false;
 	}
 	if (CurrentAmmo == 0)
 	{
@@ -103,37 +115,48 @@ bool AWeapon_Ranged::AltFire()
 
 void AWeapon_Ranged::Reload()
 {
-	UE_LOG(LogTemp, Display, TEXT("Reloading"));
-	if (MAXIMUM_TOTAL_AMMO != 0)
+	
+	if (CurrentAmmo < MagazineCapacity)
 	{
-		int8 AmmoNeededToFillMagazine = MagazineCapacity - CurrentAmmo;
-		int8 NewTotalAmmo = TotalAmmo - AmmoNeededToFillMagazine;
-		uint8 NewCurrentAmmo = CurrentAmmo + AmmoNeededToFillMagazine;
-		
-		if (NewTotalAmmo < 0)
+		UE_LOG(LogTemp, Display, TEXT("Reloading")); 
+		if (MAXIMUM_TOTAL_AMMO != 0)
 		{
-			NewCurrentAmmo += NewTotalAmmo;
-			NewTotalAmmo += -NewTotalAmmo;
+			int8 AmmoNeededToFillMagazine = MagazineCapacity - CurrentAmmo;
+			int8 NewTotalAmmo = TotalAmmo - AmmoNeededToFillMagazine;
+			uint8 NewCurrentAmmo = CurrentAmmo + AmmoNeededToFillMagazine;
+
+			if (NewTotalAmmo < 0)
+			{
+				NewCurrentAmmo += NewTotalAmmo;
+				NewTotalAmmo += -NewTotalAmmo;
+			}
+
+			CurrentAmmo = NewCurrentAmmo;
+			TotalAmmo = NewTotalAmmo;
+
+			//UE_LOG(LogTemp, Display, TEXT("Ammo To Add: %i"), AmmoNeededToFillMagazine);
+			//UE_LOG(LogTemp, Display, TEXT("Current ammo: %u"), CurrentAmmo);
+			//UE_LOG(LogTemp, Display, TEXT("Total ammo: %i"), TotalAmmo);
 		}
-
-		CurrentAmmo = NewCurrentAmmo;
-		TotalAmmo = NewTotalAmmo;
-
-		//UE_LOG(LogTemp, Display, TEXT("Ammo To Add: %i"), AmmoNeededToFillMagazine);
-		//UE_LOG(LogTemp, Display, TEXT("Current ammo: %u"), CurrentAmmo);
-		//UE_LOG(LogTemp, Display, TEXT("Total ammo: %i"), TotalAmmo);
+		else
+		{
+			//UE_LOG(LogTemp, Display, TEXT("Weapon has infinite reserve ammo"));
+			CurrentAmmo = MagazineCapacity;
+		}
 	}
-	else
-	{
-		//UE_LOG(LogTemp, Display, TEXT("Weapon has infinite reserve ammo"));
-		CurrentAmmo = MagazineCapacity;
-	}
-	
-	
 }
 
 void AWeapon_Ranged::SetOwner(AActor* NewOwner)
 {
 	Super::SetOwner(NewOwner);
+}
+
+bool AWeapon_Ranged::CanFire()
+{
+	if (CurrentAmmo > 0)
+	{
+		return Super::CanFire();
+	}
+	return false;
 }
 
