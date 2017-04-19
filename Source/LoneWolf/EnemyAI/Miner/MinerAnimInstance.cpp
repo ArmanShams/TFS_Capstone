@@ -14,7 +14,6 @@
 
 void UMinerAnimInstance::NativeInitializeAnimation()
 {
-	
 	//if (EnemyCharacter)
 	//{
 	//	//PawnState = Cast<AMinerAI>(EnemyCharacter)->GetMinerState();
@@ -26,57 +25,72 @@ void UMinerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	
 	Super::NativeUpdateAnimation(DeltaSeconds);
 
-	EnemyCharacter = Cast<AMinerAI>(TryGetPawnOwner());
-
-	if (EnemyCharacter)
+	if (GetWorld()->HasBegunPlay())
 	{
-		CurrentMinerState = Cast<AMinerAI>(EnemyCharacter)->GetMinerState();
-		bCanAttack = Cast<AMinerAI>(EnemyCharacter)->GetBTIsInRange();
+		EnemyCharacter = Cast<AMinerAI>(TryGetPawnOwner());
+
+		if (EnemyCharacter)
+		{
+			CurrentMinerState = Cast<AMinerAI>(EnemyCharacter)->GetMinerState();
+			bCanAttack = Cast<AMinerAI>(EnemyCharacter)->GetBTIsInRange();
+		}
 	}
 }
 
 void UMinerAnimInstance::AnimNotify_MeleeAtkStart()
 {
-	//UE_LOG(LogTemp, Display, TEXT("We are in the beam"));
-	//call a function on our characters to enable colliders on melee weapons
-	if (AWeapon_Melee* EquippedWeapon = Cast<AWeapon_Melee>(EnemyCharacter->GetEquippedWeapon()))
+	if (GetWorld()->HasBegunPlay())
 	{
-		EquippedWeapon->ToggleCollider();
+		//UE_LOG(LogTemp, Display, TEXT("We are in the beam"));
+		//call a function on our characters to enable colliders on melee weapons
+		if (AWeapon_Melee* EquippedWeapon = Cast<AWeapon_Melee>(EnemyCharacter->GetEquippedWeapon()))
+		{
+			EquippedWeapon->ToggleCollider();
+		}
 	}
 }
 
 void UMinerAnimInstance::AnimNotify_MeleeAtkEnd()
 {
-	//bCanAttack = false;
-	if (AWeapon_Melee* EquippedWeapon = Cast<AWeapon_Melee>(EnemyCharacter->GetEquippedWeapon()))
+	if (GetWorld()->HasBegunPlay())
 	{
-		EquippedWeapon->ToggleCollider();
-		EquippedWeapon->bHasHit = false;
-		//Cast<AMinerAI>(EnemyCharacter)->SetMinerState(MinerState::IDLE);
+		//bCanAttack = false;
+		if (AWeapon_Melee* EquippedWeapon = Cast<AWeapon_Melee>(EnemyCharacter->GetEquippedWeapon()))
+		{
+			EquippedWeapon->ToggleCollider();
+			EquippedWeapon->bHasHit = false;
+			//Cast<AMinerAI>(EnemyCharacter)->SetMinerState(MinerState::IDLE);
+		}
+		//call a function on our character to disable colliders on melee weapons
 	}
-	//call a function on our character to disable colliders on melee weapons
 }
 
 void UMinerAnimInstance::AnimNotify_ChargeEnd()
 {
 	//EnemyCharacter = Cast<AMinerAI>(TryGetPawnOwner());
-
-	if (EnemyCharacter)
+	if (GetWorld()->HasBegunPlay())
 	{
-		//EnemyCharacter->SetStatusEffect(CharacterState::NONE);
+		if (EnemyCharacter)
+		{
+			//EnemyCharacter->SetStatusEffect(CharacterState::NONE);
+		}
 	}
 }
 
 void UMinerAnimInstance::AnimNotify_ReturnToIdle()
 {
-	//MarkedToReturnToIdleState
-	if (EnemyCharacter)
+	if (GetWorld()->HasBegunPlay())
 	{
-		if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(TryGetPawnOwner()->GetController())->GetBrainComponent()->GetBlackboardComponent())
+		//UE_LOG()
+		//MarkedToReturnToIdleState
+		if (EnemyCharacter)
 		{
-			BlackboardComponent->SetValueAsBool(TEXT("MarkedToReturnToIdleState"), true);
+			if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(TryGetPawnOwner()->GetController())->GetBrainComponent()->GetBlackboardComponent())
+			{
+				UE_LOG(LogTemp, Display, TEXT("We are in the beam"));
+				BlackboardComponent->SetValueAsBool(TEXT("MarkedToReturnToIdleState"), true);
+			}
 		}
-	
 	}
 }
 

@@ -5,6 +5,12 @@
 #include "TrapLocations.h"
 #include "BountyHunter.h"
 #include "Engine.h"
+#include "Weapons/Weapon.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "BehaviorTree/Blackboard/BlackboardKeyAllTypes.h"
+#include "BrainComponent.h"
+#include "Character/PlayerCharacter/CharacterController.h"
+#include "Character/StatusEffects/StatusEffect_HardCrowdControl.h"
 
 ABountyHunter::ABountyHunter()
 {
@@ -21,16 +27,19 @@ ABountyHunter::ABountyHunter()
 	AttackFrequency = 1.f;
 	AttackRange = 3000.0f;
 	MaximumTrapsAllowed = 3;
+	bPlayRecoilAnimation = false;
 
 	ConstructorHelpers::FClassFinder<AWeapon>WeaponAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/Weapon_RifleBP.Weapon_RifleBP_C'"));
 	if (WeaponAsset.Class)
 	{
+		UE_LOG(LogTemp, Display, TEXT("Found the rifle."));
 		DefaultWeapon = (UClass*)WeaponAsset.Class;
 	}
 
 	ConstructorHelpers::FClassFinder<ABearTrap>TrapAsset(TEXT("Blueprint'/Game/Blueprints/Enemies/BountyHunter/BearTrapBP.BearTrapBP_C'"));
 	if (TrapAsset.Class)
 	{
+		UE_LOG(LogTemp, Display, TEXT("Found the trap."));
 		BearTrapClass = (UClass*)TrapAsset.Class;
 	}
 }
@@ -38,23 +47,63 @@ ABountyHunter::ABountyHunter()
 void ABountyHunter::BeginPlay()
 {
 	Super::BeginPlay();
+	EquipNewWeapon(DefaultWeapon);
+	//if (CurrentlyEquippedWeapon != NULL)
+	//{
+	//	CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("hand_r"));
+	//	CurrentlyEquippedWeapon->SetActorLocation(GetMesh()->GetSocketLocation(FName("hand_r")));
+	//	CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(180.f, 180.f, 0.f));
+	//	//CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepWorldTransform, FName("RightHand"));
+	//	//CurrentlyEquippedWeapon->SetActorLocation(GetMesh()->GetSocketLocation(FName("RightHand")));
+	//}
 }
 
 void ABountyHunter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (bIsInRange())
+	if (bPlayRecoilAnimation)
+	{
+		bPlayRecoilAnimation = false;
+	}
+
+	if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
+	{
+		BlackboardComponent->SetValueAsBool(TEXT("IsHardCC"), bIsHardCC());
+		BlackboardComponent->SetValueAsBool(TEXT("IsSoftCC"), bIsSoftCC());
+		BlackboardComponent->SetValueAsBool(TEXT("bCanAttackTarget"), bIsInRange());
+	}
+	/*if (bIsInRange())
 	{
 		if (CurrentlyEquippedWeapon != NULL)
 		{
 			CurrentlyEquippedWeapon->Fire();
 		}
-	}
+	}*/
 }
 
 float ABountyHunter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
 {
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+}
+
+void ABountyHunter::SetupPlayerInputComponent(class UInputComponent* InInputComponent)
+{
+	Super::SetupPlayerInputComponent(InInputComponent);
+}
+
+void ABountyHunter::AddStatusEffect(TSubclassOf<class UStatusEffectBase> ClassToCreateFrom, bool bShouldPerformTickAction, float LifeTime, float TickRate, ALoneWolfCharacter* CharacterThatInflictedStatusEffect)
+{
+	Super::AddStatusEffect(ClassToCreateFrom, bShouldPerformTickAction, LifeTime, TickRate, CharacterThatInflictedStatusEffect);
+}
+
+void ABountyHunter::AddStatusEffect(TSubclassOf<class UStatusEffectBase> ClassToCreateFrom, bool bShouldPerformTickAction, bool bShouldDealDamage, float LifeTime, float DamageToDeal, float TickRate, ALoneWolfCharacter* CharacterThatInflictedStatusEffect)
+{
+	Super::AddStatusEffect(ClassToCreateFrom, bShouldPerformTickAction, bShouldDealDamage, LifeTime, DamageToDeal, TickRate, CharacterThatInflictedStatusEffect);
+}
+
+AWeapon* ABountyHunter::GetEquippedWeapon()
+{
+	return Super::GetEquippedWeapon();
 }
 
 bool ABountyHunter::bIsInRange()
@@ -65,6 +114,38 @@ bool ABountyHunter::bIsInRange()
 bool ABountyHunter::bIsInRange(float OveriddenDesiredRange)
 {
 	return Super::bIsInRange(OveriddenDesiredRange);
+}
+
+bool ABountyHunter::bIsSoftCC()
+{
+	return Super::bIsSoftCC();
+}
+
+bool ABountyHunter::bIsHardCC()
+{
+	return Super::bIsHardCC();
+}
+
+void ABountyHunter::Destroyed()
+{
+	// Any actors spawned by this that need to be destroyed/cleaned up should be done so here before Super::Destroyed() is called.
+
+	Super::Destroyed();
+}
+
+
+bool ABountyHunter::bCanTriggerRecoilAnimation()
+{
+	return bPlayRecoilAnimation;
+}
+
+AWeapon* ABountyHunter::EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip)
+{
+	//Super::EquipNewWeapon(WeaponToEquip);
+	CurrentlyEquippedWeapon = Super::EquipNewWeapon(WeaponToEquip);
+	//CurrentlyEquippedWeapon->SetActorLocation(GetMesh()->GetSocketLocation(FName("hand_r")));
+	CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(30.f, -90.f, 90.f));
+	return CurrentlyEquippedWeapon;
 }
 
 void ABountyHunter::SetBearTrap(ATrapLocations* NewTrapLocation, const FHitResult& SweepResult)
@@ -83,6 +164,7 @@ void ABountyHunter::SetBearTrap(ATrapLocations* NewTrapLocation, const FHitResul
 			BearTrapPlaced = GetWorld()->SpawnActor<ABearTrap>(BearTrapClass);
 			BearTrapPlaced->SetActorRelativeLocation(GetMesh()->GetSocketLocation("RightToe_End"));
 			// BearTrapPlaced->SetLifeSpan(5.0f);
+			BearTrapPlaced->SetOwner(this);
 			BearTrapPlaced->SetLocationBeingOccupied(NewTrapLocation);
 			TrapArray.Add(BearTrapPlaced);
 			UE_LOG(LogTemp, Display, TEXT("Bounty Hunter set a bear trap, trap added to array list"));
@@ -103,9 +185,31 @@ void ABountyHunter::OnActorBeginOverlap(UPrimitiveComponent * OverlappedComp, AA
 	}
 }
 
+void ABountyHunter::Attack()
+{
+	if (CurrentlyEquippedWeapon != NULL)
+	{
+		if (CurrentlyEquippedWeapon->CanFire())
+		{
+			bPlayRecoilAnimation = true;
+		}
+		/*
+		if (CurrentlyEquippedWeapon->Fire())
+		{
+			bPlayRecoilAnimation = true;
+		}
+		else
+		{
+			bPlayRecoilAnimation = false;
+		}
+		*/
+	}
+}
+
 void ABountyHunter::EquipWeapon(TSubclassOf<AWeapon> WeaponToEquip)
 {
-	Super::EquipWeapon(WeaponToEquip);
-	CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("RightHand"));
-	CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(180.f, 180.f, 0.f));
+	//Super::EquipWeapon(WeaponToEquip);
+	//CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepWorldTransform, FName("RightHand"));
+	//CurrentlyEquippedWeapon->SetActorLocation(GetMesh()->GetSocketLocation(FName("RightHand")));
+	//CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(180.f, 180.f, 0.f));
 }

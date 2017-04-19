@@ -31,11 +31,11 @@ public:
 
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
-	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
+	virtual void SetupPlayerInputComponent(class UInputComponent* InInputComponent) override;
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 	virtual void AddStatusEffect(TSubclassOf<class UStatusEffectBase> ClassToCreateFrom, bool bShouldPerformTickAction, float LifeTime, float TickRate, ALoneWolfCharacter* CharacterThatInflictedStatusEffect) override;
 	virtual void AddStatusEffect(TSubclassOf<class UStatusEffectBase> ClassToCreateFrom, bool bShouldPerformTickAction, bool bShouldDealDamage, float LifeTime, float DamageToDeal, float TickRate, ALoneWolfCharacter* CharacterThatInflictedStatusEffect) override;
-	virtual AWeapon* GetEquippedWeapon();
+	virtual AWeapon* GetEquippedWeapon() override;
 	virtual bool bIsInRange();
 	virtual bool bIsInRange(float OveriddenDesiredRange);
 	// Returns true if the actor's Status Effects is a 'softCC'. Defined in Design Document
@@ -51,7 +51,8 @@ public:
 	TArray<class ATargetPoint*> PatrolPoints;
 
 protected:
-	virtual void EquipWeapon(TSubclassOf<AWeapon> WeaponToEquip);
+	virtual AWeapon* EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip) override;
+	//virtual void EquipWeapon(TSubclassOf<AWeapon> WeaponToEquip);
 	virtual void SetStatusEffect(CharacterState::StatusEffect NewStatusEffect);
 
 	UPROPERTY(EditDefaultsOnly)
@@ -86,39 +87,4 @@ protected:
 	friend class UMinerAnimInstance;
 
 	const float MAXHEALTH = 100.f;
-
-	//Unused variables
-	/*
-	// cooldown for how frequently the skills can be used
-	UPROPERTY(EditAnywhere)
-	float Skill1Cooldown;
-
-	// cooldown for how frequently the skills can be used
-	UPROPERTY(EditAnywhere)
-	float Skill2Cooldown;
-
-	UPROPERTY(EditAnywhere)
-	float isInRange;
-	*/
-
-	// Unused functionality
-	/*
-	int32 AttackType;
-
-	void Attack(int32 AttackType);
-
-	//enemy's basic attack which will be most frequently used can include input for status effect application
-	void BasicAttack(Effects effect, float Range);
-
-	void AttackEnd();
-
-	//enemy's 1st skill, will include an input for status effect application
-	void Skill1(Effects effect, float Range);
-
-	//enemy's 1st skill, will include an input for status effect application
-	void Skill2(Effects effect, float Range);
-	*/
-
-	
-
 };

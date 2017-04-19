@@ -11,24 +11,17 @@ class LONEWOLF_API AWeapon : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	AWeapon();
 
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-	// Called every frame
 	virtual void Tick(float DeltaSeconds) override;
-
 	virtual void SetOwner(AActor* NewOwner) override;
-
-	//virtual  void SetOwningActor(AActor* NewOwningActor);
-
 	virtual bool Fire();
-
 	virtual bool AltFire();
+	virtual bool CanFire();
 
 protected:
+	UPROPERTY(EditInstanceOnly)
 	bool bOwnedByPlayer;
 
 	UPROPERTY(EditDefaultsOnly)

@@ -42,13 +42,13 @@ void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 
-	EnemyState = EState::Idle;
+	//EnemyState = EState::Idle;
 
 	//TimeSinceLastAttack = 0.0f;
 	//Skill1Cooldown = MAX_FLT;
 	//Skill2Cooldown = MAX_FLT;
 	
-	EquipWeapon(DefaultWeapon);
+	//EquipNewWeapon(DefaultWeapon);
 
 	if (CurrentlyEquippedWeapon != NULL)
 	{
@@ -109,7 +109,7 @@ void AEnemy::AddStatusEffect(TSubclassOf<class UStatusEffectBase> ClassToCreateF
 
 AWeapon* AEnemy::GetEquippedWeapon()
 {
-	return CurrentlyEquippedWeapon;
+	return Super::GetEquippedWeapon();
 }
 
 void AEnemy::Tick(float DeltaTime)
@@ -125,9 +125,9 @@ void AEnemy::Tick(float DeltaTime)
 
 }
 
-void AEnemy::SetupPlayerInputComponent(class UInputComponent* InputComponent)
+void AEnemy::SetupPlayerInputComponent(class UInputComponent* InInputComponent)
 {
-	Super::SetupPlayerInputComponent(InputComponent);
+	Super::SetupPlayerInputComponent(InInputComponent);
 }
 
 // Returns true if the distance between the Enemy and it's Target is less than AttackRange
@@ -211,13 +211,18 @@ CharacterState::StatusEffect AEnemy::GetStatusEffect()
 	return Effects;
 }
 
-void AEnemy::EquipWeapon(TSubclassOf<AWeapon> WeaponToEquip)
+AWeapon* AEnemy::EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip)
 {
-	CurrentlyEquippedWeapon = GetWorld()->SpawnActor<AWeapon>(WeaponToEquip);
-	CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(25.f, -90.f, 90.f));
-	CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("WeaponSocket"));
-	CurrentlyEquippedWeapon->SetOwner(this);
+	return CurrentlyEquippedWeapon = Super::EquipNewWeapon(WeaponToEquip);
 }
+
+//void AEnemy::EquipWeapon(TSubclassOf<AWeapon> WeaponToEquip)
+//{
+//	CurrentlyEquippedWeapon = GetWorld()->SpawnActor<AWeapon>(WeaponToEquip);
+//	CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(25.f, -90.f, 90.f));
+//	CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("WeaponSocket"));
+//	CurrentlyEquippedWeapon->SetOwner(this);
+//}
 
 void AEnemy::SetStatusEffect(CharacterState::StatusEffect NewStatusEffect)
 {

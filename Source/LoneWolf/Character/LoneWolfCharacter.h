@@ -15,7 +15,7 @@ public:
 
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
-	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
+	virtual void SetupPlayerInputComponent(class UInputComponent* InInputComponent) override;
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 	/*
 		Params
@@ -37,7 +37,8 @@ public:
 		CharacterThatInflictedStatusEffect	-The character that inflicted the status effect.
 	*/
 	virtual void AddStatusEffect(TSubclassOf<class UStatusEffectBase> ClassToCreateFrom, bool bShouldPerformTickAction, bool bShouldDealDamage, float LifeTime, float DamageToDeal, float TickRate, ALoneWolfCharacter* CharacterThatInflictedStatusEffect);
-	virtual void EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip);
+	virtual class AWeapon* EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip);
+	virtual class AWeapon* GetEquippedWeapon();
 	virtual bool bIsHardCC();
 	virtual bool bIsSoftCC();
 	virtual void Destroyed() override;

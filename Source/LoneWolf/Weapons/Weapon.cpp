@@ -7,7 +7,6 @@
 
 AWeapon::AWeapon()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComponent"));
@@ -42,7 +41,7 @@ void AWeapon::SetOwner(AActor* NewOwner)
 
 bool AWeapon::Fire()
 {
-	if (TimeSinceLastFire > RateOfFire)
+	if (TimeSinceLastFire >= RateOfFire)
 	{
 		//UE_LOG(LogTemp, Display, TEXT("Trying to call fire on a base class weapon."));
 		TimeSinceLastFire = 0.f;
@@ -53,11 +52,16 @@ bool AWeapon::Fire()
 
 bool AWeapon::AltFire()
 {
-	if (TimeSinceLastFire > RateOfFire)
+	if (TimeSinceLastFire >= RateOfFire)
 	{
 		TimeSinceLastFire = 0.f;
 		return true;
 	}
 	return false;
+}
+
+bool AWeapon::CanFire()
+{
+	return TimeSinceLastFire >= RateOfFire;
 }
 

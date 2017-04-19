@@ -29,7 +29,7 @@ public:
 	virtual void AddRage(float RageToAdd);
 	virtual void AddStatusEffect(TSubclassOf<class UStatusEffectBase> ClassToCreateFrom, bool bShouldPerformTickAction, float LifeTime, float TickRate, ALoneWolfCharacter* CharacterThatInflictedStatusEffect) override;
 	virtual void AddStatusEffect(TSubclassOf<class UStatusEffectBase> ClassToCreateFrom, bool bShouldPerformTickAction, bool bShouldDealDamage, float LifeTime, float DamageToDeal, float TickRate, ALoneWolfCharacter* CharacterThatInflictedStatusEffect) override;
-	virtual void EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip) override;
+	virtual AWeapon* EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip) override;
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 	virtual bool bIsHardCC() override;
 	virtual bool bIsSoftCC() override;
@@ -51,6 +51,7 @@ public:
 	void OnAltShootReleased();
 	void OnDebugRagePressed();
 	void Roll();
+	void OnReloadPressed();
 
 	// SOON TO BE REMOVED
 	void EquipRevolver();

@@ -83,3 +83,8 @@ void AWeapon_PlayerRevolver::SetOwner(AActor* NewOwner)
 	Super::SetOwner(NewOwner);
 }
 
+bool AWeapon_PlayerRevolver::CanFire()
+{
+	return Super::CanFire();
+}
+

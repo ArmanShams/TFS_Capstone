@@ -4,6 +4,7 @@
 #include "MinerAI.h"
 #include "AIController.h"
 #include "MinerAnimInstance.h"
+#include "Weapons/Weapon.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyAllTypes.h"
 #include "BrainComponent.h"
@@ -80,6 +81,7 @@ AMinerAI::AMinerAI()
 void AMinerAI::BeginPlay()
 {
 	Super::BeginPlay();
+	EquipNewWeapon(DefaultWeapon);
 	CurrentState = MinerState::IDLE;
 	DefaultMoveSpeed = Cast<UCharacterMovementComponent>(GetMovementComponent())->MaxWalkSpeed;
 	//UE_LOG(LogTemp, Display, TEXT("Miner melee weapon default collision profile  = %s"), CurrentlyEquippedWeapon->);
@@ -169,9 +171,9 @@ void AMinerAI::Tick(float DeltaSeconds)
 	//DrawDebugLine(GetWorld(), RootComponent->GetComponentLocation(), RootComponent->GetComponentLocation() + GetActorForwardVector() * 50.f , FColor(255, 255, 255), true, -1, 0, 12.333);
 }
 
-void AMinerAI::SetupPlayerInputComponent(class UInputComponent* InputComponent)
+void AMinerAI::SetupPlayerInputComponent(class UInputComponent* InInputComponent)
 {
-	Super::SetupPlayerInputComponent(InputComponent);
+	Super::SetupPlayerInputComponent(InInputComponent);
 }
 
 void AMinerAI::AddStatusEffect(TSubclassOf<class UStatusEffectBase> ClassToCreateFrom, bool bShouldPerformTickAction, float LifeTime, float TickRate, ALoneWolfCharacter* CharacterThatInflictedStatusEffect)
@@ -224,10 +226,18 @@ bool AMinerAI::GetBTIsInRange()
 	return false;
 }
 	
-
 MinerState AMinerAI::GetMinerState()
 {
 	return CurrentState;
+}
+
+AWeapon* AMinerAI::EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip)
+{
+	CurrentlyEquippedWeapon = Super::EquipNewWeapon(WeaponToEquip);
+	//CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("hand_r"));
+	return CurrentlyEquippedWeapon;
+	//CurrentlyEquippedWeapon->SetActorLocation(GetMesh()->GetSocketLocation(FName("hand_r")));
+	//CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(30.f, -90.f, 90.f));
 }
 
 void AMinerAI::StartCharge()
@@ -302,10 +312,15 @@ void AMinerAI::Stomp()
 			DrawDebugSphere(GetWorld(), GetActorLocation(), StompRadius, 32, FColor::Red, false, 1.5f);
 			for (size_t i = 0; i < HitResult.Num(); i++)
 			{
+				
 				if (ALoneWolfCharacter* RecastedResult = Cast<ALoneWolfCharacter>(HitResult[i].GetActor()))
 				{
-					RecastedResult->AddStatusEffect(UStatusEffect_HardCrowdControl::StaticClass(), false, StompStunDuration, 0.f, this);
+					if (HitResult[i].GetActor() != this)
+					{
+						RecastedResult->AddStatusEffect(UStatusEffect_HardCrowdControl::StaticClass(), false, StompStunDuration, 0.f, this);
+					}
 				}
+			
 			}
 		}
 		Effects = CharacterState::NONE;
@@ -335,10 +350,10 @@ void AMinerAI::Destroyed()
 	Super::Destroyed();
 }
 
-void AMinerAI::EquipWeapon(TSubclassOf<AWeapon> WeaponToEquip)
-{
-	Super::EquipWeapon(WeaponToEquip);
-}
+//void AMinerAI::EquipWeapon(TSubclassOf<AWeapon> WeaponToEquip)
+//{
+//	Super::EquipWeapon(WeaponToEquip);
+//}
 
 void AMinerAI::OnCollision(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {

@@ -20,22 +20,22 @@ public:
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-		float speed;
+	float speed;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-		bool isDead;
+	bool isDead;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-		bool bCanBasicAttack;
+	bool bCanBasicAttack;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-		bool bCanSetTrap;
+	bool bCanSetTrap;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-		FRotator LookAtRotation;
+	FRotator LookAtRotation;
 
 protected:
 	UFUNCTION()
-		void AnimNotify_BasicAttackShot();
+	void AnimNotify_Shoot();
 
 	UFUNCTION()
-		void AnimNotify_PlaceTrap();
+	void AnimNotify_PlaceTrap();
 
 
 
