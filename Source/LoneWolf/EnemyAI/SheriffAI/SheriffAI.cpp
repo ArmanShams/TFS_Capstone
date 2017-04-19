@@ -145,9 +145,10 @@ void ASheriffAI::DisplayLassoTelegraph()
 	LassoDecalActor->SetOwner(this);
 }
 
-void ASheriffAI::EquipWeapon(TSubclassOf<AWeapon> WeaponToEquip)
+AWeapon* ASheriffAI::EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip)
 {
-	Super::EquipWeapon(WeaponToEquip);
+	CurrentlyEquippedWeapon = Super::EquipNewWeapon(WeaponToEquip);
 	CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(90.0f, -90.f, 90.f));
 	CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("RightHand"));
+	return CurrentlyEquippedWeapon;
 }

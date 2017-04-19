@@ -39,7 +39,8 @@ public:
 
 
 protected:
-	virtual void EquipWeapon(TSubclassOf<AWeapon> WeaponToEquip) override;
+	virtual AWeapon* EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip) override;
 
 	friend class USheriffAnimInstance;
 };
+ 
