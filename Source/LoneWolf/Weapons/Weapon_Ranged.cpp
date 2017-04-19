@@ -67,6 +67,10 @@ bool AWeapon_Ranged::Fire()
 				{
 					Temp->CollisionComponent->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore);
 				}
+				else
+				{
+					Temp->CollisionComponent->SetCollisionResponseToChannel(ECC_GameTraceChannel5, ECR_Ignore);
+				}
 			}
 			else
 			{

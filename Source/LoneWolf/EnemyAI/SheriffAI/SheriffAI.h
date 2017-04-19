@@ -3,11 +3,9 @@
 #pragma once
 
 #include "EnemyAI/Enemy.h"
+#include "Character/PlayerCharacter/CharacterController.h"
 #include "SheriffAI.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class LONEWOLF_API ASheriffAI : public AEnemy
 {
@@ -28,6 +26,9 @@ public:
 	virtual bool bIsSoftCC() override;
 	virtual bool bIsHardCC() override;
 	virtual void Destroyed() override;
+
+	bool bCanLasso();
+	void Lasso(ACharacterController* Player);
 
 	AActor* LassoDecalActor;
 	TSubclassOf<AActor> LassoDecalClass;

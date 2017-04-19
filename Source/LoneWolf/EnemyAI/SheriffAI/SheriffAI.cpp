@@ -43,7 +43,17 @@ void ASheriffAI::BeginPlay()
 void ASheriffAI::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-	UpdateLassoTelegraph();
+	if(bIsInRange())
+	{
+		if (CurrentlyEquippedWeapon != NULL)
+		{
+			CurrentlyEquippedWeapon->Fire();
+		}
+	}
+	if (bIsInRange() && bCanLasso())
+	{
+		UpdateLassoTelegraph();
+	}
 }
 
 void ASheriffAI::SetupPlayerInputComponent(class UInputComponent* InputComponent)
@@ -94,6 +104,22 @@ bool ASheriffAI::bIsHardCC()
 void ASheriffAI::Destroyed()
 {
 	Super::Destroyed();
+}
+
+bool ASheriffAI::bCanLasso()
+{
+	return true;
+}
+
+void ASheriffAI::Lasso(ACharacterController* Player)
+{
+	if (Player)
+	{
+			FVector CurrentLocation = GetActorLocation();
+			FVector CurrentTargetLocation = Player->GetRootComponent()->GetComponentLocation();
+			
+			 
+	}
 }
 
 void ASheriffAI::UpdateLassoTelegraph()
