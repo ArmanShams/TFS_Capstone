@@ -41,4 +41,6 @@ void AEnemySpawner::Tick( float DeltaTime )
 void AEnemySpawner::spawnEnemy()
 {
 	//spawn enemy
+
+	//Player = Cast<ACharacterController>(UGameplayStatics->GetActorArrayAverageLocation()
 }

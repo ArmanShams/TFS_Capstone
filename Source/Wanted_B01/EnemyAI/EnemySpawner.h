@@ -23,6 +23,10 @@ public:
 	//UPROPERTY(EditAnywhere)
 	//Enemy enemyToSpawn;
 
+	TArray<TSubclassOf<class AEnemy>> EnemyToSpawn;
+
+	TArray<TSubclassOf<class ATargetpoint*>> LocationToSpawn;
+
 	UPROPERTY(EditAnywhere)
 	float spawnRateInSeconds;
 
@@ -32,4 +36,6 @@ public:
 	uint16 enemyCount;
 
 	void spawnEnemy();
+
+	class ACharacterController* Player;
 };
