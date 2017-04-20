@@ -6,6 +6,16 @@
 #include "Character/PlayerCharacter/CharacterController.h"
 #include "SheriffAI.generated.h"
 
+UENUM(BlueprintType)
+enum class SheriffState : uint8
+{
+	IDLE			UMETA(DisplayName = "Idle"),
+	MELEE			UMETA(DisplayName = "Melee"),
+	RANGED			UMETA(DisplayName = "Ranged"),
+	LASSO			UMETA(DisplayName = "Lasso"),
+};
+
+
 UCLASS()
 class LONEWOLF_API ASheriffAI : public AEnemy
 {
@@ -17,26 +27,38 @@ public:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
+	
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 	virtual void AddStatusEffect(TSubclassOf<class UStatusEffectBase> ClassToCreateFrom, bool bShouldPerformTickAction, float LifeTime, float TickRate, ALoneWolfCharacter* CharacterThatInflictedStatusEffect) override;
 	virtual void AddStatusEffect(TSubclassOf<class UStatusEffectBase> ClassToCreateFrom, bool bShouldPerformTickAction, bool bShouldDealDamage, float LifeTime, float DamageToDeal, float TickRate, ALoneWolfCharacter* CharacterThatInflictedStatusEffect) override;
+	
 	virtual AWeapon* GetEquippedWeapon();
+	
 	virtual bool bIsInRange();
 	virtual bool bIsInRange(float OveriddenDesiredRange);
 	virtual bool bIsSoftCC() override;
 	virtual bool bIsHardCC() override;
 	virtual void Destroyed() override;
 
-	bool bCanLasso();
-	void Lasso(ACharacterController* Player);
+	SheriffState CurrentState;
+	virtual SheriffState GetSheriffState();
+	virtual void SetSheriffState(SheriffState NewStateToEnter);
 
-	AActor* LassoDecalActor;
-	TSubclassOf<AActor> LassoDecalClass;
 
-	void UpdateLassoTelegraph();
+	void Lasso(ACharacterController* Player, FHitResult& SweepHitResult);
 
-	void DisplayLassoTelegraph();
+	//bool bCanMelee;
+	//bool bCanLasso;
 
+	// bool bCanLasso();
+	// void UpdateLassoTelegraph();
+	// void DisplayLassoTelegraph();
+
+	//AActor* LassoDecalActor;
+	//TSubclassOf<AActor> LassoDecalClass;
+
+	//TSubclassOf<ALasso> LassoClass;
+	//class ALasso* LassoActor;
 
 protected:
 	virtual AWeapon* EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip) override;

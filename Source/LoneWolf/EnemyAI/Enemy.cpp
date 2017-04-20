@@ -154,7 +154,7 @@ bool AEnemy::bIsInRange(float OveriddenDesiredRange)
 					const FVector CurrentTargetLocation = CurrentTarget->GetActorLocation();
 					const FVector MyLocation = GetActorLocation();
 					const float CurrentDistance = FVector::Dist(CurrentTargetLocation, MyLocation);
-					//UE_LOG(LogTemp, Warning, TEXT("CurrentTargetLocation is %s"),  *CurrentTargetLocation.ToString());
+ 
 					//UE_LOG(LogTemp, Warning, TEXT("MyLocation is %s"), *MyLocation.ToString());
 					//UE_LOG(LogTemp, Warning, TEXT("CurrentDistance is %f"), CurrentDistance);
 					return CurrentDistance < DesiredRange;
