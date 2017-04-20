@@ -82,7 +82,7 @@ void UBTService_FindTarget::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* N
 				CurrentPoint = RangePoint;
 			}
 			
-			UE_LOG(LogTemp, Warning, TEXT("CurrentPoint is is %i"), CurrentPoint);
+			//UE_LOG(LogTemp, Warning, TEXT("CurrentPoint is is %i"), CurrentPoint);
 
 			AActor* PatrolPoint = PatrolPoints[RangePoint];
 			OwnerComp.GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), PatrolPoint);

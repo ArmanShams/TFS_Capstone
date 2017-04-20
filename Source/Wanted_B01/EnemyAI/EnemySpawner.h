@@ -23,9 +23,9 @@ public:
 	//UPROPERTY(EditAnywhere)
 	//Enemy enemyToSpawn;
 
-	TArray<class AEnemy*> EnemyToSpawn;
+	TArray<TSubclassOf<class AEnemy>> EnemyToSpawn;
 
-	//TArray<TSubclassOf<class ATargetpoint*>> LocationToSpawn;
+	TArray<TSubclassOf<class AActor>> LocationToSpawn;
 
 	UPROPERTY(EditAnywhere)
 		float spawnRateInSeconds;
