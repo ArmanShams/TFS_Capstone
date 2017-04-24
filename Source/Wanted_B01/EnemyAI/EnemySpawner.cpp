@@ -26,12 +26,14 @@ AEnemySpawner::AEnemySpawner()
 		UE_LOG(LogTemp, Warning, TEXT("EnemyPrototype Class has been found"));
 	}
 
-	ConstructorHelpers::FObjectFinder<AActor> SpawnGate(TEXT("Blueprint'/Game/Blueprints/Enemies/BaseEnemyAI/EnemySpawnGate.EnemySpawnGate_C'"));
-	FVector here = SpawnGate.Object->GetActorLocation();
-	if (SpawnGate.Object)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("SpawnGate Object has been found"));
-	}
+	FVector SpawnGate = GetActorLocation();
+	//ConstructorHelpers::FObjectFinder<AActor> SpawnGate(TEXT("Blueprint'/Game/Blueprints/Enemies/BaseEnemyAI/EnemySpawnGate.EnemySpawnGate_C'"));
+	//FVector here = SpawnGate.Object->GetActorLocation();
+	//if (SpawnGate.Object)
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("SpawnGate Object has been found"));
+	//}
+	
 	//if (LocationToSpawn.Num() == 0)
 	//{
 	//	UE_LOG(LogTemp, Warning, TEXT("LocationToSpawn has no members"));
@@ -61,13 +63,14 @@ void AEnemySpawner::Tick(float DeltaTime)
 void AEnemySpawner::spawnEnemy()
 {
 	//spawn enemy
-	ConstructorHelpers::FObjectFinder<AActor> SpawnGate(TEXT("Blueprint'/Game/Blueprints/Enemies/BaseEnemyAI/EnemySpawnGate.EnemySpawnGate'"));
 
-	FVector SpawnHere = SpawnGate.Object->GetActorLocation();
-	FRotator Rotation (0.0f, 0.0f, 0.0f);
-	FActorSpawnParameters SpawnInfo;
-	GetWorld()->SpawnActor<AEnemy>(SpawnHere, Rotation, SpawnInfo);
-	enemyCount++;
+	//AEnemy* TestSpawn;
+	//FVector SpawnHere = GetActorLocation();
+	//FRotator Rotation (0.0f, 0.0f, 0.0f);
+	//FActorSpawnParameters SpawnInfo;
+	//GetWorld()->SpawnActor(AEnemy* EnemyPrototype, Rotation, SpawnInfo )
+	//	SpawnActor<EnemyPrototype>(SpawnHere, Rotation, SpawnInfo);
+	//enemyCount++;
 	
 	UE_LOG(LogTemp, Warning, TEXT("I should have spawned"));
 }
