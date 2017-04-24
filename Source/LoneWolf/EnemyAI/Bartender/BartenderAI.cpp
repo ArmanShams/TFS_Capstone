@@ -2,9 +2,7 @@
 
 #include "LoneWolf.h"
 #include "BartenderAI.h"
-
-
-
+#include "Weapons/Projectile.h"
 
 ABartenderAI::ABartenderAI()
 {
@@ -34,6 +32,9 @@ void ABartenderAI::BeginPlay()
 void ABartenderAI::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+
+
+
 }
 
 void ABartenderAI::SetupPlayerInputComponent(class UInputComponent* InInputComponent)
@@ -91,7 +92,57 @@ void ABartenderAI::Destroyed()
 	Super::Destroyed();
 }
 
-//void ABartenderAI::EquipWeapon(TSubclassOf<AWeapon> WeaponToEquip)
-//{
-//	Super::EquipWeapon(WeaponToEquip);
-//}
+AWeapon* ABartenderAI::EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip)
+{
+	CurrentlyEquippedWeapon = Super::EquipNewWeapon(WeaponToEquip);
+	return CurrentlyEquippedWeapon;
+}
+
+FVector ABartenderAI::HitTargetLocationAtTime(FVector StartPosition, FVector TargetPosition, FVector GravityBase, float TimeToTarget)
+{
+	FVector AtoB = TargetPosition - StartPosition;
+	FVector Horizontal = GetHorizontalVector(AtoB, GravityBase);
+	float HorizontalDistance = Horizontal.Size();
+	FVector Vertical = GetVerticalVector(AtoB, GravityBase);
+	float VerticalDistance = Vertical.Size() * Sign(FVector::DotProduct(Vertical, -GravityBase));
+
+	float HorizontalSpeed = HorizontalDistance / TimeToTarget;
+	float VerticalSpeed = (VerticalDistance + ((0.5f * GravityBase.Size()) * (TimeToTarget * TimeToTarget))) / TimeToTarget;
+	//if (Horizontal.Normalize() && GravityBase.Normalize())
+	{
+		FVector Launch = (Horizontal.GetSafeNormal() * HorizontalSpeed) - (GravityBase.GetSafeNormal() * VerticalSpeed);
+		return Launch;
+	}
+	return FVector::ZeroVector;
+}
+
+FVector ABartenderAI::GetHorizontalVector(FVector Direction, FVector GravityBase)
+{
+	FVector Output;
+	FVector Perpendicular = FVector::CrossProduct(Direction, GravityBase);
+	Perpendicular = FVector::CrossProduct(GravityBase, Perpendicular);
+	Output = Direction.ProjectOnTo(Perpendicular); //FVector::Pro(Direction, Perpendicular);
+	return Output;
+}
+
+FVector ABartenderAI::GetVerticalVector(FVector Direction, FVector GravityBase)
+{
+	FVector Output;
+	//output = FVector.Project(AtoB, gravityBase);
+	Output = Direction.ProjectOnTo(GravityBase);
+	return Output;
+}
+
+float ABartenderAI::Sign(float RetrieveSignOf)
+{
+	if (RetrieveSignOf < 0)
+	{
+		return -1.f;
+	}
+	if (RetrieveSignOf > 0)
+	{
+		return 1.0f;
+	}
+	return 0;
+}
+

@@ -8,7 +8,15 @@
 /**
  * 
  */
-UCLASS()
+UENUM(BlueprintType)
+enum class BounterHunterState : uint8
+{
+	IDLE			UMETA(DisplayName = "Idle"),
+	READYINGATTACK	UMETA(DisplayName = "PreparingToAttack"),
+	ATTACKING		UMETA(DisplayName = "Attacking")
+};
+
+UCLASS(Blueprintable)
 class LONEWOLF_API ABountyHunter : public AEnemy
 {
 	GENERATED_BODY()
@@ -31,7 +39,7 @@ public:
 	virtual bool bIsHardCC() override;
 	virtual void Destroyed() override;
 	virtual bool bCanTriggerRecoilAnimation();
-
+	virtual void SetBountyHunterState(BounterHunterState NewState);
 
 protected:
 	virtual AWeapon* EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip) override;
@@ -55,7 +63,7 @@ protected:
 	ABearTrap* BearTrapPlaced;
 
 	TArray<AActor*> TrapArray;
-
+	BounterHunterState CurrentState;
 
 
 	friend class ABearTrap;

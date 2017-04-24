@@ -33,5 +33,11 @@ public:
 	virtual void Destroyed() override;
 	
 protected:
-	//virtual void EquipWeapon(TSubclassOf<AWeapon> WeaponToEquip) override;
+	virtual AWeapon* EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip) override;
+
+	virtual FVector HitTargetLocationAtTime(FVector StartPosition, FVector TargetPosition, FVector GravityBase, float TimeToTarget);
+	virtual FVector GetHorizontalVector(FVector Direction, FVector GravityBase);
+	virtual FVector GetVerticalVector(FVector Direction, FVector GravityBase);
+
+	virtual float Sign(float RetrieveSignOf);
 };

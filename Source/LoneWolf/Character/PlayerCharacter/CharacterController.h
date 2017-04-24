@@ -82,8 +82,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	float RollDistance;
 
-	UPROPERTY(EditDefaultsOnly)
+	//UPROPERTY(EditDefaultsOnly)
 	float Rage;
+
+	UPROPERTY(EditDefaultsOnly)
+	float CameraArmDistance;
 
 	UPROPERTY(EditDefaultsOnly)
 	float RageDrainPerSecond;

@@ -26,6 +26,7 @@ ACharacterController::ACharacterController()
 	AimSnapHalfHeight = 256.f;
 	AimSnapRadius = 128.;
 
+	CameraArmDistance = 600.f;
 
 	AimSnapCapsule = CreateDefaultSubobject<UCapsuleComponent>(TEXT("AimSnapCapsule"));
 	//AimSnapCapsule->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
@@ -48,7 +49,7 @@ ACharacterController::ACharacterController()
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	CameraBoom->SetRelativeRotation(FRotator(-70.f, 0.f, 0.f));
-	CameraBoom->TargetArmLength = 600.f;
+	CameraBoom->TargetArmLength = CameraArmDistance;
 	CameraBoom->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
 
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
@@ -80,8 +81,9 @@ void ACharacterController::BeginPlay()
 	AimSnapCapsule->SetCapsuleHalfHeight(AimSnapHalfHeight);
 	AimSnapCapsule->SetCapsuleRadius(AimSnapRadius);
 	AimSnapCapsule->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+
 	Super::BeginPlay();
-	
+
 	if (!NeuteredMode)
 	{
 		EquipNewWeapon(DefaultWeapon);
@@ -124,13 +126,11 @@ void ACharacterController::Tick( float DeltaSeconds )
 
 		FString AnimClassStringTest = "Class'/Game/Blueprints/Player/CharacterControllerWolfPlaceholder.CharacterControllerWolfPlaceholder_C'";
 
-		// load the class
 		UClass* AnimationClass = LoadObject<UClass>(NULL, *AnimClassStringTest);
-		if (!AnimationClass) return;
+		//if (!AnimationClass) return;
 
 		if (AnimationClass && NewMesh)
 		{
-
 			GetMesh()->SetSkeletalMesh(NewMesh);
 			GetMesh()->SetAnimInstanceClass(AnimationClass);
 
@@ -140,9 +140,6 @@ void ACharacterController::Tick( float DeltaSeconds )
 			//CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(90.f, 180.f, 0.f));
 			CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("WeaponSocket"));
 			CurrentlyEquippedWeapon->SetOwner(this);
-
-			//CurrentlyEquippedWeapon->bOwnedByPlayer = true;
-			
 		}
 		// assign the anim blueprint class to your skeletal mesh component
 		//Skeletal3DMeshComponent->SetAnimInstanceClass(AnimationClass);
@@ -285,7 +282,7 @@ bool ACharacterController::bIsSoftCC()
 AWeapon* ACharacterController::EquipNewWeapon(TSubclassOf<AWeapon> WeaponToEquip)
 {
 	CurrentlyEquippedWeapon = Super::EquipNewWeapon(WeaponToEquip);
-	CurrentlyEquippedWeapon->SetOwner(this);
+	//CurrentlyEquippedWeapon->SetOwner(this);
 	//FVector Direction = (GetActorForwardVector()) * 128.f + GetActorUpVector() * 128.f - CurrentlyEquippedWeapon->GetActorLocation();
 	////DrawDebugLine(GetWorld(), CurrentlyEquippedWeapon->GetActorLocation(), OutHitResult.ImpactPoint + FVector::UpVector * 20.f, FColor(255, 0, 255), false, 0.05f, 0, 12.333f);
 	////FRotator RotationInDirection = FRotationMatrix::MakeFromX(Direction).Rotator();
@@ -379,7 +376,7 @@ void ACharacterController::OnMouseMove(float scale)
 							}
 							//DrawDebugPoint(GetWorld(), OutHitResultVerticalResult.Location, 2.0f, FColor(0, 255, 255), false, 1.0f);
 						}
-						CurrentlyEquippedWeapon->SetActorRotation(FMath::RInterpTo(CurrentlyEquippedWeapon->GetActorRotation(), DesiredWeaponRotation, GetWorld()->GetDeltaSeconds(), TurnRate));
+						CurrentlyEquippedWeapon->SetActorRotation(FMath::RInterpTo(CurrentlyEquippedWeapon->GetActorRotation(), DesiredWeaponRotation, GetWorld()->GetDeltaSeconds(), TurnRate * TurnRate));
 					}
 				}	
 			}
