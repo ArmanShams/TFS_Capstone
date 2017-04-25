@@ -44,21 +44,13 @@ public:
 	virtual SheriffState GetSheriffState();
 	virtual void SetSheriffState(SheriffState NewStateToEnter);
 
+	void Lasso();
+	void TraceToAim();
 
-	void Lasso(ACharacterController* Player, FHitResult& SweepHitResult);
-
-	//bool bCanMelee;
-	//bool bCanLasso;
-
-	// bool bCanLasso();
-	// void UpdateLassoTelegraph();
-	// void DisplayLassoTelegraph();
-
-	//AActor* LassoDecalActor;
-	//TSubclassOf<AActor> LassoDecalClass;
-
-	//TSubclassOf<ALasso> LassoClass;
-	//class ALasso* LassoActor;
+	FComponentReference CastedPlayerReference;
+	
+	AActor* LassoActor;
+	TSubclassOf<AActor> LassoActorClass;
 
 protected:
 	virtual AWeapon* EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip) override;

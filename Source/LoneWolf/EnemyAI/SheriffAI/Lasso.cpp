@@ -6,4 +6,5 @@
 ALasso::ALasso()
 {
 	CableComponent = CreateDefaultSubobject<UCableComponent>(TEXT("CableComponent"));
+
 }

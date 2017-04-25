@@ -6,6 +6,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyAllTypes.h"
 #include "Character/PlayerCharacter/CharacterController.h"
+#include "DrawDebugHelpers.h"
 #include "SheriffAI.h"
 
 ASheriffAI::ASheriffAI()
@@ -19,13 +20,18 @@ ASheriffAI::ASheriffAI()
 	TurnRate = 0.25f;
 	MaxRange = 100.0f;
 	AttackFrequency = 5.f;
-	AttackRange = 250.0f;
-	// bCanMelee = false;
+	AttackRange = 1000.0f;
 
 	ConstructorHelpers::FClassFinder<AWeapon>KnifeAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/KnifeBP_Arman.KnifeBP_Arman_C'"));
 	if (KnifeAsset.Class)
 	{
 		DefaultWeapon = (UClass*)KnifeAsset.Class;
+	}
+
+	ConstructorHelpers::FClassFinder<AActor>LassoAsset(TEXT("Blueprint'/Game/Blueprints/Enemies/Sheriff/LassoBP.LassoBP_C'"));
+	if (LassoAsset.Class)
+	{
+		UE_LOG(LogTemp, Display, TEXT("Lasso class found!"));
 	}
 }
 
@@ -52,59 +58,20 @@ void ASheriffAI::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	//switch (CurrentState)
-	//{
-	//	case SheriffState::IDLE:
-	//	{
-	//		DefaultWeapon = NULL;
-	//	}
-	//	break;
+	FVector LinkDistance;
+	LinkDistance.X = AttackRange;
 
-	//	case SheriffState::MELEE:
-	//	{
-	//		ConstructorHelpers::FClassFinder<AWeapon>KnifeAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/KnifeBP_Arman.KnifeBP_Arman_C'"));
-	//		if (KnifeAsset.Class)
-	//		{
-	//			DefaultWeapon = (UClass*)KnifeAsset.Class;
-	//		}	
-	//	}
-	//	break;
-
-	//	case SheriffState::RANGED:
-	//	{
-	//		ConstructorHelpers::FClassFinder<AWeapon>KnifeAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/KnifeBP_Arman.KnifeBP_Arman_C'"));
-	//		if (KnifeAsset.Class)
-	//		{
-	//			DefaultWeapon = (UClass*)KnifeAsset.Class;
-
-	//		}
-	//	}
-	//	break;
-	//	case SheriffState::LASSO
-	//	{
-	//		ConstructorHelpers::FClassFinder<AWeapon>LassoAsset(TEXT("Blueprint'/Game/Blueprints/Enemies/Sheriff/RopeBP.RopeBP_C'"));
-	//		if (LassoAsset.Class)
-	//		{
-	//			DefaultWeapon = (UClass*)LassoAsset.Class;
-	//		}
-	//	}
+	FVector LinkStart = GetActorLocation();
+	FVector LinkEnd = LinkStart + LinkDistance;
+	DrawDebugLine(GetWorld(), LinkStart, LinkEnd, FColor(0, 0, 0), false, -1.f, 0, 5.f);
 
 	if (bIsInRange())
 	{
 		UE_LOG(LogTemp, Display, TEXT("You are in range of the Sheriff"));
 		if (CurrentlyEquippedWeapon != NULL)
 		{
-			CurrentlyEquippedWeapon->Fire();
-			
+			// CurrentlyEquippedWeapon->Fire();
 			// Lasso();
-			/*if (bCanMelee == true)
-			{
-				CurrentlyEquippedWeapon->Fire();
-			}
-			if (bCanMelee = false)
-			{
-				CurrentlyEquippedWeapon->Fire();
-			}*/
 		}
 	}
 }
@@ -159,55 +126,25 @@ void ASheriffAI::Destroyed()
 	Super::Destroyed();
 }
 
-//bool ASheriffAI::bCanLasso()
-//{
-//	return true;
-//}
 
-void ASheriffAI::Lasso(ACharacterController* Player, FHitResult& SweepHitResult)
+void ASheriffAI::Lasso()
 {
-	//if (Player = Cast<ACharacterController>(Cast<AAIController>(GetController()->GetBrainComponent()->GetBlackBoardComponent()->GetValueAsObject(TEXT("Target"))))
-	//{
-	//	FRotator CurrentRotation = GetActorRotation();
+	ACharacterController* PlayerController = Cast<ACharacterController>(GetController());
 	FVector CurrentLocation = RootComponent->GetComponentLocation();
-	FVector CurrentTargetLocation = Player->GetActorLocation();
+	FVector CurrentTargetLocation = PlayerController->GetActorLocation();
 	float SpeedOfLerp = 1.0f;
 
 	FVector Difference = FMath::Lerp(CurrentLocation, CurrentTargetLocation, SpeedOfLerp);
+	if (PlayerController != nullptr)
+	{
+		FHitResult TraceResult(ForceInit);
+		AActor* DamagedActor = TraceResult.GetActor();
+		UPrimitiveComponent* DamagedComponent = TraceResult.GetComponent();
 
-	
-	// UE_LOG(LogTemp, Display, TEXT("Lerp Difference: %s"), Difference.ToString());
-	// Difference.Rotation();		// Get Rotation of Lerp
-
-	//	FVector Difference = FVector(CurrentTargetLocation.X - CurrentLocation.X, CurrentTargetLocation.Y - CurrentLocation.Y, 0.f);
-
-	//	SetActorRotation(FMath::Lerp(CurrentRotation, FRotator(0.f, Difference.Rotation().Yaw, 0.f), 0.2f));
-	//	SetActorLocation(CurrentLocation.Z - 100.f, CurrentLocation.X - 50.f);
-	//}
+		const float ForceAmount = -2000.f;
+		DamagedComponent->AddForce(FVector(0.0f, 0.0f, ForceAmount));
+	}
 }
-
-//void ASheriffAI::UpdateLassoTelegraph()
-//{
-//	if (LassoDecalActor != NULL)
-//	{
-//		if (UBlackboardComponent* BlackboardComponent = Cast<ASheriffAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
-//		{ 
-//		UE_LOG(LogTemp, Display, TEXT("Telegraph for Lasso displaying!"));
-//		FRotator CurrentRotation = LassoDecalActor->GetActorRotation();
-//		FVector CurrentLocation = GetActorLocation();
-//		FVector CurrentTargetLocation = Cast<ACharacter>(BlackboardComponent->GetValue<UBlackboardKeyType_Object>(TEXT("Target")))->GetRootComponent()->GetComponentLocation();
-//		FVector Difference = FVector(CurrentTargetLocation.X - CurrentLocation.X, CurrentTargetLocation.Y - CurrentLocation.Y, CurrentTargetLocation.Z - CurrentLocation.Z);
-//
-//		LassoDecalActor->SetActorRotation(FMath::Lerp(CurrentRotation, FRotator(CurrentRotation.Pitch, Difference.Rotation().Yaw, CurrentRotation.Roll), 0.1f));
-//		}
-//	}
-//}
-//
-//void ASheriffAI::DisplayLassoTelegraph()
-//{
-//	LassoDecalActor = GetWorld()->SpawnActor<AActor>(LassoDecalClass);
-//	LassoDecalActor->SetOwner(this);
-//}
 
 AWeapon* ASheriffAI::EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip)
 {

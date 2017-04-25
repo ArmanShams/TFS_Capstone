@@ -9,7 +9,8 @@
 
 ASheriffAIController::ASheriffAIController()
 {
-	PerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("PerceptionComponent"));
+	PerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("PerceptionComponent")); // Deprecated function
+	// PerceptionComponent = GetPerceptionComponent();
 }
 
 void ASheriffAIController::Possess(APawn* InPawn)
