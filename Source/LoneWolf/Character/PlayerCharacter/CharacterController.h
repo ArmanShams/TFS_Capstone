@@ -10,6 +10,7 @@
 UENUM(BlueprintType)
 enum class TransformationState : uint8
 {
+	DEAD		UMETA(DisplayName = "Dead"),
 	HUMAN		UMETA(DisplayName = "Human"),
 	WOLF		UMETA(DisplayName = "Wolf")
 };
@@ -65,6 +66,7 @@ public:
 	void OnAimSnapBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION()
 	void OnAimSnapOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
 protected:
 	bool IsRolling();
 	bool IsMeleeAttacking();
@@ -119,10 +121,16 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
 	TSubclassOf<class UUserWidget> wInGameHud;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
+	TSubclassOf<class UUserWidget> wDeadHud;
+
 	// Variable to store the widget after creating it.
 	class UUserWidget* InGameHud;
 
+	class UUserWidget* DeadHud;
 
+
+	UPROPERTY(BlueprintReadOnly, Category = "PlayerTransformationState")
 	TransformationState CurrentForm;
 	AttackTypes::MeleeAttackType CurrentMeleeAttackType;
 	CharacterState::StatusEffect Effects;

@@ -94,6 +94,7 @@ void ACharacterController::BeginPlay()
 		}
 
 		wInGameHud = LoadClass<UUserWidget>(NULL, TEXT("WidgetBlueprint'/Game/Blueprints/HUD/HUD.HUD_C'"), NULL, LOAD_None, NULL);
+		wDeadHud = LoadClass<UUserWidget>(NULL, TEXT("WidgetBlueprint'/Game/Blueprints/HUD/DeadHud.DeadHud_C'"), NULL, LOAD_None, NULL);
 
 		if (wInGameHud)
 		{
@@ -259,7 +260,25 @@ float ACharacterController::TakeDamage(float DamageAmount, struct FDamageEvent c
 
 	if (NewHealth <= 0.f)
 	{
-		UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()), false);
+		//UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()), false);
+		CurrentForm = TransformationState::DEAD;
+		if (APlayerController* RecastController = Cast<APlayerController>(GetController()))
+		{
+			DisableInput(RecastController);
+			if (wDeadHud)
+			{
+				//Destroy(InGameHud);
+				InGameHud->RemoveFromViewport();
+				DeadHud = CreateWidget<UUserWidget>(GetWorld(), wDeadHud);
+
+				if (!DeadHud->GetIsVisible())
+				{
+					//InGameHud->AddToPlayerScreen();
+					DeadHud->AddToViewport(80);
+				}
+			}
+		}
+		//GetController()->DisableInput();
 		//SetLifeSpan(0.1f);
 	}
 
