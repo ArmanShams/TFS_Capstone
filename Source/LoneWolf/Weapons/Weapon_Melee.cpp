@@ -116,20 +116,20 @@ void AWeapon_Melee::OnMeleeWeaponOverlapBegin(UPrimitiveComponent * HitComponent
 	default:
 		break;
 	}
-	APawn* ReCastedOwningActor = Cast<APawn>(OwningActor);
-
-	if (bMultiTap)
+	if (APawn* ReCastedOwningActor = Cast<APawn>(OwningActor))
 	{
-		UE_LOG(LogTemp, Display, TEXT("OverlappingAComponent %s"), *HitComponent->GetName());
-		UGameplayStatics::ApplyDamage(OtherActor, DamageToDeal, ReCastedOwningActor->GetController(), OwningActor, TSubclassOf<UDamageType>());
+		if (bMultiTap)
+		{
+			UE_LOG(LogTemp, Display, TEXT("OverlappingAComponent %s"), *HitComponent->GetName());
+			UGameplayStatics::ApplyDamage(OtherActor, DamageToDeal, ReCastedOwningActor->GetController(), OwningActor, TSubclassOf<UDamageType>());
+		}
+		else if (!bHasHit && !bMultiTap)
+		{
+			UE_LOG(LogTemp, Display, TEXT("OverlappingAComponent %s"), *HitComponent->GetName());
+			UGameplayStatics::ApplyDamage(OtherActor, DamageToDeal, ReCastedOwningActor->GetController(), OwningActor, TSubclassOf<UDamageType>());
+			bHasHit = true;
+		}
 	}
-	else if (!bHasHit && !bMultiTap)
-	{
-		UE_LOG(LogTemp, Display, TEXT("OverlappingAComponent %s"), *HitComponent->GetName());
-		UGameplayStatics::ApplyDamage(OtherActor, DamageToDeal, ReCastedOwningActor->GetController(), OwningActor, TSubclassOf<UDamageType>());
-		bHasHit = true;
-	}
-	
 }
 
 

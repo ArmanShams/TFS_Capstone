@@ -67,7 +67,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	float MaxRange;
 
-	UPROPERTY(EditDefaultsOnly)
 	float TimeSinceLastAttack;
 
 	UPROPERTY(EditDefaultsOnly)

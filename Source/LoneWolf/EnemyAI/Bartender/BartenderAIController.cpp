@@ -7,7 +7,9 @@
 
 ABartenderAIController::ABartenderAIController()
 {
+	//NewPerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("PerceptionComponent"));
 	PerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("PerceptionComponent"));
+	//SetPerceptionComponent(NewPerceptionComponent);
 }
 
 void ABartenderAIController::Possess(APawn* InPawn)

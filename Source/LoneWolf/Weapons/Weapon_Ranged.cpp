@@ -78,6 +78,13 @@ bool AWeapon_Ranged::Fire()
 				{
 					Temp->CollisionComponent->SetCollisionResponseToChannel(ECC_GameTraceChannel4, ECR_Ignore);
 				}
+
+				if (CurrentAmmo == 0)
+				{
+					UE_LOG(LogTemp, Display, TEXT("Ran out of ammo after firing"));
+					Reload();
+				}
+
 				return true;
 			}
 			else

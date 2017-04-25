@@ -312,7 +312,6 @@ void AMinerAI::Stomp()
 			DrawDebugSphere(GetWorld(), GetActorLocation(), StompRadius, 32, FColor::Red, false, 1.5f);
 			for (size_t i = 0; i < HitResult.Num(); i++)
 			{
-				
 				if (ALoneWolfCharacter* RecastedResult = Cast<ALoneWolfCharacter>(HitResult[i].GetActor()))
 				{
 					if (HitResult[i].GetActor() != this)
@@ -394,25 +393,26 @@ void AMinerAI::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComp, AAct
 {
 	if (CurrentState ==  MinerState::CHARGING)
 	{
-		FVector DirectionToLaunch = 2.f * (OtherActor->GetActorLocation() - GetActorLocation());
-		Cast<ACharacter>(OtherActor)->LaunchCharacter(DirectionToLaunch * ChargeLaunchDistance, true, true);
-		if (ACharacterController* CastedAsPlayer = Cast<ACharacterController>(OtherActor))
+		if (ALoneWolfCharacter* RecastedActor = Cast<ALoneWolfCharacter>(OtherActor))
 		{
-			UE_LOG(LogTemp, Display, TEXT("The miner overlapped something."));
-			UGameplayStatics::ApplyDamage(OtherActor, ChargeDamage, GetController(), this, TSubclassOf<UDamageType>());
-			bChargeHasDamagedPlayer = true;
-			//DirectionToLaunch.Normalize();
-		}
+			FVector DirectionToLaunch = 2.f * (RecastedActor->GetActorLocation() - GetActorLocation()); RecastedActor->LaunchCharacter(DirectionToLaunch * ChargeLaunchDistance, true, true);
 
-		if (bChargeHasDamagedPlayer)
-		{
-			GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Block);
-			GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel4, ECR_Block);
-			GetMovementComponent()->StopActiveMovement();
-			Cast<UCharacterMovementComponent>(GetMovementComponent())->MaxWalkSpeed = DefaultMoveSpeed;
-			Effects = CharacterState::NONE;
-			CurrentState = MinerState::IDLE;
+			if (ACharacterController* CastedAsPlayer = Cast<ACharacterController>(RecastedActor))
+			{
+				UE_LOG(LogTemp, Display, TEXT("The miner overlapped something."));
+				UGameplayStatics::ApplyDamage(RecastedActor, ChargeDamage, GetController(), this, TSubclassOf<UDamageType>());
+				bChargeHasDamagedPlayer = true;
+				//DirectionToLaunch.Normalize();
+			}
+			if (bChargeHasDamagedPlayer)
+			{
+				GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Block);
+				GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel4, ECR_Block);
+				GetMovementComponent()->StopActiveMovement();
+				Cast<UCharacterMovementComponent>(GetMovementComponent())->MaxWalkSpeed = DefaultMoveSpeed;
+				Effects = CharacterState::NONE;
+				CurrentState = MinerState::IDLE;
+			}
 		}
 	}
-
 }

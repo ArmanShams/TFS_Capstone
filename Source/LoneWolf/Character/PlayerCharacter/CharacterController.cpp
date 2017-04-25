@@ -122,12 +122,10 @@ void ACharacterController::Tick( float DeltaSeconds )
 		//USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(NULL, TEXT("SkeletalMesh'/Game/Geometry/Characters/Werewolf/M_Werewolf.M_Werewolf'"), NULL, LOAD_None, NULL);
 
 		USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(NULL, TEXT("SkeletalMesh'/Game/MixamoAnimPack/Mixamo_Adam/Mesh/Maximo_Adam.Maximo_Adam'"), NULL, LOAD_None, NULL);
-		//UAnimBlueprint* NewAnimInstance = LoadObject<UAnimBlueprint>(NULL, TEXT("AnimBlueprint'/Game/Blueprints/Player/CharacterControllerWolfPlaceholder.CharacterControllerWolfPlaceholder'"), NULL, LOAD_None, NULL);
 
 		FString AnimClassStringTest = "Class'/Game/Blueprints/Player/CharacterControllerWolfPlaceholder.CharacterControllerWolfPlaceholder_C'";
 
 		UClass* AnimationClass = LoadObject<UClass>(NULL, *AnimClassStringTest);
-		//if (!AnimationClass) return;
 
 		if (AnimationClass && NewMesh)
 		{
@@ -154,7 +152,7 @@ void ACharacterController::Tick( float DeltaSeconds )
 			CurrentForm = TransformationState::WOLF;
 			UE_LOG(LogTemp, Display, TEXT("Player 'Transformed' to human"));
 
-			USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(NULL, TEXT("SkeletalMesh'/Game/Geometry/Characters/VincentArgo/M_VincentArgo.M_VincentArgo'"), NULL, LOAD_None, NULL);
+			USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(NULL, TEXT("SkeletalMesh'/Game/Geometry/Characters/VincentArgo/SK_Vincent.SK_Vincent'"), NULL, LOAD_None, NULL);
 			if (NewMesh)
 			{
 				CurrentlyEquippedWeapon->Destroy();

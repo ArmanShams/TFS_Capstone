@@ -40,4 +40,10 @@ protected:
 	virtual FVector GetVerticalVector(FVector Direction, FVector GravityBase);
 
 	virtual float Sign(float RetrieveSignOf);
+
+
+	UPROPERTY(EditDefaultsOnly)
+	float TimeForMolotovToReachTargetLocation;
+
+	bool bSpawned = false;
 };
