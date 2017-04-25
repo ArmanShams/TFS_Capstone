@@ -59,6 +59,15 @@ void AProjectile::SetOwner(AActor* NewOwner)
 	Owner = NewOwner;
 }
 
+UProjectileMovementComponent* AProjectile::GetProjectileMovementComponent()
+{
+	if (GetWorld()->HasBegunPlay() && ProjectileMovementComponent != NULL)
+	{
+		return ProjectileMovementComponent;
+	}
+	return NULL;
+}
+
 void AProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	// OtherComp->AddImpulseAtLocation(GetVelocity() * BulletImpulse, GetActorLocation());

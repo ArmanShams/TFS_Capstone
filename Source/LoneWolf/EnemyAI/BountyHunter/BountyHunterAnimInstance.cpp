@@ -40,6 +40,7 @@ void UBountyHunterAnimInstance::AnimNotify_Shoot()
 	if (GetWorld()->HasBegunPlay())
 	{
 		BountyHunter->GetEquippedWeapon()->Fire();
+		BountyHunter->SetBountyHunterState(BounterHunterState::IDLE);
 	}
 }
 

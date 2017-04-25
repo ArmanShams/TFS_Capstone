@@ -24,6 +24,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	class UBehaviorTree* BehaviorTreeAsset;
 
+	//class UAIPerceptionComponent NewPerceptionComponent;
+
 	friend class AEnemy;
 	
 	

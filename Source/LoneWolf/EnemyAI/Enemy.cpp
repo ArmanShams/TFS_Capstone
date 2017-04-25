@@ -88,7 +88,10 @@ float AEnemy::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEv
 
 	if (NewHealth <= 0.f)
 	{
-		CurrentlyEquippedWeapon->SetLifeSpan(0.1f);
+		if (CurrentlyEquippedWeapon != NULL)
+		{
+			CurrentlyEquippedWeapon->SetLifeSpan(0.1f);
+		}
 		SetLifeSpan(0.1f);
 	}
 

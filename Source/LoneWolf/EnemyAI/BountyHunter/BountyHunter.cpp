@@ -28,18 +28,19 @@ ABountyHunter::ABountyHunter()
 	AttackRange = 3000.0f;
 	MaximumTrapsAllowed = 3;
 	bPlayRecoilAnimation = false;
+	CurrentState = BounterHunterState::IDLE;
 
 	ConstructorHelpers::FClassFinder<AWeapon>WeaponAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/Weapon_RifleBP.Weapon_RifleBP_C'"));
 	if (WeaponAsset.Class)
 	{
-		UE_LOG(LogTemp, Display, TEXT("Found the rifle."));
+		//UE_LOG(LogTemp, Display, TEXT("Found the rifle."));
 		DefaultWeapon = (UClass*)WeaponAsset.Class;
 	}
 
 	ConstructorHelpers::FClassFinder<ABearTrap>TrapAsset(TEXT("Blueprint'/Game/Blueprints/Enemies/BountyHunter/BearTrapBP.BearTrapBP_C'"));
 	if (TrapAsset.Class)
 	{
-		UE_LOG(LogTemp, Display, TEXT("Found the trap."));
+		//UE_LOG(LogTemp, Display, TEXT("Found the trap."));
 		BearTrapClass = (UClass*)TrapAsset.Class;
 	}
 }
@@ -71,7 +72,37 @@ void ABountyHunter::Tick(float DeltaTime)
 		BlackboardComponent->SetValueAsBool(TEXT("IsHardCC"), bIsHardCC());
 		BlackboardComponent->SetValueAsBool(TEXT("IsSoftCC"), bIsSoftCC());
 		BlackboardComponent->SetValueAsBool(TEXT("bCanAttackTarget"), bIsInRange());
+
+		if (CurrentState == BounterHunterState::READYINGATTACK && CurrentlyEquippedWeapon != NULL)
+		{
+			if (BlackboardComponent->GetValueAsObject(TEXT("Target")) != NULL)
+			{
+				if (ACharacterController* RecastTarget = Cast<ACharacterController>(BlackboardComponent->GetValueAsObject(TEXT("Target"))))
+				{
+					FRotator DesiredWeaponRotation = GetActorRotation();
+
+					FVector DirectionToTarget = RecastTarget->GetActorLocation() - GetActorLocation(); //FVector(RecastTarget->GetActorLocation().X - GetActorLocation().X, RecastTarget->GetActorLocation().Y - GetActorLocation().Y, RecastTarget->GetActorLocation().Z - GetActorLocation().Z);
+					if (DirectionToTarget.Size() > 300.f)
+					{
+						FRotator YawRotation = (RecastTarget->GetActorLocation() - CurrentlyEquippedWeapon->GetActorLocation()).Rotation();
+						DesiredWeaponRotation.Yaw = YawRotation.Yaw;
+					}
+					else
+					{
+						FRotator YawRotation = (GetActorLocation() + (GetMesh()->GetRightVector() * 256.f) - CurrentlyEquippedWeapon->GetActorLocation()).Rotation();
+						//DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + GetMesh()->GetRightVector() * 256.f, FColor(255, 255, 255), false, 0.018f, 8, 12.333f);
+						DesiredWeaponRotation.Yaw = YawRotation.Yaw;
+					}
+					FRotator RotationInDirection = FRotationMatrix::MakeFromX(DirectionToTarget).Rotator();
+					DesiredWeaponRotation.Pitch = RotationInDirection.Pitch;
+
+					CurrentlyEquippedWeapon->SetActorRotation(FMath::RInterpTo(CurrentlyEquippedWeapon->GetActorRotation(), DesiredWeaponRotation, GetWorld()->GetDeltaSeconds(), 200.f));
+				}
+			}
+		}
 	}
+
+
 	/*if (bIsInRange())
 	{
 		if (CurrentlyEquippedWeapon != NULL)
@@ -139,6 +170,11 @@ bool ABountyHunter::bCanTriggerRecoilAnimation()
 	return bPlayRecoilAnimation;
 }
 
+void ABountyHunter::SetBountyHunterState(BounterHunterState NewState)
+{
+	CurrentState = NewState;
+}
+
 AWeapon* ABountyHunter::EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip)
 {
 	//Super::EquipNewWeapon(WeaponToEquip);
@@ -191,6 +227,7 @@ void ABountyHunter::Attack()
 	{
 		if (CurrentlyEquippedWeapon->CanFire())
 		{
+			CurrentState = BounterHunterState::READYINGATTACK;
 			bPlayRecoilAnimation = true;
 		}
 		/*
