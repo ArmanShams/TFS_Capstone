@@ -15,32 +15,35 @@ class WANTED_B01_API UMainMenuWidget : public UUserWidget
 
 public:
 	virtual void NativeConstruct() override;
-	virtual void NativeTick(const FGeometry& MyGeometry, float DeltaSeconds) override;
 
-	UFUNCTION(BlueprintCallable, Category = "Options")
+	UFUNCTION(BlueprintCallable, Category = Settings)
 	float GetMasterVolume();
 
-	UFUNCTION(BlueprintCallable, Category = "Options")
+	UFUNCTION(BlueprintCallable, Category = Settings)
 	float GetSFXVolume();
 
-	UFUNCTION(BlueprintCallable, Category = "Options")
+	UFUNCTION(BlueprintCallable, Category = Settings)
 	float GetMusicVolume();
 
-	UFUNCTION(BlueprintCallable, Category = "Options")
+	UFUNCTION(BlueprintCallable, Category = Settings)
 	float GetVoiceVolume();
 
-	UPROPERTY(BlueprintReadOnly, Category = "Options")
+	UPROPERTY(BlueprintReadOnly, Category = Settings)
 	float MasterVolume;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Options")
+	UPROPERTY(BlueprintReadOnly, Category = Settings)
 	float SFXVolume;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Options")
+	UPROPERTY(BlueprintReadOnly, Category = Settings)
 	float MusicVolume;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Options")
+	UPROPERTY(BlueprintReadOnly, Category = Settings)
 	float VoiceVolume;
 
+	uint16 ShadowQuality = 0;
+	uint16 ShadowMax = 3;
+
+	class LWGameUserSettings* LWGame;
 	friend class LWGameUserSettings;
 
 	

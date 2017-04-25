@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Wanted_B01.h"
+#include "Wanted_B01/Menus/LWGameUserSettings.h"
 #include "MainMenuWidget.h"
 
 
@@ -9,11 +10,14 @@
 void UMainMenuWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-}
 
-void UMainMenuWidget::NativeTick(const FGeometry& MyGeometry, float DeltaSeconds)
-{
-	Super::NativeTick(MyGeometry, DeltaSeconds);
+	//LWGame = Cast<ULWGameUserSettings>()
+
+	//MasterVolume = LWGame->MasterVolume;
+	//SFXVolume = LWGame->SFXVolume;
+	//MusicVolume = LWGame->MusicVolume;
+	//VoiceVolume = LWGame->VoiceVolume;
+
 }
 
 float UMainMenuWidget::GetMasterVolume()
