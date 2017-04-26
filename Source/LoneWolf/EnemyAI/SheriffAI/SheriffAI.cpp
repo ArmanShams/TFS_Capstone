@@ -28,6 +28,10 @@ ASheriffAI::ASheriffAI()
 	AttackFrequency = 5.f;
 	AttackRange = 1000.0f;
 
+	FName LassoSocket = TEXT("RightHand");
+	LassoCableComponent = CreateDefaultSubobject<UCableComponent>(TEXT("Cable Component"));
+	LassoCableComponent->AttachTo(GetMesh(), LassoSocket);
+
 	ConstructorHelpers::FClassFinder<AWeapon>KnifeAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/KnifeBP_Arman.KnifeBP_Arman_C'"));
 	if (KnifeAsset.Class)
 	{
@@ -39,7 +43,7 @@ ASheriffAI::ASheriffAI()
 	{
 		UE_LOG(LogTemp, Display, TEXT("Lasso class found!"));
 	}
-	LassoCableComponent = CreateDefaultSubobject<UCableComponent>(TEXT("Cable Component"));
+
 
 }
 
@@ -75,8 +79,8 @@ void ASheriffAI::Tick(float DeltaSeconds)
 
 	if (bIsInRange())
 	{
-		UE_LOG(LogTemp, Display, TEXT("You are in range of the Sheriff"));
 		Lasso();
+
 	}
 }
 
@@ -139,27 +143,24 @@ void ASheriffAI::Lasso()
 		{
 			if (ACharacterController* PlayerReference = Cast<ACharacterController>(BlackboardComponent->GetValueAsObject(TEXT("Target"))))
 			{
-				// CurrentlyEquippedWeapon->Fire();
-				// Lasso();
-				// LassoCableComponent->SetRelativeLocation(RootComponent);
-				LassoCableComponent->SetAttachEndTo(this, ("Root Component"));
-				LassoCableComponent->EndLocation = PlayerReference->GetActorLocation();
-				PlayerReference->AddStatusEffect(UStatusEffect_SoftCrowdControl::StaticClass(), false, 2.4f
-					, 0.f, Cast<ALoneWolfCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn()));
-			/*	FVector CurrentLocation = RootComponent->GetComponentLocation();
-				FVector CurrentTargetLocation = PlayerReference->GetActorLocation();
-				float SpeedOfLerp = 1.0f;
-				FVector Difference = FMath::Lerp(CurrentLocation, CurrentTargetLocation, SpeedOfLerp);
-*/
-				//if (PlayerController != nullptr)
-				//{
-				//	FHitResult TraceResult(ForceInit);
-				//	AActor* DamagedActor = TraceResult.GetActor();
-				//	UPrimitiveComponent* DamagedComponent = TraceResult.GetComponent();
+				UMeshComponent* PlayerMesh = PlayerReference->GetMesh();
+				FVector LassoTarget = PlayerMesh->GetSocketLocation("pelvis");
+			
+				LassoCableComponent->SetAttachEndTo(PlayerReference,  RootComponent->GetDefaultSceneRootVariableName());
+				LassoCableComponent->EndLocation = LassoTarget;
+				LassoCableComponent->CableLength = 50;
 
-				//	const float ForceAmount = -2000.f;
-				//	DamagedComponent->AddForce(FVector(0.0f, 0.0f, ForceAmount));
-				//}
+				FVector CurrentLocation = GetActorLocation();
+				FVector PullingVelocity;
+				float ForceAmount = -0.1f;
+
+				PullingVelocity.X = CurrentLocation.X * ForceAmount;
+				PullingVelocity.Y = CurrentLocation.Y * ForceAmount;
+
+				ALoneWolfCharacter* PlayerActor = PlayerReference;
+				PlayerActor->LaunchCharacter(PullingVelocity, false, false);
+
+				//PlayerReference->AddStatusEffect(UStatusEffect_SoftCrowdControl::StaticClass(), false, .5f, 0.f, Cast<ALoneWolfCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn()));
 			}
 		}
 	}
