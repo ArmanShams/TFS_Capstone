@@ -14,7 +14,7 @@ AMolotov::AMolotov()
 	CollisionComponent->InitSphereRadius(SphereRadius);
 	CollisionComponent->BodyInstance.SetCollisionProfileName("BlockAll");
 	CollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	CollisionComponent->OnComponentHit.AddDynamic(this, &ThisClass::OnHit);
+	CollisionComponent->OnComponentHit.AddDynamic(this, &ThisClass::OnComponentHit);
 	CollisionComponent->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Ignore);
 	CollisionComponent->SetCollisionResponseToChannel(ECC_GameTraceChannel5, ECR_Ignore);
 	CollisionComponent->SetCollisionResponseToChannel(ECC_GameTraceChannel6, ECR_Ignore);
@@ -75,9 +75,17 @@ UProjectileMovementComponent* AMolotov::GetProjectileMovementComponent()
 	return Super::GetProjectileMovementComponent();
 }
 
-void AMolotov::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+void AMolotov::OnComponentHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	//UE_LOG(LogTemp, Display, TEXT("Molotov hit a %s"), *OtherActor->GetName());
-	UE_LOG(LogTemp, Display, TEXT("Time of Molotov landing: %f, hit a %s"), GetWorld()->GetTimeSeconds(), *OtherActor->GetName());
+	if (APawn* RecastedOwner = Cast<APawn>(Owner))
+	{
+		//UE_LOG(LogTemp, Display, TEXT("Molotov hit a %s"), *OtherActor->GetName());
+		UE_LOG(LogTemp, Display, TEXT("Time of Molotov landing: %f, hit a %s"), GetWorld()->GetTimeSeconds(), *OtherActor->GetName());
+
+		if (ACharacter* RecastedOtherCharacter = Cast<ACharacter>(OtherActor))
+		{
+			UGameplayStatics::ApplyDamage(OtherActor, 10.f, RecastedOwner->GetController(), Owner, TSubclassOf<UDamageType>());
+		}
+	}
 	Destroy();
 }

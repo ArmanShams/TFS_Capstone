@@ -13,7 +13,6 @@ class LONEWOLF_API AWeapon_PlayerRevolver : public AWeapon_Ranged
 {
 	GENERATED_BODY()
 
-
 public:
 	AWeapon_PlayerRevolver();
 
@@ -24,6 +23,7 @@ public:
 	virtual void Reload() override;	
 	virtual void SetOwner(AActor* NewOwner) override;
 	virtual bool CanFire() override;
+	virtual bool IsFanFiring();
 
 	UPROPERTY(EditDefaultsOnly)
 	float FanFireInterval;

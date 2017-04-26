@@ -22,13 +22,11 @@ protected:
 
 	AttackTypes::MeleeAttackType CurrentMeleeAttackType;
 
-protected:
 	UFUNCTION()
 	void AnimNotify_MeleeAtkStart();
 
 	UFUNCTION()
 	void AnimNotify_MeleeAtkEnd();
-
 
 
 	class ACharacterController* CharacterController;

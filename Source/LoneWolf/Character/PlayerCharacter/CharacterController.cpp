@@ -5,6 +5,7 @@
 #include "Environment/Interactable.h"
 #include "Weapons/Weapon.h"
 #include "Weapons/Weapon_Ranged.h"
+#include "Weapons/Weapon_PlayerRevolver.h"
 #include "Blueprint/UserWidget.h"
 #include "Character/StatusEffects/StatusEffectBase.h"
 #include "Character/StatusEffects/StatusEffect_HardCrowdControl.h"
@@ -73,6 +74,11 @@ ACharacterController::ACharacterController()
 	CurrentForm = TransformationState::HUMAN;
 	bIsRolling = false;
 	bIsMeleeAttacking = false;
+
+	bShouldEnterReload = false;
+	bAnimPrimaryFire = false;
+	bAnimSecondaryFire = false;
+	//bShouldEnterRoll;
 }
 
 
@@ -170,7 +176,7 @@ void ACharacterController::Tick( float DeltaSeconds )
 	// Tune to be dependent on Anim notifies in the future.
 	if (bIsRolling)
 	{
-		FVector CurrentPosition = (FMath::Lerp(RootComponent->RelativeLocation, RollDestination, 25.f * DeltaSeconds) - RootComponent->RelativeLocation);
+		/*FVector CurrentPosition = (FMath::Lerp(RootComponent->RelativeLocation, RollDestination, 25.f * DeltaSeconds) - RootComponent->RelativeLocation);
 		GetMovementComponent()->AddInputVector(CurrentPosition);
 
 		if (bIsRolling && FVector::Dist(RootComponent->RelativeLocation, RollDestination) <= 5.3f)
@@ -178,7 +184,7 @@ void ACharacterController::Tick( float DeltaSeconds )
 			GetMovementComponent()->StopActiveMovement();
 			UE_LOG(LogTemp, Display, TEXT("End roll"));
 			bIsRolling = false;
-		}
+		}*/
 	}
 
 	switch (CurrentForm)
@@ -187,11 +193,21 @@ void ACharacterController::Tick( float DeltaSeconds )
 		break;
 
 	case TransformationState::HUMAN:
-		
 
+		if (bShouldEnterReload)
+		{
+			bShouldEnterReload = false;
+		}
+		if (bAnimPrimaryFire)
+		{
+			bAnimPrimaryFire = false;
+		}
+		if (AWeapon_PlayerRevolver* RecastWeapon = Cast<AWeapon_PlayerRevolver>(CurrentlyEquippedWeapon))
+		{
+			bAnimSecondaryFire = RecastWeapon->IsFanFiring();
+		}
 		break;
 	}
-
 }
 
 void ACharacterController::SetupPlayerInputComponent(class UInputComponent* InInputComponent)
@@ -213,12 +229,9 @@ void ACharacterController::SetupPlayerInputComponent(class UInputComponent* InIn
 		InInputComponent->BindAction(TEXT("Roll"), IE_Pressed, this, &ThisClass::OnRollPressed);
 		InInputComponent->BindAction(TEXT("Reload"), IE_Pressed, this, &ThisClass::OnReloadPressed);
 
-
 		// Debug keybinding, remove later.
 		//InInputComponent->BindAction(TEXT("DebugRage"), IE_Pressed, this, &ThisClass::OnDebugRagePressed);
 	}
-	
-
 }
 void ACharacterController::AddRage(float RageToAdd)
 {
@@ -229,7 +242,6 @@ void ACharacterController::AddRage(float RageToAdd)
 	{
 		NewRage = MAXRAGE;
 	}
-
 	Rage = NewRage;
 	UE_LOG(LogTemp, Display, TEXT("Modifying rage: %f"), Rage);
 }
@@ -246,40 +258,24 @@ void ACharacterController::AddStatusEffect(TSubclassOf<class UStatusEffectBase> 
 
 float ACharacterController::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
 {
-	float NewHealth = Health;
-	NewHealth -= DamageAmount;
-
-	if (NewHealth > MAXHEALTH)
+	if (!bIsRolling)
 	{
-		NewHealth = MAXHEALTH;
-	}
+		float NewHealth = Health;
+		NewHealth -= DamageAmount;
 
-	UE_LOG(LogTemp, Display, TEXT("Player health modified, health is now: %f"), NewHealth);
-
-	Health = NewHealth;
-
-	if (NewHealth <= 0.f)
-	{
-		//UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()), false);
-		CurrentForm = TransformationState::DEAD;
-		if (APlayerController* RecastController = Cast<APlayerController>(GetController()))
+		if (NewHealth > MAXHEALTH)
 		{
-			DisableInput(RecastController);
-			if (wDeadHud)
-			{
-				//Destroy(InGameHud);
-				InGameHud->RemoveFromViewport();
-				DeadHud = CreateWidget<UUserWidget>(GetWorld(), wDeadHud);
-
-				if (!DeadHud->GetIsVisible())
-				{
-					//InGameHud->AddToPlayerScreen();
-					DeadHud->AddToViewport(80);
-				}
-			}
+			NewHealth = MAXHEALTH;
 		}
-		//GetController()->DisableInput();
-		//SetLifeSpan(0.1f);
+
+		UE_LOG(LogTemp, Display, TEXT("Player health modified, health is now: %f"), NewHealth);
+
+		Health = NewHealth;
+
+		if (NewHealth <= 0.f)
+		{
+			Die();
+		}
 	}
 
 	return Health;
@@ -299,15 +295,10 @@ bool ACharacterController::bIsSoftCC()
 AWeapon* ACharacterController::EquipNewWeapon(TSubclassOf<AWeapon> WeaponToEquip)
 {
 	CurrentlyEquippedWeapon = Super::EquipNewWeapon(WeaponToEquip);
-	//CurrentlyEquippedWeapon->SetOwner(this);
-	//FVector Direction = (GetActorForwardVector()) * 128.f + GetActorUpVector() * 128.f - CurrentlyEquippedWeapon->GetActorLocation();
-	////DrawDebugLine(GetWorld(), CurrentlyEquippedWeapon->GetActorLocation(), OutHitResult.ImpactPoint + FVector::UpVector * 20.f, FColor(255, 0, 255), false, 0.05f, 0, 12.333f);
-	////FRotator RotationInDirection = FRotationMatrix::MakeFromX(Direction).Rotator();
 	CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepWorldTransform, FName("hand_r"));
 	CurrentlyEquippedWeapon->SetActorLocation(GetMesh()->GetSocketLocation(FName("hand_r")));
 	CurrentlyEquippedWeapon->SetActorRotation(FRotator::ZeroRotator);
 	return CurrentlyEquippedWeapon;
-	//CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(0.f, -90.f, 0.f));
 }
 
 CharacterState::StatusEffect ACharacterController::GetStatusEffect()
@@ -346,7 +337,6 @@ void ACharacterController::OnMouseMove(float scale)
 				FVector2D CenterPoint;
 				PlayerController->ProjectWorldLocationToScreen(GetMesh()->GetComponentLocation(), CenterPoint);
 
-
 				FVector Diff = FVector(MousePosition.X - CenterPoint.X, MousePosition.Y - CenterPoint.Y, 0.f);
 				GetMesh()->SetRelativeRotation(FMath::RInterpTo(GetMesh()->RelativeRotation, FRotator(0.f, Diff.Rotation().Yaw, 0.f),GetWorld()->GetDeltaSeconds(), TurnRate));
 				if (CurrentlyEquippedWeapon != NULL && CurrentForm == TransformationState::HUMAN)
@@ -358,20 +348,15 @@ void ACharacterController::OnMouseMove(float scale)
 						FHitResult OutHitResultHorizontalAdjust(ForceInit);
 						if (PlayerController->GetHitResultUnderCursor(ECollisionChannel::ECC_Camera, false, OutHitResultHorizontalAdjust))
 						{
-							FVector DirectionHorizontal = FVector(OutHitResultHorizontalAdjust.Location.X - GetActorLocation().X, OutHitResultHorizontalAdjust.Location.Y - GetActorLocation().Y, OutHitResultHorizontalAdjust.Location.Z - GetActorLocation().Z);;
-							//DirectionHorizontal.Z = CurrentlyEquippedWeapon->GetActorLocation().Z;
-							//UE_LOG(LogTemp, Display, TEXT("Distance from player %f"), DirectionHorizontal.Size());
+							FVector DirectionHorizontal = FVector(OutHitResultHorizontalAdjust.Location.X - GetActorLocation().X, OutHitResultHorizontalAdjust.Location.Y - GetActorLocation().Y, OutHitResultHorizontalAdjust.Location.Z - GetActorLocation().Z);
 							if (DirectionHorizontal.Size() > 300.f)
 							{
-								//float Magnitude = DirectionHorizontal.Size();	
-								//UE_LOG(LogTemp, Display, TEXT("Distance from player %f"), DirectionHorizontal.Size());
 								FRotator YawRotation = (OutHitResultHorizontalAdjust.Location - CurrentlyEquippedWeapon->GetActorLocation()).Rotation();
 								DesiredWeaponRotation.Yaw = YawRotation.Yaw;
 							}
 							else
 							{
 								FRotator YawRotation = (GetActorLocation() + (GetMesh()->GetRightVector() * 256.f) - CurrentlyEquippedWeapon->GetActorLocation()).Rotation();
-								//DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + GetMesh()->GetRightVector() * 256.f, FColor(255, 255, 255), false, 0.018f, 8, 12.333f);
 								DesiredWeaponRotation.Yaw = YawRotation.Yaw;
 							}
 						}
@@ -380,18 +365,12 @@ void ACharacterController::OnMouseMove(float scale)
 						if (PlayerController->GetHitResultUnderCursor(ECollisionChannel::ECC_GameTraceChannel6, false, OutHitResultVerticalResult))
 						{
 							FVector DirectionHorizontal = FVector(OutHitResultVerticalResult.Location.X - GetActorLocation().X, OutHitResultVerticalResult.Location.Y - GetActorLocation().Y, OutHitResultVerticalResult.Location.Z - GetActorLocation().Z);
-							//DirectionHorizontal.Z = CurrentlyEquippedWeapon->GetActorLocation().Z;
-							//DirectionHorizontal = OutHitResultVerticalResult.Location - GetActorLocation();
-							//UE_LOG(LogTemp, Display, TEXT("Distance from player %f"), DirectionHorizontal.Size());
-
 							if (DirectionHorizontal.Size() > 140.f)
 							{
-								//UE_LOG(LogTemp, Display, TEXT("Distance from player %f"), DirectionHorizontal.Size());
 								FVector Direction = OutHitResultVerticalResult.Location + FVector::UpVector * 128.f - CurrentlyEquippedWeapon->GetActorLocation();
 								FRotator RotationInDirection = FRotationMatrix::MakeFromX(Direction).Rotator();
 								DesiredWeaponRotation.Pitch = RotationInDirection.Pitch;
 							}
-							//DrawDebugPoint(GetWorld(), OutHitResultVerticalResult.Location, 2.0f, FColor(0, 255, 255), false, 1.0f);
 						}
 						CurrentlyEquippedWeapon->SetActorRotation(FMath::RInterpTo(CurrentlyEquippedWeapon->GetActorRotation(), DesiredWeaponRotation, GetWorld()->GetDeltaSeconds(), TurnRate * TurnRate));
 					}
@@ -418,11 +397,11 @@ void ACharacterController::OnInteractReleased()
 			if (AInteractable* Interactable = Cast<AInteractable>(hitResult[0].GetActor()))
 			{
 				Interactable->Interact(this);
-				UE_LOG(LogTemp, Display, TEXT("Actually hit a thing."));
+				//UE_LOG(LogTemp, Display, TEXT("Actually hit a thing."));
 			}
 		}
 	}
-	UE_LOG(LogTemp, Display, TEXT("Interact key released"));
+	//UE_LOG(LogTemp, Display, TEXT("Interact key released"));
 }
 
 void ACharacterController::OnRollPressed()
@@ -451,10 +430,7 @@ void ACharacterController::Roll()
 
 void ACharacterController::OnReloadPressed()
 {
-	if (AWeapon_Ranged* RecastPlayerWeapon = Cast<AWeapon_Ranged>(CurrentlyEquippedWeapon))
-	{
-		RecastPlayerWeapon->Reload();
-	}
+	bShouldEnterReload = true;
 }
 
 void ACharacterController::EquipRevolver()
@@ -469,14 +445,19 @@ void ACharacterController::OnShootPressed()
 {
 	if (!bIsHardCC())
 	{
-		if (CurrentForm == TransformationState::HUMAN)
+		switch (CurrentForm)
 		{
+		case TransformationState::DEAD:
+			break;
+		case TransformationState::HUMAN:
 			CurrentlyEquippedWeapon->Fire();
-		}
-		if (CurrentForm == TransformationState::WOLF)
-		{
+			break;
+		case TransformationState::WOLF:
 			bIsMeleeAttacking = true;
 			CurrentMeleeAttackType = AttackTypes::LIGHT;
+			break;
+		default:
+			break;
 		}
 	}
 }
@@ -490,14 +471,19 @@ void ACharacterController::OnAltShootPressed()
 {
 	if (!bIsHardCC())
 	{
-		if (CurrentForm == TransformationState::HUMAN)
+		switch (CurrentForm)
 		{
+		case TransformationState::DEAD:
+			break;
+		case TransformationState::HUMAN:
 			CurrentlyEquippedWeapon->AltFire();
-		}
-		if (CurrentForm == TransformationState::WOLF)
-		{
+			break;
+		case TransformationState::WOLF:
 			bIsMeleeAttacking = true;
 			CurrentMeleeAttackType = AttackTypes::HEAVY;
+			break;
+		default:
+			break;
 		}
 	}
 }
@@ -526,8 +512,8 @@ void ACharacterController::OnCollision(UPrimitiveComponent* HitComponent, AActor
 {
 	if (bIsRolling)
 	{
-		RollDestination = RootComponent->RelativeLocation;
-		bIsRolling = false;
+		//RollDestination = RootComponent->RelativeLocation;
+		//bIsRolling = false;
 	}
 }
 
@@ -535,7 +521,7 @@ void ACharacterController::OnAimSnapBeginOverlap(UPrimitiveComponent* Overlapped
 {
 	if (AAimSnapSurface* RecastedSurface = Cast<AAimSnapSurface>(OtherActor))
 	{
-		UE_LOG(LogTemp, Display, TEXT("Activating an aimsnap area %s"), *OtherActor->GetName());
+		//UE_LOG(LogTemp, Display, TEXT("Activating an aimsnap area %s"), *OtherActor->GetName());
 		DrawDebugLine(GetWorld(), GetActorLocation(), OtherActor->GetActorLocation(), FColor(0, 255, 0), false, 0.05f, 0, 12.333f);
 		RecastedSurface->SetActive(true);
 	}
@@ -545,7 +531,7 @@ void ACharacterController::OnAimSnapOverlapEnd(UPrimitiveComponent* OverlappedCo
 {	
 	if (AAimSnapSurface* RecastedSurface = Cast<AAimSnapSurface>(OtherActor))
 	{
-		UE_LOG(LogTemp, Display, TEXT("DeActivating an aimsnap area %s"), *OtherActor->GetName());
+		//UE_LOG(LogTemp, Display, TEXT("DeActivating an aimsnap area %s"), *OtherActor->GetName());
 		DrawDebugLine(GetWorld(), GetActorLocation(), OtherActor->GetActorLocation(), FColor(255, 0, 0), false, 0.05f, 0, 12.333f);
 		RecastedSurface->SetActive(false);
 	}
@@ -559,5 +545,40 @@ bool ACharacterController::IsRolling()
 bool ACharacterController::IsMeleeAttacking()
 {
 	return bIsMeleeAttacking;
+}
+
+bool ACharacterController::bEnterReloadAnimation()
+{
+	return bShouldEnterReload;
+}
+
+void ACharacterController::Reload()
+{
+	if (CurrentForm == TransformationState::HUMAN)
+	{
+		if (AWeapon_Ranged* RecastPlayerWeapon = Cast<AWeapon_Ranged>(CurrentlyEquippedWeapon))
+		{
+			RecastPlayerWeapon->Reload();
+		}
+	}
+}
+
+void ACharacterController::Die()
+{
+	CurrentForm = TransformationState::DEAD;
+	if (APlayerController* RecastController = Cast<APlayerController>(GetController()))
+	{
+		DisableInput(RecastController);
+		if (wDeadHud)
+		{
+			InGameHud->RemoveFromViewport();
+			DeadHud = CreateWidget<UUserWidget>(GetWorld(), wDeadHud);
+
+			if (!DeadHud->GetIsVisible())
+			{
+				DeadHud->AddToViewport(80);
+			}
+		}
+	}
 }
 

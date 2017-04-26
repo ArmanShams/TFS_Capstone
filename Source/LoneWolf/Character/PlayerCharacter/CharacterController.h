@@ -70,13 +70,19 @@ public:
 protected:
 	bool IsRolling();
 	bool IsMeleeAttacking();
+	bool bEnterReloadAnimation();
+	void Reload();
+	void Die();
+
+	bool bShouldEnterReload;
+	bool bShouldEnterRoll;
+	bool bAnimPrimaryFire;
+	bool bAnimSecondaryFire;
 
 	UPROPERTY(EditDefaultsOnly)
 	float MoveSpeed;
-
 	UPROPERTY(EditDefaultsOnly)
 	float TurnRate;
-
 	UPROPERTY(EditDefaultsOnly)
 	float Health;
 
@@ -139,14 +145,13 @@ protected:
 	FVector RollStartingPoint;
 	FVector RollDestination;
 
-	
-
 private:
 	bool NeuteredMode = false;
 
 	const float MAXHEALTH = 100.f;
 	const float MAXRAGE = 100.f;
 
+	friend class UCharacterHumanAnimInstance;
 	friend class UCharacterWolfAnimInstance;
 	friend class UUIWidget;
 };
