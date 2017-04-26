@@ -200,6 +200,10 @@ void ACharacterController::Tick( float DeltaSeconds )
 			bShouldEnterReload = false;
 		}
 		*/
+		if (!CurrentlyEquippedWeapon->CanFire())
+		{
+			bShouldEnterReload = true;
+		}
 		if (bAnimPrimaryFire)
 		{
 			bAnimPrimaryFire = false;

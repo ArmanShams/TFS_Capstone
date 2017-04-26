@@ -44,6 +44,7 @@ void UCharacterHumanAnimInstance::AnimNotify_ReloadEnd()
 		if (CharacterController != NULL)
 		{
 			CharacterController->bShouldEnterReload = false;
+			bReloading = false;
 		}
 	}
 }

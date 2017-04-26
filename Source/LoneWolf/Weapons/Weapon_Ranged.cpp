@@ -82,7 +82,7 @@ bool AWeapon_Ranged::Fire()
 				if (CurrentAmmo == 0)
 				{
 					UE_LOG(LogTemp, Display, TEXT("Ran out of ammo after firing"));
-					Reload();
+					//Reload();
 				}
 
 				return true;
@@ -100,7 +100,7 @@ bool AWeapon_Ranged::Fire()
 		if (CurrentAmmo == 0)
 		{
 			UE_LOG(LogTemp, Display, TEXT("Ran out of ammo after firing"));
-			Reload();
+			//Reload();
 		}
 		return false;
 	}
@@ -166,4 +166,3 @@ bool AWeapon_Ranged::CanFire()
 	}
 	return false;
 }
-
