@@ -10,14 +10,6 @@
 void UMainMenuWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-
-	//LWGame = Cast<ULWGameUserSettings>()
-
-	//MasterVolume = LWGame->MasterVolume;
-	//SFXVolume = LWGame->SFXVolume;
-	//MusicVolume = LWGame->MusicVolume;
-	//VoiceVolume = LWGame->VoiceVolume;
-
 }
 
 float UMainMenuWidget::GetMasterVolume()
