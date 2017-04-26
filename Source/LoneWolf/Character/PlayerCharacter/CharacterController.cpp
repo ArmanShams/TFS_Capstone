@@ -200,17 +200,20 @@ void ACharacterController::Tick( float DeltaSeconds )
 			bShouldEnterReload = false;
 		}
 		*/
-		if (!CurrentlyEquippedWeapon->CanFire())
+		if (AWeapon_Ranged* RecastRangedWeapon = Cast<AWeapon_Ranged>(CurrentlyEquippedWeapon))
 		{
-			bShouldEnterReload = true;
-		}
-		if (bAnimPrimaryFire)
-		{
-			bAnimPrimaryFire = false;
-		}
-		if (AWeapon_PlayerRevolver* RecastWeapon = Cast<AWeapon_PlayerRevolver>(CurrentlyEquippedWeapon))
-		{
-			bAnimSecondaryFire = RecastWeapon->IsFanFiring();
+			if (!RecastRangedWeapon->HasAmmo())
+			{
+				bShouldEnterReload = true;
+			}
+			if (bAnimPrimaryFire)
+			{
+				bAnimPrimaryFire = false;
+			}
+			if (AWeapon_PlayerRevolver* RecastWeaponToRevolver = Cast<AWeapon_PlayerRevolver>(RecastRangedWeapon))
+			{
+				bAnimSecondaryFire = RecastWeaponToRevolver->IsFanFiring();
+			}
 		}
 		break;
 	}

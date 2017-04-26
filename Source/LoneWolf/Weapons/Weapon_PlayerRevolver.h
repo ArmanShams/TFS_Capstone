@@ -23,6 +23,7 @@ public:
 	virtual void Reload() override;	
 	virtual void SetOwner(AActor* NewOwner) override;
 	virtual bool CanFire() override;
+	virtual bool HasAmmo() override;
 	virtual bool IsFanFiring();
 
 	UPROPERTY(EditDefaultsOnly)

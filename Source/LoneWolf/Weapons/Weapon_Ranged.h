@@ -22,6 +22,7 @@ public:
 	virtual void Reload();
 	virtual void SetOwner(AActor* NewOwner) override;
 	virtual bool CanFire() override;
+	virtual bool HasAmmo();
 
 protected:
 	UPROPERTY(EditDefaultsOnly)

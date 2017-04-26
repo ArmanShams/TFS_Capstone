@@ -106,7 +106,7 @@ bool AWeapon_Ranged::Fire()
 	}
 	if (CurrentAmmo == 0)
 	{
-		Reload();
+		//Reload();
 	}
 	return false;
 }
@@ -165,4 +165,9 @@ bool AWeapon_Ranged::CanFire()
 		return Super::CanFire();
 	}
 	return false;
+}
+
+bool AWeapon_Ranged::HasAmmo()
+{
+	return CurrentAmmo > 0;
 }
