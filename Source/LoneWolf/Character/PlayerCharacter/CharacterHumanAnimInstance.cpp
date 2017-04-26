@@ -21,6 +21,7 @@ void UCharacterHumanAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			bPrimaryFire = CharacterController->bAnimPrimaryFire;
 			bSecondaryFiring = CharacterController->bAnimSecondaryFire;
 			bIsDead = CharacterController->Health <= 0.f;
+			bReloading = CharacterController->bShouldEnterReload;
 		}
 	}
 }
@@ -32,6 +33,17 @@ void UCharacterHumanAnimInstance::AnimNotify_Reload()
 		if (CharacterController != NULL)
 		{
 			CharacterController->Reload();
+		}
+	}
+}
+
+void UCharacterHumanAnimInstance::AnimNotify_ReloadEnd()
+{
+	if (GetWorld()->HasBegunPlay())
+	{
+		if (CharacterController != NULL)
+		{
+			CharacterController->bShouldEnterReload = false;
 		}
 	}
 }

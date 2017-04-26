@@ -31,11 +31,19 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bIsDead;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool bReloading;
+
 	UFUNCTION()
 	void AnimNotify_Reload();
 
 	UFUNCTION()
+	void AnimNotify_ReloadEnd();
+
+	UFUNCTION()
 	void AnimNotify_ToggleRollState();
+
+
 
 	class ACharacterController* CharacterController;
 

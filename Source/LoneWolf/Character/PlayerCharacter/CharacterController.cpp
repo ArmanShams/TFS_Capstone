@@ -194,10 +194,12 @@ void ACharacterController::Tick( float DeltaSeconds )
 
 	case TransformationState::HUMAN:
 
+		/*
 		if (bShouldEnterReload)
 		{
 			bShouldEnterReload = false;
 		}
+		*/
 		if (bAnimPrimaryFire)
 		{
 			bAnimPrimaryFire = false;
@@ -450,7 +452,10 @@ void ACharacterController::OnShootPressed()
 		case TransformationState::DEAD:
 			break;
 		case TransformationState::HUMAN:
-			CurrentlyEquippedWeapon->Fire();
+			if (!bShouldEnterReload)
+			{
+				CurrentlyEquippedWeapon->Fire();
+			}
 			break;
 		case TransformationState::WOLF:
 			bIsMeleeAttacking = true;
@@ -476,7 +481,10 @@ void ACharacterController::OnAltShootPressed()
 		case TransformationState::DEAD:
 			break;
 		case TransformationState::HUMAN:
-			CurrentlyEquippedWeapon->AltFire();
+			if (!bShouldEnterReload)
+			{
+				CurrentlyEquippedWeapon->AltFire();
+			}
 			break;
 		case TransformationState::WOLF:
 			bIsMeleeAttacking = true;
