@@ -45,9 +45,11 @@ public:
 	virtual void SetSheriffState(SheriffState NewStateToEnter);
 
 	void Lasso();
-	void TraceToAim();
 
 	FComponentReference CastedPlayerReference;
+
+	UPROPERTY(EditAnywhere)
+	class UCableComponent* LassoCableComponent;
 	
 	AActor* LassoActor;
 	TSubclassOf<AActor> LassoActorClass;

@@ -7,6 +7,12 @@
 #include "BehaviorTree/Blackboard/BlackboardKeyAllTypes.h"
 #include "Character/PlayerCharacter/CharacterController.h"
 #include "DrawDebugHelpers.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "BehaviorTree/Blackboard/BlackboardKeyAllTypes.h"
+#include "BrainComponent.h"
+#include "CableComponent.h"
+#include "Character/StatusEffects/StatusEffect_SoftCrowdControl.h"
+
 #include "SheriffAI.h"
 
 ASheriffAI::ASheriffAI()
@@ -33,6 +39,8 @@ ASheriffAI::ASheriffAI()
 	{
 		UE_LOG(LogTemp, Display, TEXT("Lasso class found!"));
 	}
+	LassoCableComponent = CreateDefaultSubobject<UCableComponent>(TEXT("Cable Component"));
+
 }
 
 void ASheriffAI::BeginPlay()
@@ -63,16 +71,12 @@ void ASheriffAI::Tick(float DeltaSeconds)
 
 	FVector LinkStart = GetActorLocation();
 	FVector LinkEnd = LinkStart + LinkDistance;
-	DrawDebugLine(GetWorld(), LinkStart, LinkEnd, FColor(0, 0, 0), false, -1.f, 0, 5.f);
+	DrawDebugLine(GetWorld(), LinkStart, LinkEnd, FColor(255, 0, 0), false, -1.f, 0, 7.f);
 
 	if (bIsInRange())
 	{
 		UE_LOG(LogTemp, Display, TEXT("You are in range of the Sheriff"));
-		if (CurrentlyEquippedWeapon != NULL)
-		{
-			// CurrentlyEquippedWeapon->Fire();
-			// Lasso();
-		}
+		Lasso();
 	}
 }
 
@@ -129,20 +133,35 @@ void ASheriffAI::Destroyed()
 
 void ASheriffAI::Lasso()
 {
-	ACharacterController* PlayerController = Cast<ACharacterController>(GetController());
-	FVector CurrentLocation = RootComponent->GetComponentLocation();
-	FVector CurrentTargetLocation = PlayerController->GetActorLocation();
-	float SpeedOfLerp = 1.0f;
-
-	FVector Difference = FMath::Lerp(CurrentLocation, CurrentTargetLocation, SpeedOfLerp);
-	if (PlayerController != nullptr)
+	if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
 	{
-		FHitResult TraceResult(ForceInit);
-		AActor* DamagedActor = TraceResult.GetActor();
-		UPrimitiveComponent* DamagedComponent = TraceResult.GetComponent();
+		if (BlackboardComponent->GetValueAsObject(TEXT("Target")) != NULL)
+		{
+			if (ACharacterController* PlayerReference = Cast<ACharacterController>(BlackboardComponent->GetValueAsObject(TEXT("Target"))))
+			{
+				// CurrentlyEquippedWeapon->Fire();
+				// Lasso();
+				// LassoCableComponent->SetRelativeLocation(RootComponent);
+				LassoCableComponent->SetAttachEndTo(this, ("Root Component"));
+				LassoCableComponent->EndLocation = PlayerReference->GetActorLocation();
+				PlayerReference->AddStatusEffect(UStatusEffect_SoftCrowdControl::StaticClass(), false, 2.4f
+					, 0.f, Cast<ALoneWolfCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn()));
+			/*	FVector CurrentLocation = RootComponent->GetComponentLocation();
+				FVector CurrentTargetLocation = PlayerReference->GetActorLocation();
+				float SpeedOfLerp = 1.0f;
+				FVector Difference = FMath::Lerp(CurrentLocation, CurrentTargetLocation, SpeedOfLerp);
+*/
+				//if (PlayerController != nullptr)
+				//{
+				//	FHitResult TraceResult(ForceInit);
+				//	AActor* DamagedActor = TraceResult.GetActor();
+				//	UPrimitiveComponent* DamagedComponent = TraceResult.GetComponent();
 
-		const float ForceAmount = -2000.f;
-		DamagedComponent->AddForce(FVector(0.0f, 0.0f, ForceAmount));
+				//	const float ForceAmount = -2000.f;
+				//	DamagedComponent->AddForce(FVector(0.0f, 0.0f, ForceAmount));
+				//}
+			}
+		}
 	}
 }
 
