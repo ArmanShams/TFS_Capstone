@@ -35,13 +35,12 @@ public:
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 	virtual void AddStatusEffect(TSubclassOf<class UStatusEffectBase> ClassToCreateFrom, bool bShouldPerformTickAction, float LifeTime, float TickRate, ALoneWolfCharacter* CharacterThatInflictedStatusEffect) override;
 	virtual void AddStatusEffect(TSubclassOf<class UStatusEffectBase> ClassToCreateFrom, bool bShouldPerformTickAction, bool bShouldDealDamage, float LifeTime, float DamageToDeal, float TickRate, ALoneWolfCharacter* CharacterThatInflictedStatusEffect) override;
+	virtual bool GetbIsInHardCC() override;
+	virtual bool GetbIsInSoftCC() override;
 	virtual AWeapon* GetEquippedWeapon() override;
 	virtual bool bIsInRange();
 	virtual bool bIsInRange(float OveriddenDesiredRange);
-	// Returns true if the actor's Status Effects is a 'softCC'. Defined in Design Document
-	virtual bool bIsSoftCC() override;
-	// Returns true if the actor's Status Effects is a 'hardCC'. Defined in Design Document
-	virtual bool bIsHardCC() override;
+	
 	virtual void Destroyed() override;
 
 
@@ -51,9 +50,16 @@ public:
 	TArray<class ATargetPoint*> PatrolPoints;
 
 protected:
+	// Returns true if the actor's Status Effects is a 'softCC'. Defined in Design Document
+	virtual bool bIsSoftCC() override;
+	// Returns true if the actor's Status Effects is a 'hardCC'. Defined in Design Document
+	virtual bool bIsHardCC() override;
+
 	virtual AWeapon* EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip) override;
 	//virtual void EquipWeapon(TSubclassOf<AWeapon> WeaponToEquip);
 	virtual void SetStatusEffect(CharacterState::StatusEffect NewStatusEffect);
+
+
 
 	UPROPERTY(EditDefaultsOnly)
 	float Health;

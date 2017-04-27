@@ -122,10 +122,9 @@ bool AWeapon_Ranged::AltFire()
 
 void AWeapon_Ranged::Reload()
 {
-	
 	if (CurrentAmmo < MagazineCapacity)
 	{
-		UE_LOG(LogTemp, Display, TEXT("Reloading")); 
+		//UE_LOG(LogTemp, Display, TEXT("Reloading")); 
 		if (MAXIMUM_TOTAL_AMMO != 0)
 		{
 			int8 AmmoNeededToFillMagazine = MagazineCapacity - CurrentAmmo;

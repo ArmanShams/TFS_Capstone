@@ -56,7 +56,6 @@ ACharacterController::ACharacterController()
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	CameraComponent->AttachToComponent(CameraBoom, FAttachmentTransformRules::KeepRelativeTransform);
 
-
 	ConstructorHelpers::FClassFinder<AWeapon>RangedWeaponAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/PlayerRevolverBlueprint.PlayerRevolverBlueprint_C'"));
 	if (RangedWeaponAsset.Class)
 	{
@@ -170,9 +169,9 @@ void ACharacterController::Tick( float DeltaSeconds )
 
 			USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(NULL, TEXT("SkeletalMesh'/Game/MixamoAnimPack/Mixamo_Adam/Mesh/Maximo_Adam.Maximo_Adam'"), NULL, LOAD_None, NULL);
 
-			FString AnimClassStringTest = "Class'/Game/Animation/Wolf/CharacterControllerWolfPlaceholder.CharacterControllerWolfPlaceholder_C'";
+			FString AnimClassStringWolf = "Class'/Game/Animation/Wolf/CharacterControllerWolfPlaceholder.CharacterControllerWolfPlaceholder_C'";
 
-			UClass* AnimationClass = LoadObject<UClass>(NULL, *AnimClassStringTest);
+			UClass* AnimationClass = LoadObject<UClass>(NULL, *AnimClassStringWolf);
 			if (AnimationClass && NewMesh)
 			{
 				GetMesh()->SetSkeletalMesh(NewMesh);
@@ -199,9 +198,9 @@ void ACharacterController::Tick( float DeltaSeconds )
 			CurrentForm = TransformationState::WOLF;
 			UE_LOG(LogTemp, Display, TEXT("Player 'Transformed' to human"));
 
-			FString AnimClassStringTest = "Class'/Game/Animation/Vincent/Character_Controller_AnimBP.Character_Controller_AnimBP_C'";
+			FString AnimClassStringHuman = "Class'/Game/Animation/Vincent/Character_Controller_AnimBP.Character_Controller_AnimBP_C'";
 
-			UClass* AnimationClass = LoadObject<UClass>(NULL, *AnimClassStringTest);
+			UClass* AnimationClass = LoadObject<UClass>(NULL, *AnimClassStringHuman);
 
 			USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(NULL, TEXT("SkeletalMesh'/Game/Geometry/Characters/VincentArgo/SK_Vincent.SK_Vincent'"), NULL, LOAD_None, NULL);
 			if (AnimationClass && NewMesh)
@@ -222,8 +221,8 @@ void ACharacterController::Tick( float DeltaSeconds )
 	default:
 		break;
 	}
-	bIsInHardCC = bIsHardCC();
-	bIsInSoftCC = bIsSoftCC();
+	//bIsInHardCC = bIsHardCC();
+	//bIsInSoftCC = bIsSoftCC();
 }
 
 void ACharacterController::SetupPlayerInputComponent(class UInputComponent* InInputComponent)
@@ -276,6 +275,16 @@ void ACharacterController::AddStatusEffect(TSubclassOf<class UStatusEffectBase> 
 	{
 		Super::AddStatusEffect(ClassToCreateFrom, bShouldPerformTickAction, bShouldDealDamage, LifeTime, DamageToDeal, TickRate, CharacterThatInflictedStatusEffect);
 	}
+}
+
+bool ACharacterController::GetbIsInHardCC()
+{
+	return Super::GetbIsInHardCC();
+}
+
+bool ACharacterController::GetbIsInSoftCC()
+{
+	return Super::GetbIsInSoftCC();
 }
 
 float ACharacterController::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
@@ -477,6 +486,7 @@ void ACharacterController::OnShootPressed()
 		case TransformationState::HUMAN:
 			if (!bShouldEnterReload)
 			{
+				bAnimPrimaryFire = true;
 				CurrentlyEquippedWeapon->Fire();
 			}
 			break;
@@ -506,6 +516,7 @@ void ACharacterController::OnAltShootPressed()
 		case TransformationState::HUMAN:
 			if (!bShouldEnterReload)
 			{
+				bAnimSecondaryFire = true;
 				CurrentlyEquippedWeapon->AltFire();
 			}
 			break;

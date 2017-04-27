@@ -150,8 +150,8 @@ void AMinerAI::Tick(float DeltaSeconds)
 		
 	if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
 	{
-		BlackboardComponent->SetValueAsBool(TEXT("IsHardCC"), bIsHardCC());
-		BlackboardComponent->SetValueAsBool(TEXT("IsSoftCC"), bIsSoftCC());
+		BlackboardComponent->SetValueAsBool(TEXT("IsHardCC"), bIsInHardCC);
+		BlackboardComponent->SetValueAsBool(TEXT("IsSoftCC"), bIsInSoftCC);
 		BlackboardComponent->SetValueAsBool(TEXT("IsInMeleeRange"), bIsInRange());
 		BlackboardComponent->SetValueAsBool(TEXT("IsInRangeToCharge"), bIsInRange(DistanceToUseCharge));
 		BlackboardComponent->SetValueAsBool(TEXT("IsInRangeToStomp"), bIsInRange(DistanceToUseStomp));
@@ -204,6 +204,16 @@ bool AMinerAI::bIsInRange(float OveriddenDesiredRange)
 AWeapon* AMinerAI::GetEquippedWeapon()
 {
 	return Super::GetEquippedWeapon();
+}
+
+bool AMinerAI::GetbIsInHardCC()
+{
+	return Super::GetbIsInHardCC();
+}
+
+bool AMinerAI::GetbIsInSoftCC()
+{
+	return Super::GetbIsInSoftCC();
 }
 
 bool AMinerAI::bIsSoftCC()

@@ -110,6 +110,16 @@ void AEnemy::AddStatusEffect(TSubclassOf<class UStatusEffectBase> ClassToCreateF
 
 }
 
+bool AEnemy::GetbIsInHardCC()
+{
+	return Super::GetbIsInHardCC();
+}
+
+bool AEnemy::GetbIsInSoftCC()
+{
+	return Super::GetbIsInSoftCC();
+}
+
 AWeapon* AEnemy::GetEquippedWeapon()
 {
 	return Super::GetEquippedWeapon();

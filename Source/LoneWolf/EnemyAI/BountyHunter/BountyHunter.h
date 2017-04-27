@@ -33,15 +33,17 @@ public:
 	virtual AWeapon* GetEquippedWeapon() override;
 	virtual bool bIsInRange() override;
 	virtual bool bIsInRange(float OveriddenDesiredRange) override;
-	// Returns true if the actor's Status Effects is a 'softCC'. Defined in Design Document
-	virtual bool bIsSoftCC() override;
-	// Returns true if the actor's Status Effects is a 'hardCC'. Defined in Design Document
-	virtual bool bIsHardCC() override;
+	virtual bool GetbIsInHardCC() override;
+	virtual bool GetbIsInSoftCC() override;
 	virtual void Destroyed() override;
 	virtual bool bCanTriggerRecoilAnimation();
 	virtual void SetBountyHunterState(BounterHunterState NewState);
 
 protected:
+	// Returns true if the actor's Status Effects is a 'softCC'. Defined in Design Document
+	virtual bool bIsSoftCC() override;
+	// Returns true if the actor's Status Effects is a 'hardCC'. Defined in Design Document
+	virtual bool bIsHardCC() override;
 	virtual AWeapon* EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip) override;
 
 	UFUNCTION()

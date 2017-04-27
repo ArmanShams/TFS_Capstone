@@ -49,14 +49,6 @@ void ABountyHunter::BeginPlay()
 {
 	Super::BeginPlay();
 	EquipNewWeapon(DefaultWeapon);
-	//if (CurrentlyEquippedWeapon != NULL)
-	//{
-	//	CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("hand_r"));
-	//	CurrentlyEquippedWeapon->SetActorLocation(GetMesh()->GetSocketLocation(FName("hand_r")));
-	//	CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(180.f, 180.f, 0.f));
-	//	//CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepWorldTransform, FName("RightHand"));
-	//	//CurrentlyEquippedWeapon->SetActorLocation(GetMesh()->GetSocketLocation(FName("RightHand")));
-	//}
 }
 
 void ABountyHunter::Tick(float DeltaTime)
@@ -66,11 +58,10 @@ void ABountyHunter::Tick(float DeltaTime)
 	{
 		bPlayRecoilAnimation = false;
 	}
-
 	if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
 	{
-		BlackboardComponent->SetValueAsBool(TEXT("IsHardCC"), bIsHardCC());
-		BlackboardComponent->SetValueAsBool(TEXT("IsSoftCC"), bIsSoftCC());
+		BlackboardComponent->SetValueAsBool(TEXT("IsHardCC"), bIsInHardCC);
+		BlackboardComponent->SetValueAsBool(TEXT("IsSoftCC"), bIsInSoftCC);
 		BlackboardComponent->SetValueAsBool(TEXT("bCanAttackTarget"), bIsInRange());
 
 		if (CurrentState == BounterHunterState::READYINGATTACK && CurrentlyEquippedWeapon != NULL)
@@ -145,6 +136,16 @@ bool ABountyHunter::bIsInRange()
 bool ABountyHunter::bIsInRange(float OveriddenDesiredRange)
 {
 	return Super::bIsInRange(OveriddenDesiredRange);
+}
+
+bool ABountyHunter::GetbIsInHardCC()
+{
+	return Super::GetbIsInHardCC();
+}
+
+bool ABountyHunter::GetbIsInSoftCC()
+{
+	return Super::GetbIsInSoftCC();
 }
 
 bool ABountyHunter::bIsSoftCC()
