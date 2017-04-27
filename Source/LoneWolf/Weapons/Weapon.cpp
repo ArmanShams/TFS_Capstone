@@ -41,21 +41,27 @@ void AWeapon::SetOwner(AActor* NewOwner)
 
 bool AWeapon::Fire()
 {
-	if (TimeSinceLastFire >= RateOfFire)
+	if (GetWorld()->HasBegunPlay())
 	{
-		//UE_LOG(LogTemp, Display, TEXT("Trying to call fire on a base class weapon."));
-		TimeSinceLastFire = 0.f;
-		return true;
+		if (TimeSinceLastFire >= RateOfFire)
+		{
+			//UE_LOG(LogTemp, Display, TEXT("Trying to call fire on a base class weapon."));
+			TimeSinceLastFire = 0.f;
+			return true;
+		}
 	}
 	return false;
 }
 
 bool AWeapon::AltFire()
 {
-	if (TimeSinceLastFire >= RateOfFire)
+	if (GetWorld()->HasBegunPlay())
 	{
-		TimeSinceLastFire = 0.f;
-		return true;
+		if (TimeSinceLastFire >= RateOfFire)
+		{
+			TimeSinceLastFire = 0.f;
+			return true;
+		}
 	}
 	return false;
 }

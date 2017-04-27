@@ -30,11 +30,11 @@ public:
 	virtual void AddRage(float RageToAdd);
 	virtual void AddStatusEffect(TSubclassOf<class UStatusEffectBase> ClassToCreateFrom, bool bShouldPerformTickAction, float LifeTime, float TickRate, ALoneWolfCharacter* CharacterThatInflictedStatusEffect) override;
 	virtual void AddStatusEffect(TSubclassOf<class UStatusEffectBase> ClassToCreateFrom, bool bShouldPerformTickAction, bool bShouldDealDamage, float LifeTime, float DamageToDeal, float TickRate, ALoneWolfCharacter* CharacterThatInflictedStatusEffect) override;
+	virtual bool GetbIsInHardCC() override;
+	virtual bool GetbIsInSoftCC() override;
 	virtual AWeapon* EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip) override;
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
-	virtual bool bIsHardCC() override;
-	virtual bool bIsSoftCC() override;
-
+	
 	virtual CharacterState::StatusEffect GetStatusEffect();
 	
 	//virtual bool bIsAttacking();
@@ -68,41 +68,42 @@ public:
 	void OnAimSnapOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 protected:
+	virtual bool bIsHardCC() override;
+	virtual bool bIsSoftCC() override;
+
 	bool IsRolling();
 	bool IsMeleeAttacking();
+	bool bEnterReloadAnimation();
+	void Reload();
+	virtual void Die() override;
+
+	bool bShouldEnterReload;
+	bool bShouldEnterRoll;
+	bool bAnimPrimaryFire;
+	bool bAnimSecondaryFire;
+	bool bIsMeleeAttacking;
+	bool bIsRolling;
 
 	UPROPERTY(EditDefaultsOnly)
 	float MoveSpeed;
-
 	UPROPERTY(EditDefaultsOnly)
 	float TurnRate;
-
 	UPROPERTY(EditDefaultsOnly)
 	float Health;
-
 	// SOON TO BE REMOVED WHEN ROLL ANIMATION IS IMPLEMENTED
 	UPROPERTY(EditDefaultsOnly)
 	float RollDistance;
-
 	//UPROPERTY(EditDefaultsOnly)
 	float Rage;
-
 	UPROPERTY(EditDefaultsOnly)
 	float CameraArmDistance;
-
 	UPROPERTY(EditDefaultsOnly)
 	float RageDrainPerSecond;
-	
 	UPROPERTY(EditDefaultsOnly)
 	float AimSnapHalfHeight;
 	UPROPERTY(EditDefaultsOnly)
 	float AimSnapRadius;
-	//UPROPERTY(EditDefaultsOnly)
-	//	float Health;
-
-	bool bIsMeleeAttacking;
-	bool bIsRolling;
-
+	
 	UPROPERTY(Category = Camera, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* CameraComponent;
 
@@ -139,14 +140,13 @@ protected:
 	FVector RollStartingPoint;
 	FVector RollDestination;
 
-	
-
 private:
 	bool NeuteredMode = false;
 
 	const float MAXHEALTH = 100.f;
 	const float MAXRAGE = 100.f;
 
+	friend class UCharacterHumanAnimInstance;
 	friend class UCharacterWolfAnimInstance;
 	friend class UUIWidget;
 };

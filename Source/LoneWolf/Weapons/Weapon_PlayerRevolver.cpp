@@ -55,7 +55,6 @@ bool AWeapon_PlayerRevolver::Fire()
 	{
 		return true;
 	}
-
 	return false;
 }
 
@@ -86,5 +85,15 @@ void AWeapon_PlayerRevolver::SetOwner(AActor* NewOwner)
 bool AWeapon_PlayerRevolver::CanFire()
 {
 	return Super::CanFire();
+}
+
+bool AWeapon_PlayerRevolver::HasAmmo()
+{
+	return Super::HasAmmo();
+}
+
+bool AWeapon_PlayerRevolver::IsFanFiring()
+{
+	return bFanFiring;
 }
 

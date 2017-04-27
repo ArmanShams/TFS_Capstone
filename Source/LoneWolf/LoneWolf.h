@@ -35,7 +35,6 @@ namespace AttackTypes
 UENUM(BlueprintType)
 namespace CharacterState
 {
-	
 	enum StatusEffect
 	{
 		NONE			UMETA(DisplayName = "None"),

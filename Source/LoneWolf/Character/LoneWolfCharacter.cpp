@@ -10,6 +10,9 @@
 ALoneWolfCharacter::ALoneWolfCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	bIsInHardCC = false;
+	bIsInSoftCC = false;
 }
 
 void ALoneWolfCharacter::BeginPlay()
@@ -22,6 +25,8 @@ void ALoneWolfCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	bIsInHardCC = bIsHardCC();
+	bIsInSoftCC = bIsSoftCC();
 }
 
 void ALoneWolfCharacter::SetupPlayerInputComponent(class UInputComponent* InInputComponent)
@@ -51,7 +56,6 @@ void ALoneWolfCharacter::AddStatusEffect(TSubclassOf<class UStatusEffectBase> Cl
 		Effect->RegisterComponent();
 		Effect->SetUpStatusEffect(false, bShouldPerformTickAction, LifeTime, TickRate, this, CharacterThatInflictedStatusEffect);
 	}
-	
 }
 /*
 	Params
@@ -73,6 +77,16 @@ void ALoneWolfCharacter::AddStatusEffect(TSubclassOf<class UStatusEffectBase> Cl
 		Effect->RegisterComponent();
 		Effect->SetUpStatusEffect(bShouldDealDamage, bShouldPerformTickAction, LifeTime, DamageToDeal, TickRate, this, CharacterThatInflictedStatusEffect);
 	}
+}
+
+bool ALoneWolfCharacter::GetbIsInHardCC()
+{
+	return bIsInHardCC;
+}
+
+bool ALoneWolfCharacter::GetbIsInSoftCC()
+{
+	return bIsInSoftCC;
 }
 
 AWeapon* ALoneWolfCharacter::EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip)
@@ -117,6 +131,11 @@ bool ALoneWolfCharacter::bIsSoftCC()
 		return true;
 	}
 	return false;
+}
+
+void ALoneWolfCharacter::Die()
+{
+
 }
 
 void ALoneWolfCharacter::Destroyed()

@@ -34,8 +34,8 @@ public:
 	virtual bool bIsInRange() override;
 	virtual bool bIsInRange(float OveriddenDesiredRange) override;
 	virtual AWeapon* GetEquippedWeapon() override;
-	virtual bool bIsSoftCC() override;
-	virtual bool bIsHardCC() override;
+	virtual bool GetbIsInHardCC() override;
+	virtual bool GetbIsInSoftCC() override;
 	virtual bool GetBTIsInRange();
 	virtual MinerState GetMinerState();
 	virtual CharacterState::StatusEffect GetStatusEffect() override;
@@ -78,7 +78,8 @@ public:
 	TSubclassOf<AActor> StompDecalActorClass;
 
 protected:
-
+	virtual bool bIsSoftCC() override;
+	virtual bool bIsHardCC() override;
 	//virtual void EquipWeapon(TSubclassOf<AWeapon> WeaponToEquip) override;
 	virtual AWeapon* EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip) override;
 	virtual void StartCharge();
