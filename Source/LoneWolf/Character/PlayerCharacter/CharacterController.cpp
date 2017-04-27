@@ -486,8 +486,8 @@ void ACharacterController::OnShootPressed()
 				if (!bAnimPrimaryFire)
 				{
 					bAnimPrimaryFire = true;
+					CurrentlyEquippedWeapon->Fire();
 				}
-				CurrentlyEquippedWeapon->Fire();
 			}
 			break;
 		case TransformationState::WOLF:
