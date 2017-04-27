@@ -78,6 +78,9 @@ ACharacterController::ACharacterController()
 	bShouldEnterReload = false;
 	bAnimPrimaryFire = false;
 	bAnimSecondaryFire = false;
+	bIsInHardCC = false;
+	bIsInSoftCC = false;
+
 	//bShouldEnterRoll;
 }
 
@@ -121,37 +124,71 @@ void ACharacterController::Tick( float DeltaSeconds )
 {
 	Super::Tick(DeltaSeconds);
 
-	if (Rage >= MAXRAGE && CurrentForm == TransformationState::HUMAN)
+	
+
+
+	// Tune to be dependent on Anim notifies in the future.
+	if (bIsRolling)
 	{
-		CurrentForm = TransformationState::WOLF;
-		UE_LOG(LogTemp, Display, TEXT("Player 'Transformed' to wolf"));
+		/*FVector CurrentPosition = (FMath::Lerp(RootComponent->RelativeLocation, RollDestination, 25.f * DeltaSeconds) - RootComponent->RelativeLocation);
+		GetMovementComponent()->AddInputVector(CurrentPosition);
 
-		//USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(NULL, TEXT("SkeletalMesh'/Game/Geometry/Characters/Werewolf/M_Werewolf.M_Werewolf'"), NULL, LOAD_None, NULL);
-
-		USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(NULL, TEXT("SkeletalMesh'/Game/MixamoAnimPack/Mixamo_Adam/Mesh/Maximo_Adam.Maximo_Adam'"), NULL, LOAD_None, NULL);
-
-		FString AnimClassStringTest = "Class'/Game/Blueprints/Player/CharacterControllerWolfPlaceholder.CharacterControllerWolfPlaceholder_C'";
-
-		UClass* AnimationClass = LoadObject<UClass>(NULL, *AnimClassStringTest);
-
-		if (AnimationClass && NewMesh)
+		if (bIsRolling && FVector::Dist(RootComponent->RelativeLocation, RollDestination) <= 5.3f)
 		{
-			GetMesh()->SetSkeletalMesh(NewMesh);
-			GetMesh()->SetAnimInstanceClass(AnimationClass);
-
-			CurrentlyEquippedWeapon->Destroy();
-			CurrentlyEquippedWeapon = NULL;
-			CurrentlyEquippedWeapon = GetWorld()->SpawnActor<AWeapon>(WolfWeapon);
-			//CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(90.f, 180.f, 0.f));
-			CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("WeaponSocket"));
-			CurrentlyEquippedWeapon->SetOwner(this);
-		}
-		// assign the anim blueprint class to your skeletal mesh component
-		//Skeletal3DMeshComponent->SetAnimInstanceClass(AnimationClass);
-		
+			GetMovementComponent()->StopActiveMovement();
+			UE_LOG(LogTemp, Display, TEXT("End roll"));
+			bIsRolling = false;
+		}*/
 	}
-	if (CurrentForm == TransformationState::WOLF)
+
+	switch (CurrentForm)
 	{
+	case TransformationState::DEAD:
+		break;
+	case TransformationState::HUMAN:
+		if (AWeapon_Ranged* RecastRangedWeapon = Cast<AWeapon_Ranged>(CurrentlyEquippedWeapon))
+		{
+			if (!RecastRangedWeapon->HasAmmo())
+			{
+				bShouldEnterReload = true;
+			}
+			if (AWeapon_PlayerRevolver* RecastWeaponToRevolver = Cast<AWeapon_PlayerRevolver>(RecastRangedWeapon))
+			{
+				bAnimSecondaryFire = RecastWeaponToRevolver->IsFanFiring();
+			}
+			if (bAnimPrimaryFire)
+			{
+				bAnimPrimaryFire = false;
+			}
+		}
+		if (Rage >= MAXRAGE)
+		{
+			CurrentForm = TransformationState::WOLF;
+			UE_LOG(LogTemp, Display, TEXT("Player 'Transformed' to wolf"));
+
+			//USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(NULL, TEXT("SkeletalMesh'/Game/Geometry/Characters/Werewolf/M_Werewolf.M_Werewolf'"), NULL, LOAD_None, NULL);
+
+			USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(NULL, TEXT("SkeletalMesh'/Game/MixamoAnimPack/Mixamo_Adam/Mesh/Maximo_Adam.Maximo_Adam'"), NULL, LOAD_None, NULL);
+
+			FString AnimClassStringTest = "Class'/Game/Blueprints/Player/CharacterControllerWolfPlaceholder.CharacterControllerWolfPlaceholder_C'";
+
+			UClass* AnimationClass = LoadObject<UClass>(NULL, *AnimClassStringTest);
+
+			if (AnimationClass && NewMesh)
+			{
+				GetMesh()->SetSkeletalMesh(NewMesh);
+				GetMesh()->SetAnimInstanceClass(AnimationClass);
+
+				CurrentlyEquippedWeapon->Destroy();
+				CurrentlyEquippedWeapon = NULL;
+				CurrentlyEquippedWeapon = GetWorld()->SpawnActor<AWeapon>(WolfWeapon);
+				//CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(90.f, 180.f, 0.f));
+				CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("WeaponSocket"));
+				CurrentlyEquippedWeapon->SetOwner(this);
+			}
+		}
+		break;
+	case TransformationState::WOLF:
 		Rage -= RageDrainPerSecond * DeltaSeconds;
 
 		if (Rage <= 0.1f)
@@ -171,52 +208,12 @@ void ACharacterController::Tick( float DeltaSeconds )
 			Rage = 0.0f;
 			CurrentForm = TransformationState::HUMAN;
 		}
-	}
-
-	// Tune to be dependent on Anim notifies in the future.
-	if (bIsRolling)
-	{
-		/*FVector CurrentPosition = (FMath::Lerp(RootComponent->RelativeLocation, RollDestination, 25.f * DeltaSeconds) - RootComponent->RelativeLocation);
-		GetMovementComponent()->AddInputVector(CurrentPosition);
-
-		if (bIsRolling && FVector::Dist(RootComponent->RelativeLocation, RollDestination) <= 5.3f)
-		{
-			GetMovementComponent()->StopActiveMovement();
-			UE_LOG(LogTemp, Display, TEXT("End roll"));
-			bIsRolling = false;
-		}*/
-	}
-
-	switch (CurrentForm)
-	{
+		break;
 	default:
 		break;
-
-	case TransformationState::HUMAN:
-
-		/*
-		if (bShouldEnterReload)
-		{
-			bShouldEnterReload = false;
-		}
-		*/
-		if (AWeapon_Ranged* RecastRangedWeapon = Cast<AWeapon_Ranged>(CurrentlyEquippedWeapon))
-		{
-			if (!RecastRangedWeapon->HasAmmo())
-			{
-				bShouldEnterReload = true;
-			}
-			if (bAnimPrimaryFire)
-			{
-				bAnimPrimaryFire = false;
-			}
-			if (AWeapon_PlayerRevolver* RecastWeaponToRevolver = Cast<AWeapon_PlayerRevolver>(RecastRangedWeapon))
-			{
-				bAnimSecondaryFire = RecastWeaponToRevolver->IsFanFiring();
-			}
-		}
-		break;
 	}
+	bIsInHardCC = bIsHardCC();
+	bIsInSoftCC = bIsSoftCC();
 }
 
 void ACharacterController::SetupPlayerInputComponent(class UInputComponent* InInputComponent)
@@ -257,12 +254,18 @@ void ACharacterController::AddRage(float RageToAdd)
 
 void ACharacterController::AddStatusEffect(TSubclassOf<class UStatusEffectBase> ClassToCreateFrom, bool bShouldPerformTickAction, float LifeTime, float TickRate, ALoneWolfCharacter* CharacterThatInflictedStatusEffect)
 {
-	Super::AddStatusEffect(ClassToCreateFrom, bShouldPerformTickAction, LifeTime, TickRate, CharacterThatInflictedStatusEffect);
+	if (!bIsRolling)
+	{
+		Super::AddStatusEffect(ClassToCreateFrom, bShouldPerformTickAction, LifeTime, TickRate, CharacterThatInflictedStatusEffect);
+	}
 }
 
 void ACharacterController::AddStatusEffect(TSubclassOf<class UStatusEffectBase> ClassToCreateFrom, bool bShouldPerformTickAction, bool bShouldDealDamage, float LifeTime, float DamageToDeal, float TickRate, ALoneWolfCharacter* CharacterThatInflictedStatusEffect)
 {
-	Super::AddStatusEffect(ClassToCreateFrom, bShouldPerformTickAction, bShouldDealDamage, LifeTime, DamageToDeal, TickRate, CharacterThatInflictedStatusEffect);
+	if (!bIsRolling)
+	{
+		Super::AddStatusEffect(ClassToCreateFrom, bShouldPerformTickAction, bShouldDealDamage, LifeTime, DamageToDeal, TickRate, CharacterThatInflictedStatusEffect);
+	}
 }
 
 float ACharacterController::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
@@ -286,10 +289,8 @@ float ACharacterController::TakeDamage(float DamageAmount, struct FDamageEvent c
 			Die();
 		}
 	}
-
 	return Health;
 }
-
 
 bool ACharacterController::bIsHardCC()
 {
@@ -317,7 +318,7 @@ CharacterState::StatusEffect ACharacterController::GetStatusEffect()
 
 void ACharacterController::OnMoveForward(float scale)
 {
-	if (!bIsRolling && !bIsSoftCC())
+	if (!bIsRolling && !bIsInSoftCC)
 	{
 		GetMovementComponent()->AddInputVector(GetActorForwardVector() * scale * MoveSpeed);
 	}
@@ -325,7 +326,7 @@ void ACharacterController::OnMoveForward(float scale)
 
 void ACharacterController::OnMoveRight(float scale)
 {
-	if (!bIsRolling && !bIsSoftCC())
+	if (!bIsRolling && !bIsInSoftCC)
 	{
 		GetMovementComponent()->AddInputVector(GetActorRightVector() * scale * MoveSpeed);
 	}
@@ -334,7 +335,7 @@ void ACharacterController::OnMoveRight(float scale)
 void ACharacterController::OnMouseMove(float scale)
 {
 	// Player controller class controls pawns, not where you'd want to store controls.
-	if (!bIsHardCC())
+	if (!bIsInHardCC)
 	{
 		if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
 		{
@@ -396,7 +397,7 @@ void ACharacterController::OnInteractPressed()
 
 void ACharacterController::OnInteractReleased()
 {
-	if (!bIsSoftCC())
+	if (!bIsInSoftCC)
 	{
 		TArray<FOverlapResult> hitResult;
 		GetWorld()->OverlapMultiByChannel(hitResult, GetActorLocation(), FQuat::Identity, ECC_GameTraceChannel1, FCollisionShape::MakeSphere(50.f));
@@ -415,7 +416,7 @@ void ACharacterController::OnInteractReleased()
 
 void ACharacterController::OnRollPressed()
 {
-	if (!bIsHardCC())
+	if (!bIsInHardCC)
 	{
 		if (!bIsRolling)
 		{
@@ -452,7 +453,7 @@ void ACharacterController::EquipRevolver()
 
 void ACharacterController::OnShootPressed()
 {
-	if (!bIsHardCC())
+	if (!bIsInHardCC)
 	{
 		switch (CurrentForm)
 		{
@@ -481,7 +482,7 @@ void ACharacterController::OnShootReleased()
 
 void ACharacterController::OnAltShootPressed()
 {
-	if (!bIsHardCC())
+	if (!bIsInHardCC)
 	{
 		switch (CurrentForm)
 		{

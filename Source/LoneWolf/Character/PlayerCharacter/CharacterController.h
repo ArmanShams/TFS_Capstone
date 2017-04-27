@@ -79,6 +79,9 @@ protected:
 	bool bAnimPrimaryFire;
 	bool bAnimSecondaryFire;
 
+	bool bIsInHardCC;
+	bool bIsInSoftCC;
+
 	UPROPERTY(EditDefaultsOnly)
 	float MoveSpeed;
 	UPROPERTY(EditDefaultsOnly)

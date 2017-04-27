@@ -22,6 +22,8 @@ void UCharacterHumanAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			bSecondaryFiring = CharacterController->bAnimSecondaryFire;
 			bIsDead = CharacterController->Health <= 0.f;
 			bReloading = CharacterController->bShouldEnterReload;
+			bIsInHardCC = CharacterController->bIsInHardCC;
+			bIsInSoftCC = CharacterController->bIsInSoftCC;
 		}
 	}
 }
@@ -43,8 +45,8 @@ void UCharacterHumanAnimInstance::AnimNotify_ReloadEnd()
 	{
 		if (CharacterController != NULL)
 		{
-			CharacterController->bShouldEnterReload = false;
 			bReloading = false;
+			CharacterController->bShouldEnterReload = bReloading;
 		}
 	}
 }
