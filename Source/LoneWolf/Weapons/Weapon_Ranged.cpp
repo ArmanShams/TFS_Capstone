@@ -82,7 +82,7 @@ bool AWeapon_Ranged::Fire()
 				if (CurrentAmmo == 0)
 				{
 					UE_LOG(LogTemp, Display, TEXT("Ran out of ammo after firing"));
-					Reload();
+					//Reload();
 				}
 
 				return true;
@@ -100,13 +100,13 @@ bool AWeapon_Ranged::Fire()
 		if (CurrentAmmo == 0)
 		{
 			UE_LOG(LogTemp, Display, TEXT("Ran out of ammo after firing"));
-			Reload();
+			//Reload();
 		}
 		return false;
 	}
 	if (CurrentAmmo == 0)
 	{
-		Reload();
+		//Reload();
 	}
 	return false;
 }
@@ -122,10 +122,9 @@ bool AWeapon_Ranged::AltFire()
 
 void AWeapon_Ranged::Reload()
 {
-
 	if (CurrentAmmo < MagazineCapacity)
 	{
-		UE_LOG(LogTemp, Display, TEXT("Reloading"));
+		//UE_LOG(LogTemp, Display, TEXT("Reloading")); 
 		if (MAXIMUM_TOTAL_AMMO != 0)
 		{
 			int8 AmmoNeededToFillMagazine = MagazineCapacity - CurrentAmmo;
@@ -165,4 +164,9 @@ bool AWeapon_Ranged::CanFire()
 		return Super::CanFire();
 	}
 	return false;
+}
+
+bool AWeapon_Ranged::HasAmmo()
+{
+	return CurrentAmmo > 0;
 }
