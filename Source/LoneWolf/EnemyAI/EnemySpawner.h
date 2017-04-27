@@ -3,33 +3,42 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
+#include "Character/LoneWolfCharacter.h"
 #include "EnemySpawner.generated.h"
 
-UCLASS()
+UCLASS(Blueprintable)
 class LONEWOLF_API AEnemySpawner : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
-	// Sets default values for this actor's properties
+
+public:
 	AEnemySpawner();
-
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	
-	// Called every frame
-	virtual void Tick( float DeltaSeconds ) override;
+	virtual void Tick(float DeltaSeconds) override;
 
-	//UPROPERTY(EditAnywhere)
-	//Enemy enemyToSpawn;
+	UPROPERTY(EditDefaultsOnly)
+	UBoxComponent* BoxCollider;
 
-	UPROPERTY(EditAnywhere)
-	float spawnRateInSeconds;
+	UPROPERTY(EditDefaultsOnly)
+	float TimeSinceLastSpawn;
 
-	UPROPERTY(EditAnywhere)
-	float spawnTimer;
+	UPROPERTY(EditDefaultsOnly)
+	float RateOfSpawning;
 
-	uint16 enemyCount;
+	UPROPERTY(EditDefaultsOnly, Category = Spawner)
+	TSubclassOf<ALoneWolfCharacter> EnemyClass;
 
-	void spawnEnemy();
+	FVector SpawnLocation;
+	FRotator SpawnRotation;
+
+	void SpawnEnemy();
+	bool CanSpawn();
+
+	bool bIsOverlapping;
+
+	UFUNCTION()
+	void OnPlayerOverlap(UPrimitiveComponent * HitComponent, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+
+	UFUNCTION()
+	void OnPlayerOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 };
