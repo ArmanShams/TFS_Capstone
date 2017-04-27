@@ -16,8 +16,6 @@ class LONEWOLF_API UCharacterHumanAnimInstance : public UAnimInstance
 public:
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
-
-
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bPrimaryFire;
@@ -34,7 +32,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bIsInSoftCC;
 
-
 	UFUNCTION()
 	void AnimNotify_Reload();
 
@@ -44,6 +41,8 @@ protected:
 	UFUNCTION()
 	void AnimNotify_ToggleRollState();
 
+	UFUNCTION()
+	void AnimNotify_EndPrimaryFire();
 
 
 	class ACharacterController* CharacterController;

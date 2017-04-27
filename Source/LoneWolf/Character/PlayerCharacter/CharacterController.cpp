@@ -155,10 +155,10 @@ void ACharacterController::Tick( float DeltaSeconds )
 			{
 				bAnimSecondaryFire = RecastWeaponToRevolver->IsFanFiring();
 			}
-			if (bAnimPrimaryFire)
+			/*if (bAnimPrimaryFire)
 			{
 				bAnimPrimaryFire = false;
-			}
+			}*/
 		}
 		if (Rage >= MAXRAGE)
 		{

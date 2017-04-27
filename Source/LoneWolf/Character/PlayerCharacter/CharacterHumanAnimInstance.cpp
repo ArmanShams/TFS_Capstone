@@ -62,3 +62,16 @@ void UCharacterHumanAnimInstance::AnimNotify_ToggleRollState()
 		}
 	}
 }
+
+void UCharacterHumanAnimInstance::AnimNotify_EndPrimaryFire()
+{
+	if (GetWorld()->HasBegunPlay())
+	{
+		if (CharacterController != NULL)
+		{
+			bPrimaryFire = false;
+			CharacterController->bAnimPrimaryFire = bPrimaryFire;
+		}
+	}
+
+}
