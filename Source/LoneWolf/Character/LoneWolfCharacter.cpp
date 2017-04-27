@@ -56,7 +56,6 @@ void ALoneWolfCharacter::AddStatusEffect(TSubclassOf<class UStatusEffectBase> Cl
 		Effect->RegisterComponent();
 		Effect->SetUpStatusEffect(false, bShouldPerformTickAction, LifeTime, TickRate, this, CharacterThatInflictedStatusEffect);
 	}
-	
 }
 /*
 	Params

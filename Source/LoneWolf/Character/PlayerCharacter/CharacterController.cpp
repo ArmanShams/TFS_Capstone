@@ -123,9 +123,6 @@ void ACharacterController::Tick( float DeltaSeconds )
 {
 	Super::Tick(DeltaSeconds);
 
-	
-
-
 	// Tune to be dependent on Anim notifies in the future.
 	if (bIsRolling)
 	{
@@ -486,7 +483,10 @@ void ACharacterController::OnShootPressed()
 		case TransformationState::HUMAN:
 			if (!bShouldEnterReload)
 			{
-				bAnimPrimaryFire = true;
+				if (!bAnimPrimaryFire)
+				{
+					bAnimPrimaryFire = true;
+				}
 				CurrentlyEquippedWeapon->Fire();
 			}
 			break;
