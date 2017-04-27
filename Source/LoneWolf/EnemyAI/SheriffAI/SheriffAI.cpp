@@ -80,7 +80,6 @@ void ASheriffAI::Tick(float DeltaSeconds)
 	if (bIsInRange())
 	{
 		Lasso();
-
 	}
 }
 
@@ -143,24 +142,18 @@ void ASheriffAI::Lasso()
 		{
 			if (ACharacterController* PlayerReference = Cast<ACharacterController>(BlackboardComponent->GetValueAsObject(TEXT("Target"))))
 			{
+				FVector CurrentLocation = GetActorLocation();
+				FVector PlayerLocation = PlayerReference->GetActorLocation();
+				FVector PullingVelocity = FVector(-1.f, -1.f, 0.f);
+
+
+
+				PlayerReference->GetMovementComponent()->AddInputVector(PlayerLocation*PullingVelocity);
+				LassoCableComponent->SetAttachEndTo(PlayerReference, RootComponent->GetDefaultSceneRootVariableName());
+
 				UMeshComponent* PlayerMesh = PlayerReference->GetMesh();
 				FVector LassoTarget = PlayerMesh->GetSocketLocation("pelvis");
-			
-				LassoCableComponent->SetAttachEndTo(PlayerReference,  RootComponent->GetDefaultSceneRootVariableName());
 				LassoCableComponent->EndLocation = LassoTarget;
-				LassoCableComponent->CableLength = 50;
-
-				FVector CurrentLocation = GetActorLocation();
-				FVector PullingVelocity;
-				float ForceAmount = -0.1f;
-
-				PullingVelocity.X = CurrentLocation.X * ForceAmount;
-				PullingVelocity.Y = CurrentLocation.Y * ForceAmount;
-
-				ALoneWolfCharacter* PlayerActor = PlayerReference;
-				PlayerActor->LaunchCharacter(PullingVelocity, false, false);
-
-				//PlayerReference->AddStatusEffect(UStatusEffect_SoftCrowdControl::StaticClass(), false, .5f, 0.f, Cast<ALoneWolfCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn()));
 			}
 		}
 	}
