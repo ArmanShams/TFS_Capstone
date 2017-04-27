@@ -18,12 +18,21 @@ void UCharacterHumanAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		if (CharacterController != NULL)
 		{
 			bRolling = CharacterController->bIsRolling;
-			bPrimaryFire = CharacterController->bAnimPrimaryFire;
+			if (!bPrimaryFire)
+			{
+				bPrimaryFire = CharacterController->bAnimPrimaryFire;
+			}
+			
 			bSecondaryFiring = CharacterController->bAnimSecondaryFire;
 			bIsDead = CharacterController->Health <= 0.f;
 			bReloading = CharacterController->bShouldEnterReload;
 			bIsInHardCC = CharacterController->bIsInHardCC;
 			bIsInSoftCC = CharacterController->bIsInSoftCC;
+
+			if (bPrimaryFire)
+			{
+				CharacterController->bAnimPrimaryFire = bPrimaryFire;
+			}
 		}
 	}
 }
@@ -46,6 +55,8 @@ void UCharacterHumanAnimInstance::AnimNotify_ReloadEnd()
 		if (CharacterController != NULL)
 		{
 			bReloading = false;
+			bPrimaryFire = false;
+			CharacterController->bAnimPrimaryFire = bPrimaryFire;
 			CharacterController->bShouldEnterReload = bReloading;
 		}
 	}
@@ -58,6 +69,7 @@ void UCharacterHumanAnimInstance::AnimNotify_ToggleRollState()
 		if (CharacterController != NULL)
 		{
 			CharacterController->bIsRolling = !CharacterController->bIsRolling;
+			CharacterController->RollDirection = FVector::ZeroVector;
 			UE_LOG(LogTemp, Display, TEXT("Ending Roll"));
 		}
 	}
@@ -73,5 +85,4 @@ void UCharacterHumanAnimInstance::AnimNotify_EndPrimaryFire()
 			CharacterController->bAnimPrimaryFire = bPrimaryFire;
 		}
 	}
-
 }

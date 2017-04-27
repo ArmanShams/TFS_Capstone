@@ -17,7 +17,7 @@ ACharacterController::ACharacterController()
 	PrimaryActorTick.bCanEverTick = true;
 
 	MoveSpeed = .4f;
-	RollDistance = 1.f;
+	RollSpeed = 400.f;
 	Health = 100.f;
 	Rage = 0.f;
 	RageDrainPerSecond = 4.f;
@@ -124,8 +124,9 @@ void ACharacterController::Tick( float DeltaSeconds )
 	Super::Tick(DeltaSeconds);
 
 	// Tune to be dependent on Anim notifies in the future.
-	if (bIsRolling)
+	if (bIsRolling && RollDirection != FVector::ZeroVector)
 	{
+		GetMovementComponent()->AddInputVector(RollDirection * RollSpeed);
 		/*FVector CurrentPosition = (FMath::Lerp(RootComponent->RelativeLocation, RollDestination, 25.f * DeltaSeconds) - RootComponent->RelativeLocation);
 		GetMovementComponent()->AddInputVector(CurrentPosition);
 
@@ -351,7 +352,7 @@ void ACharacterController::OnMoveRight(float scale)
 void ACharacterController::OnMouseMove(float scale)
 {
 	// Player controller class controls pawns, not where you'd want to store controls.
-	if (!bIsInHardCC)
+	if (!bIsInHardCC && !bIsRolling)
 	{
 		if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
 		{
@@ -442,7 +443,20 @@ void ACharacterController::OnRollPressed()
 		if (!bIsRolling)
 		{
 			FVector MovementVector = GetLastMovementInputVector();
+			if (MovementVector != FVector::ZeroVector)
+			{
+				RollDirection = MovementVector;
+				bIsRolling = true;
 
+				//FVector Diff = (GetActorLocation() + (MovementVector * 500.f)) - GetActorLocation();
+				FRotator RollRotator = GetMesh()->RelativeRotation;
+				RollRotator.Yaw = (MovementVector.Rotation().Yaw - 90.f);
+				GetMesh()->SetRelativeRotation(RollRotator);
+				//GetMesh()->SetRelativeRotation(FMath::RInterpTo(GetMesh()->RelativeRotation, FRotator(0.f, Diff.Rotation().Yaw, 0.f), GetWorld()->GetDeltaSeconds(), TurnRate));
+			}
+
+			//FVector MovementVector = GetLastMovementInputVector();
+			/*
 			if (MovementVector != FVector::ZeroVector)
 			{
 				RollStartingPoint = RootComponent->RelativeLocation;
@@ -450,6 +464,7 @@ void ACharacterController::OnRollPressed()
 				RollDestination = FVector(RollStartingPoint.X + (MovementVector.X * RollDistance), RollStartingPoint.Y + (MovementVector.Y * RollDistance), RollStartingPoint.Z);
 				bIsRolling = true;
 			}
+			*/
 		}
 	}
 }
@@ -466,15 +481,17 @@ void ACharacterController::OnReloadPressed()
 
 void ACharacterController::EquipRevolver()
 {
+	/*
 	CurrentlyEquippedWeapon = GetWorld()->SpawnActor<AWeapon>(DefaultWeapon);
 	CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(90.f, 180.f, 0.f));
 	CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("hand_r"));
 	CurrentlyEquippedWeapon->SetOwner(this);
+	*/
 }
 
 void ACharacterController::OnShootPressed()
 {
-	if (!bIsInHardCC)
+	if (!bIsInHardCC && !bIsRolling)
 	{
 		switch (CurrentForm)
 		{
@@ -552,11 +569,11 @@ void ACharacterController::OnDebugRagePressed()
 
 void ACharacterController::OnCollision(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (bIsRolling)
-	{
-		//RollDestination = RootComponent->RelativeLocation;
-		//bIsRolling = false;
-	}
+	//if (bIsRolling)
+	//{
+	//	RollDestination = RootComponent->RelativeLocation;
+	//	bIsRolling = false;
+	//}
 }
 
 void ACharacterController::OnAimSnapBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

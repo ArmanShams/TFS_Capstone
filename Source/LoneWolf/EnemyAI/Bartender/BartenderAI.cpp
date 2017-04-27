@@ -46,30 +46,7 @@ void ABartenderAI::Tick(float DeltaSeconds)
 	{
 		if (bIsInRange())
 		{
-			if (AActor* ValidTarget = Cast<AActor>(Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent()->GetValueAsObject(TEXT("Target"))))
-			{
-				UClass* MolotovClass = LoadObject<UClass>(NULL, TEXT("Blueprint'/Game/Blueprints/Enemies/BartenderAI/MolotovBP.MolotovBP_C'")); //MolotovAsset();
-				if (MolotovClass)
-				{
-					TSubclassOf<AMolotov> SubClassOfMolotov = MolotovClass;
-
-					AMolotov* SpawnedMolotov = GetWorld()->SpawnActor<AMolotov>(SubClassOfMolotov);
-					SpawnedMolotov->SetActorLocation(GetActorLocation() + FVector(0.f, 0.f, 200.f));
-					SpawnedMolotov->SetOwner(this);
-					FVector TargetDestination = ValidTarget->GetActorLocation();
-					if (APawn* RecastTarget = Cast<APawn>(ValidTarget))
-					{
-						if (RecastTarget->GetLastMovementInputVector() != FVector::ZeroVector)
-						{
-							//TargetDestination += RecastTarget->GetLastMovementInputVector() * RecastTarget->GetVelocity().Size();
-						}
-					}
-					SpawnedMolotov->SetMolotovVelocity(HitTargetLocationAtTime(SpawnedMolotov->GetActorLocation(), TargetDestination, FVector(0.f, 0.f, GetWorld()->GetGravityZ()), TimeForMolotovToReachTargetLocation));
-					TimeSinceLastAttack = 0.f;
-					UE_LOG(LogTemp, Display, TEXT("Time of launching Molotov: %f"), GetWorld()->GetTimeSeconds());
-					//DrawDebugLine(GetWorld(), HitTargetLocationAtTime(T->GetActorLocation(), GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation(), FVector(0.f, 0.f, GetWorld()->GetGravityZ()), 2.0f), 5.f, FColor(255, 0, 0), true, 8);
-				}
-			}
+			
 		}
 	}
 }
@@ -133,6 +110,34 @@ AWeapon* ABartenderAI::EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip)
 {
 	CurrentlyEquippedWeapon = Super::EquipNewWeapon(WeaponToEquip);
 	return CurrentlyEquippedWeapon;
+}
+
+void ABartenderAI::ThrowMolotov()
+{
+	if (AActor* ValidTarget = Cast<AActor>(Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent()->GetValueAsObject(TEXT("Target"))))
+	{
+		UClass* MolotovClass = LoadObject<UClass>(NULL, TEXT("Blueprint'/Game/Blueprints/Enemies/BartenderAI/MolotovBP.MolotovBP_C'")); //MolotovAsset();
+		if (MolotovClass)
+		{
+			TSubclassOf<AMolotov> SubClassOfMolotov = MolotovClass;
+
+			AMolotov* SpawnedMolotov = GetWorld()->SpawnActor<AMolotov>(SubClassOfMolotov);
+			SpawnedMolotov->SetActorLocation(GetActorLocation() + FVector(0.f, 0.f, 200.f));
+			SpawnedMolotov->SetOwner(this);
+			FVector TargetDestination = ValidTarget->GetActorLocation();
+			//if (APawn* RecastTarget = Cast<APawn>(ValidTarget))
+			//{
+			//	if (RecastTarget->GetLastMovementInputVector() != FVector::ZeroVector)
+			//	{
+			//		TargetDestination += RecastTarget->GetLastMovementInputVector() * RecastTarget->GetVelocity().Size();
+			//	}
+			//}
+			SpawnedMolotov->SetMolotovVelocity(HitTargetLocationAtTime(SpawnedMolotov->GetActorLocation(), TargetDestination, FVector(0.f, 0.f, GetWorld()->GetGravityZ()), TimeForMolotovToReachTargetLocation));
+			TimeSinceLastAttack = 0.f;
+			UE_LOG(LogTemp, Display, TEXT("Time of launching Molotov: %f"), GetWorld()->GetTimeSeconds());
+			//DrawDebugLine(GetWorld(), HitTargetLocationAtTime(T->GetActorLocation(), GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation(), FVector(0.f, 0.f, GetWorld()->GetGravityZ()), 2.0f), 5.f, FColor(255, 0, 0), true, 8);
+		}
+	}
 }
 
 FVector ABartenderAI::HitTargetLocationAtTime(FVector StartPosition, FVector TargetPosition, FVector GravityBase, float TimeToTarget)
