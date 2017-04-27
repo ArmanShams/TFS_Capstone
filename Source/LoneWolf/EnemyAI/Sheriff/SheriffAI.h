@@ -43,6 +43,41 @@ public:
 	SheriffState CurrentState;
 	virtual SheriffState GetSheriffState();
 	virtual void SetSheriffState(SheriffState NewStateToEnter);
+	
+	// Sphere Collider to apply the soft CC
+	USphereComponent* LassoSphereCollider;
+
+	USceneComponent* LassoEndLocation;
+
+	// Space to be kept from the Player when Lassoing
+	UPROPERTY(EditAnywhere)
+	float CushionSpace;
+	
+	// Force of lasso
+	UPROPERTY(EditAnywhere)
+	float PullingForce;
+
+	// Vector of the velocity the player is pulled
+	UPROPERTY(EditAnywhere)
+	FVector PullingVelocity;
+
+	UPROPERTY(EditAnywhere)
+	FVector CurrentLocation;
+
+	UPROPERTY(EditAnywhere)
+	FVector PlayerLocation;
+
+	UPROPERTY(EditAnywhere)
+	FVector NewLocation;
+
+	UPROPERTY(EditAnywhere)
+	FVector LassoTarget;
+
+	UPROPERTY(EditAnywhere)
+	float DistanceToPlayer;
+
+	UPROPERTY(EditAnywhere)
+	float LassoLength;
 
 	void Lasso();
 

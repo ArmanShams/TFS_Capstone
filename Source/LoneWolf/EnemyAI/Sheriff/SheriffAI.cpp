@@ -26,11 +26,20 @@ ASheriffAI::ASheriffAI()
 	TurnRate = 0.25f;
 	MaxRange = 100.0f;
 	AttackFrequency = 5.f;
-	AttackRange = 1000.0f;
+	AttackRange = 300.0f;
+	PullingForce = 0.005f;
+	CushionSpace = 300.f;
+	LassoLength = 100.f;
 
 	FName LassoSocket = TEXT("RightHand");
 	LassoCableComponent = CreateDefaultSubobject<UCableComponent>(TEXT("Cable Component"));
 	LassoCableComponent->AttachTo(GetMesh(), LassoSocket);
+
+	LassoEndLocation = CreateDefaultSubobject<USceneComponent>(TEXT("Scene Component"));
+	// LassoEndLocation->AttachTo(LassoCableComponent->EndLocation);
+
+	LassoSphereCollider = CreateDefaultSubobject<USphereComponent>(TEXT("LassoSphereCollider"));
+	//LassoSphereCollider->AttachTo();
 
 	ConstructorHelpers::FClassFinder<AWeapon>KnifeAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/KnifeBP_Arman.KnifeBP_Arman_C'"));
 	if (KnifeAsset.Class)
@@ -43,8 +52,6 @@ ASheriffAI::ASheriffAI()
 	{
 		UE_LOG(LogTemp, Display, TEXT("Lasso class found!"));
 	}
-
-
 }
 
 void ASheriffAI::BeginPlay()
@@ -80,6 +87,10 @@ void ASheriffAI::Tick(float DeltaSeconds)
 	if (bIsInRange())
 	{
 		Lasso();
+	}
+	if (!bIsInRange())
+	{
+		LassoCableComponent->SetAttachEndTo(this, GetMesh()->GetSocketBoneName("RightHand"));
 	}
 }
 
@@ -133,7 +144,6 @@ void ASheriffAI::Destroyed()
 	Super::Destroyed();
 }
 
-
 void ASheriffAI::Lasso()
 {
 	if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
@@ -142,18 +152,25 @@ void ASheriffAI::Lasso()
 		{
 			if (ACharacterController* PlayerReference = Cast<ACharacterController>(BlackboardComponent->GetValueAsObject(TEXT("Target"))))
 			{
-				FVector CurrentLocation = GetActorLocation();
-				FVector PlayerLocation = PlayerReference->GetActorLocation();
-				FVector PullingVelocity = FVector(-0.01f, -0.01f, 0.f);
+				CurrentLocation = GetActorLocation();
+				PlayerLocation = PlayerReference->GetActorLocation();
 
+				//Vector Math
+				PullingVelocity.X = PullingForce;
+				PullingVelocity.Y = PullingForce; //FVector(-PullingForce, -PullingForce, 0.f);
 
+				NewLocation = PlayerLocation - (CurrentLocation * PullingVelocity);
+				DistanceToPlayer = FVector::Dist(CurrentLocation, PlayerLocation);
+				// UE_LOG(LogTemp, Display, TEXT("New Location = %s"), *NewLocation.ToString());
 
-				PlayerReference->GetMovementComponent()->AddInputVector(PlayerLocation*PullingVelocity);
-				LassoCableComponent->SetAttachEndTo(PlayerReference, RootComponent->GetDefaultSceneRootVariableName());
-
-				UMeshComponent* PlayerMesh = PlayerReference->GetMesh();
-				FVector LassoTarget = PlayerMesh->GetSocketLocation("pelvis");
-				LassoCableComponent->EndLocation = LassoTarget;
+				if(DistanceToPlayer > CushionSpace)
+				{
+					// UE_LOG(LogTemp, Display, TEXT("Distance to player = %f"), DistanceToPlayer);
+					UMeshComponent* PlayerMesh = PlayerReference->GetMesh();
+					LassoCableComponent->CableLength = LassoLength;
+					LassoCableComponent->SetAttachEndTo(PlayerReference, GetMesh()->GetSocketBoneName("pelvis"));
+					PlayerReference->GetMovementComponent()->AddInputVector(NewLocation);
+				}
 			}
 		}
 	}
