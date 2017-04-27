@@ -170,10 +170,9 @@ void ACharacterController::Tick( float DeltaSeconds )
 
 			USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(NULL, TEXT("SkeletalMesh'/Game/MixamoAnimPack/Mixamo_Adam/Mesh/Maximo_Adam.Maximo_Adam'"), NULL, LOAD_None, NULL);
 
-			FString AnimClassStringTest = "Class'/Game/Blueprints/Player/CharacterControllerWolfPlaceholder.CharacterControllerWolfPlaceholder_C'";
+			FString AnimClassStringTest = "Class'/Game/Animation/Wolf/CharacterControllerWolfPlaceholder.CharacterControllerWolfPlaceholder_C'";
 
 			UClass* AnimationClass = LoadObject<UClass>(NULL, *AnimClassStringTest);
-
 			if (AnimationClass && NewMesh)
 			{
 				GetMesh()->SetSkeletalMesh(NewMesh);
@@ -181,6 +180,10 @@ void ACharacterController::Tick( float DeltaSeconds )
 
 				CurrentlyEquippedWeapon->Destroy();
 				CurrentlyEquippedWeapon = NULL;
+				bShouldEnterReload = false;
+				bAnimPrimaryFire = false;
+				bAnimSecondaryFire = false;
+
 				CurrentlyEquippedWeapon = GetWorld()->SpawnActor<AWeapon>(WolfWeapon);
 				//CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(90.f, 180.f, 0.f));
 				CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("WeaponSocket"));
@@ -196,12 +199,19 @@ void ACharacterController::Tick( float DeltaSeconds )
 			CurrentForm = TransformationState::WOLF;
 			UE_LOG(LogTemp, Display, TEXT("Player 'Transformed' to human"));
 
+			FString AnimClassStringTest = "Class'/Game/Animation/Vincent/Character_Controller_AnimBP.Character_Controller_AnimBP_C'";
+
+			UClass* AnimationClass = LoadObject<UClass>(NULL, *AnimClassStringTest);
+
 			USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(NULL, TEXT("SkeletalMesh'/Game/Geometry/Characters/VincentArgo/SK_Vincent.SK_Vincent'"), NULL, LOAD_None, NULL);
-			if (NewMesh)
+			if (AnimationClass && NewMesh)
 			{
+				GetMesh()->SetSkeletalMesh(NewMesh);
+				GetMesh()->SetAnimInstanceClass(AnimationClass);
+
 				CurrentlyEquippedWeapon->Destroy();
 				CurrentlyEquippedWeapon = NULL;
-				GetMesh()->SetSkeletalMesh(NewMesh);
+				//GetMesh()->SetSkeletalMesh(NewMesh);
 				EquipNewWeapon(DefaultWeapon);
 			}
 			//EquipRevolver();
@@ -349,42 +359,47 @@ void ACharacterController::OnMouseMove(float scale)
 
 				FVector Diff = FVector(MousePosition.X - CenterPoint.X, MousePosition.Y - CenterPoint.Y, 0.f);
 				GetMesh()->SetRelativeRotation(FMath::RInterpTo(GetMesh()->RelativeRotation, FRotator(0.f, Diff.Rotation().Yaw, 0.f),GetWorld()->GetDeltaSeconds(), TurnRate));
-				if (CurrentlyEquippedWeapon != NULL && CurrentForm == TransformationState::HUMAN)
+
+				// Only adjust gun position if the player isn't reloading.
+				if (!bShouldEnterReload)
 				{
-					if (Cast<AWeapon_Ranged>(CurrentlyEquippedWeapon))
+					if (CurrentlyEquippedWeapon != NULL && CurrentForm == TransformationState::HUMAN)
 					{
-						FRotator DesiredWeaponRotation = GetActorRotation();
-
-						FHitResult OutHitResultHorizontalAdjust(ForceInit);
-						if (PlayerController->GetHitResultUnderCursor(ECollisionChannel::ECC_Camera, false, OutHitResultHorizontalAdjust))
+						if (Cast<AWeapon_Ranged>(CurrentlyEquippedWeapon))
 						{
-							FVector DirectionHorizontal = FVector(OutHitResultHorizontalAdjust.Location.X - GetActorLocation().X, OutHitResultHorizontalAdjust.Location.Y - GetActorLocation().Y, OutHitResultHorizontalAdjust.Location.Z - GetActorLocation().Z);
-							if (DirectionHorizontal.Size() > 300.f)
-							{
-								FRotator YawRotation = (OutHitResultHorizontalAdjust.Location - CurrentlyEquippedWeapon->GetActorLocation()).Rotation();
-								DesiredWeaponRotation.Yaw = YawRotation.Yaw;
-							}
-							else
-							{
-								FRotator YawRotation = (GetActorLocation() + (GetMesh()->GetRightVector() * 256.f) - CurrentlyEquippedWeapon->GetActorLocation()).Rotation();
-								DesiredWeaponRotation.Yaw = YawRotation.Yaw;
-							}
-						}
+							FRotator DesiredWeaponRotation = GetActorRotation();
 
-						FHitResult OutHitResultVerticalResult(ForceInit);
-						if (PlayerController->GetHitResultUnderCursor(ECollisionChannel::ECC_GameTraceChannel6, false, OutHitResultVerticalResult))
-						{
-							FVector DirectionHorizontal = FVector(OutHitResultVerticalResult.Location.X - GetActorLocation().X, OutHitResultVerticalResult.Location.Y - GetActorLocation().Y, OutHitResultVerticalResult.Location.Z - GetActorLocation().Z);
-							if (DirectionHorizontal.Size() > 140.f)
+							FHitResult OutHitResultHorizontalAdjust(ForceInit);
+							if (PlayerController->GetHitResultUnderCursor(ECollisionChannel::ECC_Camera, false, OutHitResultHorizontalAdjust))
 							{
-								FVector Direction = OutHitResultVerticalResult.Location + FVector::UpVector * 128.f - CurrentlyEquippedWeapon->GetActorLocation();
-								FRotator RotationInDirection = FRotationMatrix::MakeFromX(Direction).Rotator();
-								DesiredWeaponRotation.Pitch = RotationInDirection.Pitch;
+								FVector DirectionHorizontal = FVector(OutHitResultHorizontalAdjust.Location.X - GetActorLocation().X, OutHitResultHorizontalAdjust.Location.Y - GetActorLocation().Y, OutHitResultHorizontalAdjust.Location.Z - GetActorLocation().Z);
+								if (DirectionHorizontal.Size() > 300.f)
+								{
+									FRotator YawRotation = (OutHitResultHorizontalAdjust.Location - CurrentlyEquippedWeapon->GetActorLocation()).Rotation();
+									DesiredWeaponRotation.Yaw = YawRotation.Yaw;
+								}
+								else
+								{
+									FRotator YawRotation = (GetActorLocation() + (GetMesh()->GetRightVector() * 256.f) - CurrentlyEquippedWeapon->GetActorLocation()).Rotation();
+									DesiredWeaponRotation.Yaw = YawRotation.Yaw;
+								}
 							}
+
+							FHitResult OutHitResultVerticalResult(ForceInit);
+							if (PlayerController->GetHitResultUnderCursor(ECollisionChannel::ECC_GameTraceChannel6, false, OutHitResultVerticalResult))
+							{
+								FVector DirectionHorizontal = FVector(OutHitResultVerticalResult.Location.X - GetActorLocation().X, OutHitResultVerticalResult.Location.Y - GetActorLocation().Y, OutHitResultVerticalResult.Location.Z - GetActorLocation().Z);
+								if (DirectionHorizontal.Size() > 140.f)
+								{
+									FVector Direction = OutHitResultVerticalResult.Location + FVector::UpVector * 128.f - CurrentlyEquippedWeapon->GetActorLocation();
+									FRotator RotationInDirection = FRotationMatrix::MakeFromX(Direction).Rotator();
+									DesiredWeaponRotation.Pitch = RotationInDirection.Pitch;
+								}
+							}
+							CurrentlyEquippedWeapon->SetActorRotation(FMath::RInterpTo(CurrentlyEquippedWeapon->GetActorRotation(), DesiredWeaponRotation, GetWorld()->GetDeltaSeconds(), TurnRate * TurnRate));
 						}
-						CurrentlyEquippedWeapon->SetActorRotation(FMath::RInterpTo(CurrentlyEquippedWeapon->GetActorRotation(), DesiredWeaponRotation, GetWorld()->GetDeltaSeconds(), TurnRate * TurnRate));
 					}
-				}	
+				}
 			}
 		}
 	}
