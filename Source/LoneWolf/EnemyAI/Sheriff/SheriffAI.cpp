@@ -26,7 +26,7 @@ ASheriffAI::ASheriffAI()
 	TurnRate = 0.25f;
 	MaxRange = 100.0f;
 	AttackFrequency = 5.f;
-	AttackRange = 300.0f;
+	AttackRange = 1000.0f;
 	PullingForce = 0.005f;
 	CushionSpace = 300.f;
 	LassoLength = 100.f;
@@ -169,7 +169,7 @@ void ASheriffAI::Lasso()
 					UMeshComponent* PlayerMesh = PlayerReference->GetMesh();
 					LassoCableComponent->CableLength = LassoLength;
 					LassoCableComponent->SetAttachEndTo(PlayerReference, GetMesh()->GetSocketBoneName("pelvis"));
-					PlayerReference->GetMovementComponent()->AddInputVector(NewLocation);
+				// 	PlayerReference->GetMovementComponent()->AddInputVector(NewLocation);
 				}
 			}
 		}
