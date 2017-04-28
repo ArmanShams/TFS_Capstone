@@ -35,6 +35,9 @@ public:
 protected:
 	virtual AWeapon* EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip) override;
 
+	virtual void ThrowMolotov();
+
+
 	virtual FVector HitTargetLocationAtTime(FVector StartPosition, FVector TargetPosition, FVector GravityBase, float TimeToTarget);
 	virtual FVector GetHorizontalVector(FVector Direction, FVector GravityBase);
 	virtual FVector GetVerticalVector(FVector Direction, FVector GravityBase);

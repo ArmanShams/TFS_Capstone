@@ -18,7 +18,6 @@ enum class TransformationState : uint8
 UCLASS(Blueprintable)
 class LONEWOLF_API ACharacterController : public ALoneWolfCharacter
 {
-	
 	GENERATED_BODY()
 
 public:
@@ -92,9 +91,7 @@ protected:
 	float Health;
 	// SOON TO BE REMOVED WHEN ROLL ANIMATION IS IMPLEMENTED
 	UPROPERTY(EditDefaultsOnly)
-	float RollDistance;
-	//UPROPERTY(EditDefaultsOnly)
-	float Rage;
+	float RollSpeed;
 	UPROPERTY(EditDefaultsOnly)
 	float CameraArmDistance;
 	UPROPERTY(EditDefaultsOnly)
@@ -103,38 +100,41 @@ protected:
 	float AimSnapHalfHeight;
 	UPROPERTY(EditDefaultsOnly)
 	float AimSnapRadius;
-	
+	float Rage;
+
+
 	UPROPERTY(Category = Camera, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* CameraComponent;
-
 	UPROPERTY(Category = Camera, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
-
 	UPROPERTY(Category = Collision, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UCapsuleComponent* CapsuleCollider;
-
 	UPROPERTY(Category = Collision, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UCapsuleComponent* AimSnapCapsule;
 
 	TSubclassOf<class AWeapon> DefaultWeapon;
 	TSubclassOf<class AWeapon> WolfWeapon;
 	
+
+	// HUD Widget references
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
 	TSubclassOf<class UUserWidget> wInGameHud;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
 	TSubclassOf<class UUserWidget> wDeadHud;
 
+
+
 	// Variable to store the widget after creating it.
 	class UUserWidget* InGameHud;
-
 	class UUserWidget* DeadHud;
-
 
 	UPROPERTY(BlueprintReadOnly, Category = "PlayerTransformationState")
 	TransformationState CurrentForm;
 	AttackTypes::MeleeAttackType CurrentMeleeAttackType;
 	CharacterState::StatusEffect Effects;
+
+	FVector RollDirection;
+
 
 	// Remove when Roll animation is added, tie to anim notifies to start and end the roll	
 	FVector RollStartingPoint;
@@ -143,6 +143,7 @@ protected:
 private:
 	bool NeuteredMode = false;
 
+	float RollCompensationYaw;
 	const float MAXHEALTH = 100.f;
 	const float MAXRAGE = 100.f;
 
