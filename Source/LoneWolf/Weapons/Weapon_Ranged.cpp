@@ -170,3 +170,8 @@ bool AWeapon_Ranged::HasAmmo()
 {
 	return CurrentAmmo > 0;
 }
+
+bool AWeapon_Ranged::CanReload()
+{
+	return CurrentAmmo < MagazineCapacity;
+}
