@@ -114,7 +114,23 @@ void ACharacterController::BeginPlay()
 				InGameHud->AddToViewport(80);
 			}
 		}
-
+		
+		//Regardless of actor spawn rotation, the roll wil compensate to always align with movement vector.
+		float DefaultYaw = GetActorRotation().Yaw;
+		if (DefaultYaw < -0.1f)
+		{
+			RollCompensationYaw = -DefaultYaw - 90.f;
+		}
+		else if (DefaultYaw > 0.1f)
+		{
+			RollCompensationYaw = -90.f - DefaultYaw;
+		}
+		else
+		{
+			RollCompensationYaw = -90.f;
+		}
+		//UE_LOG(LogTemp, Display, TEXT("Default Yaw = %f"), DefaultYaw);
+		//UE_LOG(LogTemp, Display, TEXT("Compensating roll with = %f"), RollCompensationYaw);
 		//AddStatusEffect(UStatusEffect_TestDerivative::StaticClass(), true, true, 5.0f, 0.0f, 1.0f, this);
 	}
 }
@@ -242,7 +258,7 @@ void ACharacterController::SetupPlayerInputComponent(class UInputComponent* InIn
 		InInputComponent->BindAction(TEXT("Roll"), IE_Pressed, this, &ThisClass::OnRollPressed);
 		InInputComponent->BindAction(TEXT("Reload"), IE_Pressed, this, &ThisClass::OnReloadPressed);
 
-		// Debug keybinding, remove later.
+		// Debug key binding, remove later.
 		//InInputComponent->BindAction(TEXT("DebugRage"), IE_Pressed, this, &ThisClass::OnDebugRagePressed);
 	}
 }
@@ -450,7 +466,7 @@ void ACharacterController::OnRollPressed()
 
 				//FVector Diff = (GetActorLocation() + (MovementVector * 500.f)) - GetActorLocation();
 				FRotator RollRotator = GetMesh()->RelativeRotation;
-				RollRotator.Yaw = (MovementVector.Rotation().Yaw - 90.f);
+				RollRotator.Yaw = (MovementVector.Rotation().Yaw + RollCompensationYaw);
 				GetMesh()->SetRelativeRotation(RollRotator);
 				//GetMesh()->SetRelativeRotation(FMath::RInterpTo(GetMesh()->RelativeRotation, FRotator(0.f, Diff.Rotation().Yaw, 0.f), GetWorld()->GetDeltaSeconds(), TurnRate));
 			}
@@ -476,7 +492,25 @@ void ACharacterController::Roll()
 
 void ACharacterController::OnReloadPressed()
 {
-	bShouldEnterReload = true;
+	switch (CurrentForm)
+	{
+	case TransformationState::DEAD:
+		break;
+	case TransformationState::HUMAN:
+		if (AWeapon_Ranged* RecastWeapon = Cast<AWeapon_Ranged>(CurrentlyEquippedWeapon))
+		{
+			if (RecastWeapon->CanReload())
+			{
+				bShouldEnterReload = true;
+			}
+		}
+		break;
+	case TransformationState::WOLF:
+		break;
+	default:
+		break;
+	}
+	
 }
 
 void ACharacterController::EquipRevolver()

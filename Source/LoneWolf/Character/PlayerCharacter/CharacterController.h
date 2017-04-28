@@ -143,6 +143,7 @@ protected:
 private:
 	bool NeuteredMode = false;
 
+	float RollCompensationYaw;
 	const float MAXHEALTH = 100.f;
 	const float MAXRAGE = 100.f;
 
