@@ -83,25 +83,23 @@ protected:
 	bool bIsMeleeAttacking;
 	bool bIsRolling;
 
-	UPROPERTY(EditDefaultsOnly)
-	float MoveSpeed;
-	UPROPERTY(EditDefaultsOnly)
-	float TurnRate;
-	UPROPERTY(EditDefaultsOnly)
-	float Health;
-	// SOON TO BE REMOVED WHEN ROLL ANIMATION IS IMPLEMENTED
-	UPROPERTY(EditDefaultsOnly)
-	float RollSpeed;
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Camera")
 	float CameraArmDistance;
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character")
+	float TurnRate;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character")
+	float Health;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character")
+	float RollSpeed;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character")
 	float RageDrainPerSecond;
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character")
 	float AimSnapHalfHeight;
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character")
 	float AimSnapRadius;
 	float Rage;
-
+	float AnimMovementSpeed;
+	float AnimMovementDirection;
 
 	UPROPERTY(Category = Camera, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* CameraComponent;
@@ -134,11 +132,6 @@ protected:
 	CharacterState::StatusEffect Effects;
 
 	FVector RollDirection;
-
-
-	// Remove when Roll animation is added, tie to anim notifies to start and end the roll	
-	FVector RollStartingPoint;
-	FVector RollDestination;
 
 private:
 	bool NeuteredMode = false;

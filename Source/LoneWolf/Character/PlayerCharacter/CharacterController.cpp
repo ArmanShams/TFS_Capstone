@@ -16,14 +16,25 @@ ACharacterController::ACharacterController()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	MoveSpeed = .4f;
+	MoveSpeedBase = .4f;
+	MoveSpeedActual = MoveSpeedBase;
+	AnimMovementSpeed = 0.f;
+	AnimMovementDirection = 0.f;
 	RollSpeed = 400.f;
 	Health = 100.f;
 	Rage = 0.f;
 	RageDrainPerSecond = 4.f;
-	bIsRolling = false;
 	TurnRate = 0.25f;
-	
+	bIsRolling = false;
+	bIsMeleeAttacking = false;
+	bShouldEnterReload = false;
+	bAnimPrimaryFire = false;
+	bAnimSecondaryFire = false;
+	bIsInHardCC = false;
+	bIsInSoftCC = false;
+
+
+
 	AimSnapHalfHeight = 256.f;
 	AimSnapRadius = 128.;
 
@@ -71,24 +82,16 @@ ACharacterController::ACharacterController()
 	Effects = CharacterState::NONE;
 	CurrentMeleeAttackType = AttackTypes::NONE;
 	CurrentForm = TransformationState::HUMAN;
-	bIsRolling = false;
-	bIsMeleeAttacking = false;
 
-	bShouldEnterReload = false;
-	bAnimPrimaryFire = false;
-	bAnimSecondaryFire = false;
-	bIsInHardCC = false;
-	bIsInSoftCC = false;
-
-	//bShouldEnterRoll;
+	
 }
-
 
 void ACharacterController::BeginPlay()
 {
 	AimSnapCapsule->SetCapsuleHalfHeight(AimSnapHalfHeight);
 	AimSnapCapsule->SetCapsuleRadius(AimSnapRadius);
 	AimSnapCapsule->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	MoveSpeedActual = MoveSpeedBase;
 
 	Super::BeginPlay();
 
@@ -115,7 +118,7 @@ void ACharacterController::BeginPlay()
 			}
 		}
 		
-		//Regardless of actor spawn rotation, the roll wil compensate to always align with movement vector.
+		//Regardless of actor spawn rotation, the roll will compensate to always align with movement vector.
 		float DefaultYaw = GetActorRotation().Yaw;
 		if (DefaultYaw < -0.1f)
 		{
@@ -129,30 +132,37 @@ void ACharacterController::BeginPlay()
 		{
 			RollCompensationYaw = -90.f;
 		}
-		//UE_LOG(LogTemp, Display, TEXT("Default Yaw = %f"), DefaultYaw);
-		//UE_LOG(LogTemp, Display, TEXT("Compensating roll with = %f"), RollCompensationYaw);
-		//AddStatusEffect(UStatusEffect_TestDerivative::StaticClass(), true, true, 5.0f, 0.0f, 1.0f, this);
+		
 	}
 }
 
 void ACharacterController::Tick( float DeltaSeconds )
 {
 	Super::Tick(DeltaSeconds);
-
-	// Tune to be dependent on Anim notifies in the future.
+	FVector LastInputVector = GetMovementComponent()->GetLastInputVector();
 	if (bIsRolling && RollDirection != FVector::ZeroVector)
 	{
 		GetMovementComponent()->AddInputVector(RollDirection * RollSpeed);
-		/*FVector CurrentPosition = (FMath::Lerp(RootComponent->RelativeLocation, RollDestination, 25.f * DeltaSeconds) - RootComponent->RelativeLocation);
-		GetMovementComponent()->AddInputVector(CurrentPosition);
-
-		if (bIsRolling && FVector::Dist(RootComponent->RelativeLocation, RollDestination) <= 5.3f)
-		{
-			GetMovementComponent()->StopActiveMovement();
-			UE_LOG(LogTemp, Display, TEXT("End roll"));
-			bIsRolling = false;
-		}*/
 	}
+
+	/*
+	if (LastInputVector != FVector::ZeroVector)
+	{
+		AnimMovementSpeed = LastInputVector.Size();
+	}
+	
+	float MeshYaw = GetMesh()->RelativeRotation.Yaw;
+	if (MeshYaw < 0.f)
+	{
+		MeshYaw += 360.f;
+	}
+	UE_LOG(LogTemp, Display, TEXT("Mesh rotation yaw = %f"), MeshYaw);
+	
+	if (GetMovementComponent()->GetLastInputVector() == FVector::ZeroVector)
+	{
+		AnimMovementSpeed = 0.0f;
+	}
+	*/
 
 	switch (CurrentForm)
 	{
@@ -353,7 +363,7 @@ void ACharacterController::OnMoveForward(float scale)
 {
 	if (!bIsRolling && !bIsInSoftCC)
 	{
-		GetMovementComponent()->AddInputVector(GetActorForwardVector() * scale * MoveSpeed);
+		GetMovementComponent()->AddInputVector(GetActorForwardVector() * scale * MoveSpeedActual);
 	}
 }
 
@@ -361,7 +371,21 @@ void ACharacterController::OnMoveRight(float scale)
 {
 	if (!bIsRolling && !bIsInSoftCC)
 	{
-		GetMovementComponent()->AddInputVector(GetActorRightVector() * scale * MoveSpeed);
+		/*
+		float MeshYaw = GetMesh()->RelativeRotation.Yaw;
+
+		if (MeshYaw < 0.1f)
+		{
+			AnimMovementDirection = scale;
+		}
+		else
+		{
+			AnimMovementDirection = -scale;
+		}
+		*/
+		
+
+		GetMovementComponent()->AddInputVector(GetActorRightVector() * scale * MoveSpeedActual);
 	}
 }
 
@@ -381,7 +405,13 @@ void ACharacterController::OnMouseMove(float scale)
 				PlayerController->ProjectWorldLocationToScreen(GetMesh()->GetComponentLocation(), CenterPoint);
 
 				FVector Diff = FVector(MousePosition.X - CenterPoint.X, MousePosition.Y - CenterPoint.Y, 0.f);
-				GetMesh()->SetRelativeRotation(FMath::RInterpTo(GetMesh()->RelativeRotation, FRotator(0.f, Diff.Rotation().Yaw, 0.f),GetWorld()->GetDeltaSeconds(), TurnRate));
+				float NewYaw = Diff.Rotation().Yaw;
+				
+				//if (GetMovementComponent()->GetLastInputVector() == FVector::ZeroVector)
+				{
+					GetMesh()->SetRelativeRotation(FMath::RInterpTo(GetMesh()->RelativeRotation, FRotator(0.f, NewYaw, 0.f), GetWorld()->GetDeltaSeconds(), TurnRate));
+				}
+				//
 
 				// Only adjust gun position if the player isn't reloading.
 				if (!bShouldEnterReload)
@@ -437,57 +467,43 @@ void ACharacterController::OnInteractReleased()
 {
 	if (!bIsInSoftCC)
 	{
-		TArray<FOverlapResult> hitResult;
-		GetWorld()->OverlapMultiByChannel(hitResult, GetActorLocation(), FQuat::Identity, ECC_GameTraceChannel1, FCollisionShape::MakeSphere(50.f));
+		//TArray<FOverlapResult> hitResult;
+		//GetWorld()->OverlapMultiByChannel(hitResult, GetActorLocation(), FQuat::Identity, ECC_GameTraceChannel1, FCollisionShape::MakeSphere(50.f));
 
-		if (hitResult.Num() > 0)
-		{
-			if (AInteractable* Interactable = Cast<AInteractable>(hitResult[0].GetActor()))
-			{
-				Interactable->Interact(this);
-				//UE_LOG(LogTemp, Display, TEXT("Actually hit a thing."));
-			}
-		}
+		//if (hitResult.Num() > 0)
+		//{
+		//	if (AInteractable* Interactable = Cast<AInteractable>(hitResult[0].GetActor()))
+		//	{
+		//		Interactable->Interact(this);
+		//		//UE_LOG(LogTemp, Display, TEXT("Actually hit a thing."));
+		//	}
+		//}
 	}
-	//UE_LOG(LogTemp, Display, TEXT("Interact key released"));
 }
 
 void ACharacterController::OnRollPressed()
 {
 	if (!bIsInHardCC)
 	{
-		if (!bIsRolling)
-		{
-			FVector MovementVector = GetLastMovementInputVector();
-			if (MovementVector != FVector::ZeroVector)
-			{
-				RollDirection = MovementVector;
-				bIsRolling = true;
-
-				//FVector Diff = (GetActorLocation() + (MovementVector * 500.f)) - GetActorLocation();
-				FRotator RollRotator = GetMesh()->RelativeRotation;
-				RollRotator.Yaw = (MovementVector.Rotation().Yaw + RollCompensationYaw);
-				GetMesh()->SetRelativeRotation(RollRotator);
-				//GetMesh()->SetRelativeRotation(FMath::RInterpTo(GetMesh()->RelativeRotation, FRotator(0.f, Diff.Rotation().Yaw, 0.f), GetWorld()->GetDeltaSeconds(), TurnRate));
-			}
-
-			//FVector MovementVector = GetLastMovementInputVector();
-			/*
-			if (MovementVector != FVector::ZeroVector)
-			{
-				RollStartingPoint = RootComponent->RelativeLocation;
-				UE_LOG(LogTemp, Display, TEXT("Rolling!"));
-				RollDestination = FVector(RollStartingPoint.X + (MovementVector.X * RollDistance), RollStartingPoint.Y + (MovementVector.Y * RollDistance), RollStartingPoint.Z);
-				bIsRolling = true;
-			}
-			*/
-		}
+		Roll();
 	}
 }
 
 void ACharacterController::Roll()
 {
-	
+	if (!bIsRolling)
+	{
+		FVector MovementVector = GetLastMovementInputVector();
+		if (MovementVector != FVector::ZeroVector)
+		{
+			RollDirection = MovementVector;
+			bIsRolling = true;
+
+			FRotator RollRotator = GetMesh()->RelativeRotation;
+			RollRotator.Yaw = (MovementVector.Rotation().Yaw + RollCompensationYaw);
+			GetMesh()->SetRelativeRotation(RollRotator);
+		}
+	}
 }
 
 void ACharacterController::OnReloadPressed()
