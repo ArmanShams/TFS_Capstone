@@ -12,7 +12,6 @@
 #include "BrainComponent.h"
 #include "CableComponent.h"
 #include "Character/StatusEffects/StatusEffect_SoftCrowdControl.h"
-
 #include "SheriffAI.h"
 
 ASheriffAI::ASheriffAI()
@@ -26,7 +25,7 @@ ASheriffAI::ASheriffAI()
 	TurnRate = 0.25f;
 	MaxRange = 100.0f;
 	AttackFrequency = 5.f;
-	AttackRange = 1000.0f;
+	AttackRange = 500.0f;
 	PullingForce = 0.005f;
 	CushionSpace = 300.f;
 	LassoLength = 100.f;
@@ -60,7 +59,6 @@ void ASheriffAI::BeginPlay()
 	CurrentState = SheriffState::IDLE;
 }
 
-
 SheriffState ASheriffAI::GetSheriffState()
 {
 	return CurrentState;
@@ -71,7 +69,6 @@ void ASheriffAI::SetSheriffState(SheriffState NewStateToEnter)
 	CurrentState = NewStateToEnter;
 	UE_LOG(LogTemp, Display, TEXT("Altering the Sheriff's state"));
 }
-
 
 void ASheriffAI::Tick(float DeltaSeconds)
 {
@@ -88,6 +85,7 @@ void ASheriffAI::Tick(float DeltaSeconds)
 	{
 		Lasso();
 	}
+
 	if (!bIsInRange())
 	{
 		LassoCableComponent->SetAttachEndTo(this, GetMesh()->GetSocketBoneName("RightHand"));
@@ -169,7 +167,7 @@ void ASheriffAI::Lasso()
 					UMeshComponent* PlayerMesh = PlayerReference->GetMesh();
 					LassoCableComponent->CableLength = LassoLength;
 					LassoCableComponent->SetAttachEndTo(PlayerReference, GetMesh()->GetSocketBoneName("pelvis"));
-				// 	PlayerReference->GetMovementComponent()->AddInputVector(NewLocation);
+					// PlayerReference->GetMovementComponent()->AddInputVector(NewLocation);
 				}
 			}
 		}
