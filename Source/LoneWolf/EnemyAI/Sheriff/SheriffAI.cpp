@@ -27,36 +27,41 @@ ASheriffAI::ASheriffAI()
 	AttackFrequency = 5.f;
 	AttackRange = 500.0f;
 	PullingForce = 0.005f;
-	CushionSpace = 300.f;
 	LassoLength = 100.f;
+	KnifeAttackRange = 75.0f;
+	RevolverAttackRange = 125.0f;
+	LassoAttackRange = 175.0f;
 
 	FName LassoSocket = TEXT("RightHand");
 	LassoCableComponent = CreateDefaultSubobject<UCableComponent>(TEXT("Cable Component"));
 	LassoCableComponent->AttachTo(GetMesh(), LassoSocket);
 
-	LassoEndLocation = CreateDefaultSubobject<USceneComponent>(TEXT("Scene Component"));
-	// LassoEndLocation->AttachTo(LassoCableComponent->EndLocation);
-
-	LassoSphereCollider = CreateDefaultSubobject<USphereComponent>(TEXT("LassoSphereCollider"));
-	//LassoSphereCollider->AttachTo();
-
 	ConstructorHelpers::FClassFinder<AWeapon>KnifeAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/KnifeBP_Arman.KnifeBP_Arman_C'"));
 	if (KnifeAsset.Class)
 	{
-		DefaultWeapon = (UClass*)KnifeAsset.Class;
+		KnifeWeapon = (UClass*)KnifeAsset.Class;
 	}
 
-	ConstructorHelpers::FClassFinder<AActor>LassoAsset(TEXT("Blueprint'/Game/Blueprints/Enemies/Sheriff/LassoBP.LassoBP_C'"));
+	ConstructorHelpers::FClassFinder<AWeapon>RevolverAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/SheriffRevolverBP.SheriffRevolverBP_C'"));
+	if (RevolverAsset.Class)
+	{
+		RevolverWeapon = (UClass*)RevolverAsset.Class;
+	}
+
+	ConstructorHelpers::FClassFinder<AActor>LassoAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/LassoBP.LassoBP_C'"));
 	if (LassoAsset.Class)
 	{
-		UE_LOG(LogTemp, Display, TEXT("Lasso class found!"));
+		LassoWeapon = (UClass*)LassoAsset.Class;
 	}
+
+	DefaultWeapon = KnifeWeapon;
 }
 
 void ASheriffAI::BeginPlay()
 {
 	Super::BeginPlay();
 	CurrentState = SheriffState::IDLE;
+	DefaultWeapon = KnifeWeapon;
 }
 
 SheriffState ASheriffAI::GetSheriffState()
@@ -73,19 +78,46 @@ void ASheriffAI::SetSheriffState(SheriffState NewStateToEnter)
 void ASheriffAI::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+	
+	// Update the blackboard component keys
+	if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
+	{
+		BlackboardComponent->SetValueAsBool(TEXT("IsSoftCC"), bIsInSoftCC);
+		BlackboardComponent->SetValueAsBool(TEXT("bCanSwingKnife"), bIsInRange(KnifeAttackRange));
+		BlackboardComponent->SetValueAsBool(TEXT("bCanShootRevolver"), bIsInRange(RevolverAttackRange));
+		BlackboardComponent->SetValueAsBool(TEXT("bCanLasso"), bIsInRange(LassoAttackRange));
+		BlackboardComponent->SetValueAsEnum(TEXT("CurrentState"), (uint8)CurrentState);
+	}
 
-	FVector LinkDistance;
-	LinkDistance.X = AttackRange;
-
-	FVector LinkStart = GetActorLocation();
-	FVector LinkEnd = LinkStart + LinkDistance;
-	DrawDebugLine(GetWorld(), LinkStart, LinkEnd, FColor(255, 0, 0), false, -1.f, 0, 7.f);
+	// Use functions for the appropriate state
+	switch (CurrentState)
+	{
+	case SheriffState::IDLE:
+		break;
+	case SheriffState::MELEE:
+		if (bIsInRange(KnifeAttackRange))
+		{	/* Swing Knife */	}
+		break;
+	case SheriffState::RANGED:
+		if (bIsInRange(RevolverAttackRange))
+		{	/* Shoot Revolver */	}
+		break;
+	case SheriffState::CASTING:
+		if (bIsInRange(LassoAttackRange))
+		{	/* Cast Lasso */	}
+		break;
+	case SheriffState::LASSO:
+		if (bIsInRange(LassoAttackRange))
+		{	/* Cast Lasso */	}
+		break;
+	default:
+		break;
+	}
 
 	if (bIsInRange())
 	{
 		Lasso();
 	}
-
 	if (!bIsInRange())
 	{
 		LassoCableComponent->SetAttachEndTo(this, GetMesh()->GetSocketBoneName("RightHand"));
@@ -142,32 +174,56 @@ void ASheriffAI::Destroyed()
 	Super::Destroyed();
 }
 
+void ASheriffAI::SwingKnife()
+{
+	if (DefaultWeapon = KnifeWeapon)
+	{
+		CurrentlyEquippedWeapon->Fire();
+	}
+}
+
+void ASheriffAI::ShootRevolver()
+{
+	if (DefaultWeapon = RevolverWeapon)
+	{
+		CurrentlyEquippedWeapon->Fire();
+	}
+}
+
 void ASheriffAI::Lasso()
 {
-	if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
+	if (DefaultWeapon = LassoWeapon)
 	{
-		if (BlackboardComponent->GetValueAsObject(TEXT("Target")) != NULL)
+		if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
 		{
-			if (ACharacterController* PlayerReference = Cast<ACharacterController>(BlackboardComponent->GetValueAsObject(TEXT("Target"))))
+			if (BlackboardComponent->GetValueAsObject(TEXT("Target")) != NULL)
 			{
-				CurrentLocation = GetActorLocation();
-				PlayerLocation = PlayerReference->GetActorLocation();
-
-				//Vector Math
-				PullingVelocity.X = PullingForce;
-				PullingVelocity.Y = PullingForce; //FVector(-PullingForce, -PullingForce, 0.f);
-
-				NewLocation = PlayerLocation - (CurrentLocation * PullingVelocity);
-				DistanceToPlayer = FVector::Dist(CurrentLocation, PlayerLocation);
-				// UE_LOG(LogTemp, Display, TEXT("New Location = %s"), *NewLocation.ToString());
-
-				if(DistanceToPlayer > CushionSpace)
+				if (ACharacterController* PlayerReference = Cast<ACharacterController>(BlackboardComponent->GetValueAsObject(TEXT("Target"))))
 				{
-					// UE_LOG(LogTemp, Display, TEXT("Distance to player = %f"), DistanceToPlayer);
-					UMeshComponent* PlayerMesh = PlayerReference->GetMesh();
-					LassoCableComponent->CableLength = LassoLength;
-					LassoCableComponent->SetAttachEndTo(PlayerReference, GetMesh()->GetSocketBoneName("pelvis"));
-					// PlayerReference->GetMovementComponent()->AddInputVector(NewLocation);
+					UE_LOG(LogTemp, Display, TEXT("Sheriff tried to lasso the player"));
+
+					CurrentLocation = GetActorLocation();
+					PlayerLocation = PlayerReference->GetActorLocation();
+					DistanceToPlayer = FVector::Dist(CurrentLocation, PlayerLocation);
+
+					// If the player gets pulled into the Sheriff's knife attack range, he will let go of the rope to swing his knife
+					CushionSpace = KnifeAttackRange;
+
+					if (DistanceToPlayer > CushionSpace)
+					{
+						LassoCableComponent->CableLength = LassoLength;
+						LassoCableComponent->SetAttachEndTo(PlayerReference, GetMesh()->GetSocketBoneName("pelvis"));
+						FVector PullDirecton = PullingVelocity * (PlayerReference->GetActorLocation() - GetActorLocation());
+						PlayerReference->GetMovementComponent()->AddInputVector(PullDirecton);
+
+						AddStatusEffect(UStatusEffect_SoftCrowdControl::StaticClass(), false, 2.f, 0.f, this);
+
+					}
+
+					if (DistanceToPlayer < CushionSpace)
+					{
+						LassoCableComponent->SetAttachEndTo(this, GetMesh()->GetSocketBoneName("RightHand"));
+					}
 				}
 			}
 		}

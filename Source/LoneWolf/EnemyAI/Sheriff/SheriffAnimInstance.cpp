@@ -7,16 +7,33 @@ void USheriffAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	if (SheriffAI)
 	{
-		bCanBasicAttack = SheriffAI->bIsInRange();
+		bKnifeSwing = SheriffAI->bIsInRange();
 	}
 }
 
-void USheriffAnimInstance::AnimNotify_BasicAttackShot()
+void USheriffAnimInstance::AnimNotify_KnifeSwing()
 {
+	if (SheriffAI)
+	{
+		KnifeRange = SheriffAI->RevolverAttackRange;
+		bShootRevolver = SheriffAI->bIsInRange(KnifeRange);
+	}
+}
 
+void USheriffAnimInstance::AnimNotify_ShootRevolver()
+{
+	if (SheriffAI)
+	{
+		RevolverRange = SheriffAI->RevolverAttackRange;
+		bKnifeSwing = SheriffAI->bIsInRange(RevolverRange);
+	}
 }
 
 void USheriffAnimInstance::AnimNotify_LassoAttack()
 {
-
+	if (SheriffAI)
+	{
+		LassoRange = SheriffAI->RevolverAttackRange;
+		bShootRevolver = SheriffAI->bIsInRange(LassoRange);
+	}
 }

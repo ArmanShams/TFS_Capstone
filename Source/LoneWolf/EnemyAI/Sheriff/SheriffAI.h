@@ -12,9 +12,9 @@ enum class SheriffState : uint8
 	IDLE			UMETA(DisplayName = "Idle"),
 	MELEE			UMETA(DisplayName = "Melee"),
 	RANGED			UMETA(DisplayName = "Ranged"),
+	CASTING			UMETA(DisplayName = "Casting"),
 	LASSO			UMETA(DisplayName = "Lasso"),
 };
-
 
 UCLASS()
 class LONEWOLF_API ASheriffAI : public AEnemy
@@ -29,6 +29,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 	
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
 	virtual void AddStatusEffect(TSubclassOf<class UStatusEffectBase> ClassToCreateFrom, bool bShouldPerformTickAction, float LifeTime, float TickRate, ALoneWolfCharacter* CharacterThatInflictedStatusEffect) override;
 	virtual void AddStatusEffect(TSubclassOf<class UStatusEffectBase> ClassToCreateFrom, bool bShouldPerformTickAction, bool bShouldDealDamage, float LifeTime, float DamageToDeal, float TickRate, ALoneWolfCharacter* CharacterThatInflictedStatusEffect) override;
 	
@@ -43,43 +44,52 @@ public:
 	SheriffState CurrentState;
 	virtual SheriffState GetSheriffState();
 	virtual void SetSheriffState(SheriffState NewStateToEnter);
-	
+
 	// Sphere Collider to apply the soft CC
 	USphereComponent* LassoSphereCollider;
 
-	USceneComponent* LassoEndLocation;
-
 	// Space to be kept from the Player when Lassoing
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly)
 	float CushionSpace;
-	
 	// Force of lasso
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly)
 	float PullingForce;
-
 	// Vector of the velocity the player is pulled
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly)
 	FVector PullingVelocity;
-
-	UPROPERTY(EditAnywhere)
+	// Location of the actor
+	UPROPERTY(EditDefaultsOnly)
 	FVector CurrentLocation;
-
-	UPROPERTY(EditAnywhere)
+	// Location of the lasso target
+	UPROPERTY(EditDefaultsOnly)
 	FVector PlayerLocation;
-
-	UPROPERTY(EditAnywhere)
+	// The altered location of the lasso target
+	UPROPERTY(EditDefaultsOnly)
 	FVector NewLocation;
-
-	UPROPERTY(EditAnywhere)
-	FVector LassoTarget;
-
-	UPROPERTY(EditAnywhere)
+	// Distance from the lasso target and the Sheriff
+	UPROPERTY(EditDefaultsOnly)
 	float DistanceToPlayer;
-
-	UPROPERTY(EditAnywhere)
+	// How long the lasso is
+	UPROPERTY(EditDefaultsOnly)
 	float LassoLength;
+	// Max attack range for swinging knife
+	UPROPERTY(EditDefaultsOnly)
+	float KnifeAttackRange;
+	// Max attack range for shooting revolver
+	UPROPERTY(EditDefaultsOnly)
+	float RevolverAttackRange;
+	// Max casting range to use lasso
+	UPROPERTY(EditDefaultsOnly)
+	float LassoAttackRange;
 
+	void SwingKnife();
+	void ShootRevolver();
 	void Lasso();
+
+
+	TSubclassOf<AWeapon> KnifeWeapon;
+	TSubclassOf<AWeapon> RevolverWeapon;
+	TSubclassOf<AWeapon> LassoWeapon;
 
 	FComponentReference CastedPlayerReference;
 
@@ -93,5 +103,10 @@ protected:
 	virtual AWeapon* EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip) override;
 
 	friend class USheriffAnimInstance;
+	friend class UBTTask_SheriffIdle;
+	friend class UBTTask_SheriffLasso;
+	friend class UBTTask_SheriffCasting;
+	friend class UBTTask_SheriffKnifeAttack;
+	friend class UBTTask_SheriffRevolverAttack;
 };
  

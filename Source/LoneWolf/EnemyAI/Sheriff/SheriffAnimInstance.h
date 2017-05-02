@@ -16,15 +16,26 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 		float speed;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+		float KnifeRange;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+		float RevolverRange;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+		float LassoRange;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 		bool isDead;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-		bool bCanBasicAttack;
+		bool bKnifeSwing;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+		bool bShootRevolver;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 		bool bCanLassoAttack;
 
 protected:
 	UFUNCTION()
-		void AnimNotify_BasicAttackShot();
+		void AnimNotify_KnifeSwing();
+
+	UFUNCTION()
+		void AnimNotify_ShootRevolver();
 
 	UFUNCTION()
 		void AnimNotify_LassoAttack();
