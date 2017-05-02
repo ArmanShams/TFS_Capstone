@@ -82,10 +82,10 @@ void ASheriffAI::Tick(float DeltaSeconds)
 	// Update the blackboard component keys
 	if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
 	{
-		BlackboardComponent->SetValueAsBool(TEXT("IsSoftCC"), bIsInSoftCC);
-		BlackboardComponent->SetValueAsBool(TEXT("bCanSwingKnife"), bIsInRange(KnifeAttackRange));
-		BlackboardComponent->SetValueAsBool(TEXT("bCanShootRevolver"), bIsInRange(RevolverAttackRange));
-		BlackboardComponent->SetValueAsBool(TEXT("bCanLasso"), bIsInRange(LassoAttackRange));
+		BlackboardComponent->SetValueAsBool(TEXT("bIsSoftCC"), bIsInSoftCC);
+		BlackboardComponent->SetValueAsBool(TEXT("bIsInKnifeRange"), bIsInRange(KnifeAttackRange));
+		BlackboardComponent->SetValueAsBool(TEXT("bIsInRevolverRange"), bIsInRange(RevolverAttackRange));
+		BlackboardComponent->SetValueAsBool(TEXT("bIsInLassoRange"), bIsInRange(LassoAttackRange));
 		BlackboardComponent->SetValueAsEnum(TEXT("CurrentState"), (uint8)CurrentState);
 	}
 
@@ -94,21 +94,45 @@ void ASheriffAI::Tick(float DeltaSeconds)
 	{
 	case SheriffState::IDLE:
 		break;
+
 	case SheriffState::MELEE:
 		if (bIsInRange(KnifeAttackRange))
-		{	/* Swing Knife */	}
+		{
+			CurrentlyEquippedWeapon = GetEquippedWeapon();
+			if (CurrentlyEquippedWeapon->GetClass() != KnifeWeapon)
+			{
+				CurrentlyEquippedWeapon = EquipNewWeapon(KnifeWeapon);
+			}
+			CurrentlyEquippedWeapon->Fire();
+		}
 		break;
 	case SheriffState::RANGED:
 		if (bIsInRange(RevolverAttackRange))
-		{	/* Shoot Revolver */	}
+		{
+			CurrentlyEquippedWeapon = GetEquippedWeapon();
+			if (CurrentlyEquippedWeapon->GetClass() != KnifeWeapon)
+			{
+			EquipNewWeapon(RevolverWeapon);
+			}
+			CurrentlyEquippedWeapon->Fire();
+		}
 		break;
 	case SheriffState::CASTING:
 		if (bIsInRange(LassoAttackRange))
-		{	/* Cast Lasso */	}
+		{
+			CurrentlyEquippedWeapon = GetEquippedWeapon();
+			if (CurrentlyEquippedWeapon->GetClass() != KnifeWeapon)
+			{ 
+				EquipNewWeapon(LassoWeapon);
+			}
+			CurrentlyEquippedWeapon->Fire();
+		}
 		break;
 	case SheriffState::LASSO:
 		if (bIsInRange(LassoAttackRange))
-		{	/* Cast Lasso */	}
+		{
+			/* */
+		}
 		break;
 	default:
 		break;
@@ -116,7 +140,10 @@ void ASheriffAI::Tick(float DeltaSeconds)
 
 	if (bIsInRange())
 	{
-		Lasso();
+		if (bIsInRange(LassoAttackRange))
+		{
+			Lasso();
+		}
 	}
 	if (!bIsInRange())
 	{
@@ -176,6 +203,8 @@ void ASheriffAI::Destroyed()
 
 void ASheriffAI::SwingKnife()
 {
+	SetSheriffState(SheriffState::MELEE);
+
 	if (DefaultWeapon = KnifeWeapon)
 	{
 		CurrentlyEquippedWeapon->Fire();
@@ -184,6 +213,8 @@ void ASheriffAI::SwingKnife()
 
 void ASheriffAI::ShootRevolver()
 {
+	SetSheriffState(SheriffState::RANGED);
+
 	if (DefaultWeapon = RevolverWeapon)
 	{
 		CurrentlyEquippedWeapon->Fire();
@@ -192,6 +223,8 @@ void ASheriffAI::ShootRevolver()
 
 void ASheriffAI::Lasso()
 {
+	SetSheriffState(SheriffState::LASSO);
+
 	if (DefaultWeapon = LassoWeapon)
 	{
 		if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
@@ -217,7 +250,6 @@ void ASheriffAI::Lasso()
 						PlayerReference->GetMovementComponent()->AddInputVector(PullDirecton);
 
 						AddStatusEffect(UStatusEffect_SoftCrowdControl::StaticClass(), false, 2.f, 0.f, this);
-
 					}
 
 					if (DistanceToPlayer < CushionSpace)
