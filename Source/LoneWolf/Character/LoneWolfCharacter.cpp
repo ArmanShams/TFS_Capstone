@@ -13,6 +13,8 @@ ALoneWolfCharacter::ALoneWolfCharacter()
 
 	bIsInHardCC = false;
 	bIsInSoftCC = false;
+	MoveSpeedBase = 0.4f;
+	MoveSpeedActual = MoveSpeedBase;
 }
 
 void ALoneWolfCharacter::BeginPlay()

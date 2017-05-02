@@ -18,6 +18,10 @@ public:
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float AnimMovementSpeed;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float AnimMovementDirection;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bPrimaryFire;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bSecondaryFiring;
@@ -31,6 +35,7 @@ protected:
 	bool bIsInHardCC;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bIsInSoftCC;
+
 
 	UFUNCTION()
 	void AnimNotify_Reload();

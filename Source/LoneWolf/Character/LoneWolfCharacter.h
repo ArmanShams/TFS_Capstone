@@ -52,7 +52,10 @@ protected:
 	bool bIsInHardCC;
 	bool bIsInSoftCC;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character")
+	float MoveSpeedBase;
 
+	float MoveSpeedActual;
 
 	class AWeapon* CurrentlyEquippedWeapon;
 

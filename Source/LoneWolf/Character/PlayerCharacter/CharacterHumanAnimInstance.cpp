@@ -29,6 +29,9 @@ void UCharacterHumanAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			bIsInHardCC = CharacterController->bIsInHardCC;
 			bIsInSoftCC = CharacterController->bIsInSoftCC;
 
+			AnimMovementSpeed = CharacterController->AnimMovementSpeed * 600.f;
+			AnimMovementDirection = CharacterController->AnimMovementDirection * 150.f;
+
 			if (bPrimaryFire)
 			{
 				CharacterController->bAnimPrimaryFire = bPrimaryFire;
