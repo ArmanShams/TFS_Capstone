@@ -69,7 +69,5 @@ protected:
 
 
 	friend class ABearTrap;
-	friend class UBTTask_BounterHunterAttack;
-
-
+	friend class UBTTask_BountyHunterAttack;
 };

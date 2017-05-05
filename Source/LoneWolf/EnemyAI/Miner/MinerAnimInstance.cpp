@@ -14,10 +14,7 @@
 
 void UMinerAnimInstance::NativeInitializeAnimation()
 {
-	//if (EnemyCharacter)
-	//{
-	//	//PawnState = Cast<AMinerAI>(EnemyCharacter)->GetMinerState();
-	//}
+
 }
 
 void UMinerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -58,14 +55,11 @@ void UMinerAnimInstance::AnimNotify_MeleeAttackEnd()
 {
 	if (GetWorld()->HasBegunPlay())
 	{
-		//bCanAttack = false;
 		if (AWeapon_Melee* EquippedWeapon = Cast<AWeapon_Melee>(EnemyCharacter->GetEquippedWeapon()))
 		{
 			EquippedWeapon->ToggleCollider();
 			EquippedWeapon->bHasHit = false;
-			//Cast<AMinerAI>(EnemyCharacter)->SetMinerState(MinerState::IDLE);
 		}
-		//call a function on our character to disable colliders on melee weapons
 	}
 }
 
@@ -81,12 +75,22 @@ void UMinerAnimInstance::AnimNotify_ChargeEnd()
 	}
 }
 
+void UMinerAnimInstance::AnimNotify_Stomp()
+{
+	if (GetWorld()->HasBegunPlay())
+	{
+		if (EnemyCharacter)
+		{
+			EnemyCharacter->Stomp();
+		}
+	}
+
+}
+
 void UMinerAnimInstance::AnimNotify_ReturnToIdle()
 {
 	if (GetWorld()->HasBegunPlay())
 	{
-		//UE_LOG()
-		//MarkedToReturnToIdleState
 		if (EnemyCharacter)
 		{
 			if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(TryGetPawnOwner()->GetController())->GetBrainComponent()->GetBlackboardComponent())

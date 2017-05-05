@@ -3,18 +3,18 @@
 #pragma once
 
 #include "BehaviorTree/BTTaskNode.h"
-#include "BTTask_BounterHunterAttack.generated.h"
+#include "BTTask_BountyHunterAttack.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class LONEWOLF_API UBTTask_BounterHunterAttack : public UBTTaskNode
+class LONEWOLF_API UBTTask_BountyHunterAttack : public UBTTaskNode
 {
 	GENERATED_BODY()
 
 public:
-	UBTTask_BounterHunterAttack();
+	UBTTask_BountyHunterAttack();
 
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
