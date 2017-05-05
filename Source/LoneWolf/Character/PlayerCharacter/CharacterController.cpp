@@ -409,7 +409,7 @@ void ACharacterController::OnMouseMove(float scale)
 				
 				//if (GetMovementComponent()->GetLastInputVector() == FVector::ZeroVector)
 				{
-					GetMesh()->SetRelativeRotation(FMath::RInterpTo(GetMesh()->RelativeRotation, FRotator(0.f, NewYaw, 0.f), GetWorld()->GetDeltaSeconds(), TurnRate));
+					//GetMesh()->SetRelativeRotation(FMath::RInterpTo(GetMesh()->RelativeRotation, FRotator(0.f, NewYaw, 0.f), GetWorld()->GetDeltaSeconds(), TurnRate));
 				}
 				//
 

@@ -55,6 +55,8 @@ protected:
 	// Returns true if the actor's Status Effects is a 'hardCC'. Defined in Design Document
 	virtual bool bIsHardCC() override;
 
+	virtual void Die() override;
+
 	virtual AWeapon* EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip) override;
 	//virtual void EquipWeapon(TSubclassOf<AWeapon> WeaponToEquip);
 	virtual void SetStatusEffect(CharacterState::StatusEffect NewStatusEffect);
@@ -80,6 +82,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	float AttackRange;
+
+	UPROPERTY(EditDefaultsOnly)
+	float DespawnTimer;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enum)
 	EState EnemyState;

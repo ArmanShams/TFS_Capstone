@@ -19,10 +19,10 @@ public:
 
 protected:
 	UFUNCTION()
-	virtual void AnimNotify_MeleeAtkStart();
+	virtual void AnimNotify_MeleeAttackStart();
 
 	UFUNCTION()
-	virtual void AnimNotify_MeleeAtkEnd();
+	virtual void AnimNotify_MeleeAttackEnd();
 
 	UFUNCTION()
 	virtual void AnimNotify_ChargeEnd();
@@ -33,13 +33,19 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bCanAttack;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool bIsDead;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool bIsInHardCC;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool bIsInSoftCC;
 
 	UPROPERTY(BlueprintReadOnly)
 	MinerState CurrentMinerState;
 
 	CharacterState::StatusEffect Effects;
 	
-	class AEnemy* EnemyCharacter;
+	class AMinerAI* EnemyCharacter;
 
 	friend class AEnemy;
 	friend class AMinerAI;
