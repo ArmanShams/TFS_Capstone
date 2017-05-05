@@ -12,7 +12,8 @@ UENUM(BlueprintType)
 enum class MinerState : uint8
 {
 	IDLE			UMETA(DisplayName = "Idle"),
-	READYING		UMETA(DisplayName = "PreparingCharge"),
+	READYINGCHARGE	UMETA(DisplayName = "PreparingCharge"),
+	READYINGSTOMP	UMETA(DisplayName = "PreparingStomp"),
 	CHARGING		UMETA(DisplayName = "Charging"),
 	ATTACKING		UMETA(DisplayName = "Attacking")
 };
@@ -80,6 +81,7 @@ public:
 protected:
 	virtual bool bIsSoftCC() override;
 	virtual bool bIsHardCC() override;
+	virtual void Die() override;
 	//virtual void EquipWeapon(TSubclassOf<AWeapon> WeaponToEquip) override;
 	virtual AWeapon* EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip) override;
 	virtual void StartCharge();

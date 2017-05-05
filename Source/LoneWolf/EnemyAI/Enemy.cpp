@@ -28,6 +28,8 @@ AEnemy::AEnemy()
 
 	AttackRange = 150.0f;
 
+	DespawnTimer = 2.2f;
+
 	ConstructorHelpers::FClassFinder<AWeapon>WeaponAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/KnifeBP_Arman.KnifeBP_Arman_C'"));
 
 	if (WeaponAsset.Class)
@@ -88,11 +90,15 @@ float AEnemy::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEv
 
 	if (NewHealth <= 0.f)
 	{
-		if (CurrentlyEquippedWeapon != NULL)
+		Die();
+		if (AAIController* AIController = Cast<AAIController>(GetController()))
 		{
-			CurrentlyEquippedWeapon->SetLifeSpan(0.1f);
+			if (UBrainComponent* BrainComponent = AIController->GetBrainComponent())
+			{
+				BrainComponent->StopLogic(FString("An enemy died, stopping logic."));
+				GetCapsuleComponent()->SetCollisionProfileName(FName("NoCollision"));
+			}
 		}
-		SetLifeSpan(0.1f);
 	}
 
 	return Health;
@@ -212,6 +218,16 @@ bool AEnemy::bIsHardCC()
 	//	return false;
 	//	break;
 	//}
+}
+
+void AEnemy::Die()
+{
+	Super::Die();
+	if (CurrentlyEquippedWeapon != NULL)
+	{
+		CurrentlyEquippedWeapon->SetLifeSpan(DespawnTimer);
+	}
+	SetLifeSpan(DespawnTimer);
 }
 
 void AEnemy::Destroyed()

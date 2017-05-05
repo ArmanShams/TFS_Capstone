@@ -8,7 +8,7 @@
 
 AWeapon_Melee::AWeapon_Melee()
 {
-	RootComponent = MeshComponent;
+	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("ColliderComponent"));	
 
 }
@@ -18,7 +18,8 @@ void AWeapon_Melee::BeginPlay()
 	Super::BeginPlay();
 
 	CapsuleComponent->SetRelativeLocation(FVector::ZeroVector);
-	CapsuleComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	CapsuleComponent->AttachToComponent(MeshComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	MeshComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	CapsuleComponent->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnMeleeWeaponOverlapBegin);
 
 	TimeSinceLastFire = 0.f;

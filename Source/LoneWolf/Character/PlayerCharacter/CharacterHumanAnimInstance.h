@@ -50,6 +50,8 @@ protected:
 	void AnimNotify_EndPrimaryFire();
 
 
+
+
 	class ACharacterController* CharacterController;
 
 	friend class ACharacterController;

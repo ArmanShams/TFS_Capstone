@@ -55,7 +55,7 @@ AMinerAI::AMinerAI()
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnComponentBeginOverlap);
 
 	// Replace with new weapon asset for respective enemy type.
-	ConstructorHelpers::FClassFinder<AWeapon>WeaponAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/KnifeBP_Arman.KnifeBP_Arman_C'"));
+	ConstructorHelpers::FClassFinder<AWeapon>WeaponAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/Miner/MinerPickAxe.MinerPickAxe_C'"));
 
 	if (WeaponAsset.Class)
 	{
@@ -104,7 +104,7 @@ void AMinerAI::Tick(float DeltaSeconds)
 		//GetMesh()->SetWorldRotation(FRotator(GetMesh()->GetComponentRotation().Pitch, MeshYawOffSet, GetMesh()->GetComponentRotation().Roll));
 
 		break;
-	case MinerState::READYING:
+	case MinerState::READYINGCHARGE:
 			if (AActor* ValidTarget = Cast<AActor>(Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent()->GetValueAsObject(TEXT("Target"))))
 			{
 				FRotator CurrentRotation = GetActorRotation();
@@ -132,14 +132,17 @@ void AMinerAI::Tick(float DeltaSeconds)
 					}
 				}
 			}
-			if (StompDecalActor != NULL)
-			{
+			
+		break;
+	case MinerState::READYINGSTOMP:
+		if (StompDecalActor != NULL)
+		{
 
-			}
+		}
 		break;
 	case MinerState::CHARGING:
 		GetMovementComponent()->AddInputVector(GetActorForwardVector() * ChargeSpeed);
-		
+
 		break;
 	case MinerState::ATTACKING:
 
@@ -226,6 +229,23 @@ bool AMinerAI::bIsHardCC()
 	return Super::bIsHardCC();
 }
 
+void AMinerAI::Die()
+{
+	if (ArrowDecalActor != NULL)
+	{
+		ArrowDecalActor->SetOwner(NULL);
+		ArrowDecalActor->SetLifeSpan(0.001f);
+		ArrowDecalActor = NULL;
+	}
+	if (StompDecalActor != NULL)
+	{
+		StompDecalActor->SetOwner(NULL);
+		StompDecalActor->SetLifeSpan(0.001f);
+		StompDecalActor = NULL;
+	}
+	Super::Die();
+}
+
 bool AMinerAI::GetBTIsInRange()
 {
 	if (HasActorBegunPlay() && CurrentState == MinerState::ATTACKING)
@@ -244,7 +264,9 @@ MinerState AMinerAI::GetMinerState()
 AWeapon* AMinerAI::EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip)
 {
 	CurrentlyEquippedWeapon = Super::EquipNewWeapon(WeaponToEquip);
-	//CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("hand_r"));
+	CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("hand_r"));
+	CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(14.3f, -32.f,-25.f));
+	CurrentlyEquippedWeapon->SetActorRelativeLocation(FVector(-11.364f, 5.825f, 6.f));
 	return CurrentlyEquippedWeapon;
 	//CurrentlyEquippedWeapon->SetActorLocation(GetMesh()->GetSocketLocation(FName("hand_r")));
 	//CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(30.f, -90.f, 90.f));
@@ -260,7 +282,7 @@ void AMinerAI::StartCharge()
 		ArrowDecalActor->SetOwner(this);
 		//ArrowDecalActor->SetLifeSpan(ChargeCooldown);
 		Effects = CharacterState::INTERRUPTABLE;
-		CurrentState = MinerState::READYING;
+		CurrentState = MinerState::READYINGCHARGE;
 		Cast<UCharacterMovementComponent>(GetMovementComponent())->MaxWalkSpeed = ChargeSpeed;
 	}
 }
@@ -303,7 +325,7 @@ void AMinerAI::StartStomp()
 		StompDecalActor->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform);
 		StompDecalActor->SetOwner(this);
 		Effects = CharacterState::INTERRUPTABLE;
-		CurrentState = MinerState::READYING;
+		CurrentState = MinerState::READYINGSTOMP;
 	}
 }
 
@@ -344,18 +366,7 @@ CharacterState::StatusEffect AMinerAI::GetStatusEffect()
 
 void AMinerAI::Destroyed()
 {
-	if (ArrowDecalActor != NULL)
-	{
-		ArrowDecalActor->SetOwner(NULL);
-		ArrowDecalActor->SetLifeSpan(0.001f);
-		ArrowDecalActor = NULL;
-	}
-	if (StompDecalActor != NULL)
-	{
-		StompDecalActor->SetOwner(NULL);
-		StompDecalActor->SetLifeSpan(0.001f);
-		StompDecalActor = NULL;
-	}
+	
 	Super::Destroyed();
 }
 

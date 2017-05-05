@@ -22,22 +22,26 @@ void UMinerAnimInstance::NativeInitializeAnimation()
 
 void UMinerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
-	
-	Super::NativeUpdateAnimation(DeltaSeconds);
-
 	if (GetWorld()->HasBegunPlay())
 	{
+		Super::NativeUpdateAnimation(DeltaSeconds);
+
+		//AMinerAI* RecastEnemy = Cast<AMinerAI>(TryGetPawnOwner())
+			
 		EnemyCharacter = Cast<AMinerAI>(TryGetPawnOwner());
 
-		if (EnemyCharacter)
+		if (EnemyCharacter != NULL)
 		{
-			CurrentMinerState = Cast<AMinerAI>(EnemyCharacter)->GetMinerState();
-			bCanAttack = Cast<AMinerAI>(EnemyCharacter)->GetBTIsInRange();
+			CurrentMinerState = EnemyCharacter->GetMinerState();
+			bCanAttack = EnemyCharacter->GetBTIsInRange();
+			bIsDead = EnemyCharacter->Health <= 0.f;
+			bIsInHardCC = EnemyCharacter->bIsInHardCC;
+			bIsInSoftCC = EnemyCharacter->bIsInSoftCC;
 		}
 	}
 }
 
-void UMinerAnimInstance::AnimNotify_MeleeAtkStart()
+void UMinerAnimInstance::AnimNotify_MeleeAttackStart()
 {
 	if (GetWorld()->HasBegunPlay())
 	{
@@ -50,7 +54,7 @@ void UMinerAnimInstance::AnimNotify_MeleeAtkStart()
 	}
 }
 
-void UMinerAnimInstance::AnimNotify_MeleeAtkEnd()
+void UMinerAnimInstance::AnimNotify_MeleeAttackEnd()
 {
 	if (GetWorld()->HasBegunPlay())
 	{
