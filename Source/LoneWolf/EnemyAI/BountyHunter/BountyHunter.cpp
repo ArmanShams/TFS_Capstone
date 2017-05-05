@@ -37,7 +37,7 @@ ABountyHunter::ABountyHunter()
 		DefaultWeapon = (UClass*)WeaponAsset.Class;
 	}
 
-	ConstructorHelpers::FClassFinder<ABearTrap>TrapAsset(TEXT("Blueprint'/Game/Blueprints/Enemies/BountyHunterAI/BearTrapBP.BearTrapBP_C'"));
+	ConstructorHelpers::FClassFinder<ABearTrap>TrapAsset(TEXT("Blueprint'/Game/Blueprints/Enemies/BountyHunter/BearTrapBP.BearTrapBP_C'"));
 	if (TrapAsset.Class)
 	{
 		//UE_LOG(LogTemp, Display, TEXT("Found the trap."));
