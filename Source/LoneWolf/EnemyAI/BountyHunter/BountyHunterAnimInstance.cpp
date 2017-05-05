@@ -4,20 +4,27 @@
 #include "EnemyAI/BountyHunter/BountyHunter.h"
 #include "BountyHunterAnimInstance.h"
 
+void UBountyHunterAnimInstance::NativeInitializeAnimation()
+{
+
+}
+
 void UBountyHunterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
 	if (GetWorld()->HasBegunPlay())
 	{
-		BountyHunter = Cast<ABountyHunter>(TryGetPawnOwner());
+		BountyHunterClass = Cast<ABountyHunter>(TryGetPawnOwner());
 
-		if (BountyHunter)
+		if (BountyHunterClass)
 		{
-			if (BountyHunter->bIsInRange())
+			//CurrentBountyHunterState = BountyHunterClass->CurrentState;
+
+			if (BountyHunterClass->bIsInRange())
 			{
-				if (BountyHunter->GetEquippedWeapon()->CanFire())
+				if (BountyHunterClass->GetEquippedWeapon()->CanFire())
 				{
-					if (bool t = BountyHunter->bCanTriggerRecoilAnimation())
+					if (bool t = BountyHunterClass->bCanTriggerRecoilAnimation())
 					{
 						bCanBasicAttack = t;
 					}
@@ -26,7 +33,7 @@ void UBountyHunterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 						bCanBasicAttack = false;
 					}
 				}
-				else if(AWeapon_Ranged* RecastWeapon = Cast<AWeapon_Ranged>(BountyHunter->GetEquippedWeapon()))
+				else if(AWeapon_Ranged* RecastWeapon = Cast<AWeapon_Ranged>(BountyHunterClass->GetEquippedWeapon()))
 				{
 					RecastWeapon->Reload();
 				}
@@ -39,8 +46,8 @@ void UBountyHunterAnimInstance::AnimNotify_Shoot()
 {
 	if (GetWorld()->HasBegunPlay())
 	{
-		BountyHunter->GetEquippedWeapon()->Fire();
-		BountyHunter->SetBountyHunterState(BounterHunterState::IDLE);
+		BountyHunterClass->GetEquippedWeapon()->Fire();
+		BountyHunterClass->SetBountyHunterState(BountyHunterState::IDLE);
 	}
 }
 

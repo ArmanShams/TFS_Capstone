@@ -28,7 +28,7 @@ ABountyHunter::ABountyHunter()
 	AttackRange = 3000.0f;
 	MaximumTrapsAllowed = 3;
 	bPlayRecoilAnimation = false;
-	CurrentState = BounterHunterState::IDLE;
+	CurrentState = BountyHunterState::IDLE;
 
 	ConstructorHelpers::FClassFinder<AWeapon>WeaponAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/Weapon_RifleBP.Weapon_RifleBP_C'"));
 	if (WeaponAsset.Class)
@@ -58,13 +58,14 @@ void ABountyHunter::Tick(float DeltaTime)
 	{
 		bPlayRecoilAnimation = false;
 	}
+
 	if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
 	{
 		BlackboardComponent->SetValueAsBool(TEXT("IsHardCC"), bIsInHardCC);
 		BlackboardComponent->SetValueAsBool(TEXT("IsSoftCC"), bIsInSoftCC);
 		BlackboardComponent->SetValueAsBool(TEXT("bCanAttackTarget"), bIsInRange());
 
-		if (CurrentState == BounterHunterState::READYINGATTACK && CurrentlyEquippedWeapon != NULL)
+		if (CurrentState == BountyHunterState::AIMING && CurrentlyEquippedWeapon != NULL)
 		{
 			if (BlackboardComponent->GetValueAsObject(TEXT("Target")) != NULL)
 			{
@@ -92,15 +93,6 @@ void ABountyHunter::Tick(float DeltaTime)
 			}
 		}
 	}
-
-
-	/*if (bIsInRange())
-	{
-		if (CurrentlyEquippedWeapon != NULL)
-		{
-			CurrentlyEquippedWeapon->Fire();
-		}
-	}*/
 }
 
 float ABountyHunter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
@@ -161,7 +153,6 @@ bool ABountyHunter::bIsHardCC()
 void ABountyHunter::Destroyed()
 {
 	// Any actors spawned by this that need to be destroyed/cleaned up should be done so here before Super::Destroyed() is called.
-
 	Super::Destroyed();
 }
 
@@ -171,7 +162,7 @@ bool ABountyHunter::bCanTriggerRecoilAnimation()
 	return bPlayRecoilAnimation;
 }
 
-void ABountyHunter::SetBountyHunterState(BounterHunterState NewState)
+void ABountyHunter::SetBountyHunterState(BountyHunterState NewState)
 {
 	CurrentState = NewState;
 }
@@ -222,13 +213,18 @@ void ABountyHunter::OnActorBeginOverlap(UPrimitiveComponent * OverlappedComp, AA
 	}
 }
 
+void ABountyHunter::Aim()
+{
+	CurrentState = BountyHunterState::AIMING;
+}
+
 void ABountyHunter::Attack()
 {
 	if (CurrentlyEquippedWeapon != NULL)
 	{
 		if (CurrentlyEquippedWeapon->CanFire())
 		{
-			CurrentState = BounterHunterState::READYINGATTACK;
+			CurrentState = BountyHunterState::ATTACKING;
 			bPlayRecoilAnimation = true;
 		}
 		/*

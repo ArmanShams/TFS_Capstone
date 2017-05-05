@@ -5,14 +5,11 @@
 #include "EnemyAI/Enemy.h"
 #include "BountyHunter.generated.h"
 
-/**
- * 
- */
 UENUM(BlueprintType)
-enum class BounterHunterState : uint8
+enum class BountyHunterState : uint8
 {
 	IDLE			UMETA(DisplayName = "Idle"),
-	READYINGATTACK	UMETA(DisplayName = "PreparingToAttack"),
+	AIMING			UMETA(DisplayName = "Aiming"),
 	ATTACKING		UMETA(DisplayName = "Attacking")
 };
 
@@ -37,7 +34,7 @@ public:
 	virtual bool GetbIsInSoftCC() override;
 	virtual void Destroyed() override;
 	virtual bool bCanTriggerRecoilAnimation();
-	virtual void SetBountyHunterState(BounterHunterState NewState);
+	virtual void SetBountyHunterState(BountyHunterState NewState);
 
 protected:
 	// Returns true if the actor's Status Effects is a 'softCC'. Defined in Design Document
@@ -52,12 +49,12 @@ protected:
 	UFUNCTION()
 	void OnActorBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+	virtual void Aim();
 	virtual void Attack();
-
 	virtual void EquipWeapon(TSubclassOf<AWeapon> WeaponToEquip);
 
-
 	bool bPlayRecoilAnimation;
+
 	UPROPERTY(EditDefaultsOnly)
 	uint8 MaximumTrapsAllowed;
 
@@ -65,11 +62,12 @@ protected:
 	ABearTrap* BearTrapPlaced;
 
 	TArray<AActor*> TrapArray;
-	BounterHunterState CurrentState;
 
+	BountyHunterState CurrentState;
 
 	friend class ABearTrap;
-	friend class UBTTask_BounterHunterAttack;
-
+	friend class UBTTask_BountyHunterAttack;
+	friend class UBTTask_BountyHunterAim;
+	friend class UBountyHunterAnimInstance;
 
 };
