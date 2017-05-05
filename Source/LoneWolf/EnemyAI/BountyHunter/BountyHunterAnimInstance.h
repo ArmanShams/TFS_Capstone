@@ -5,30 +5,38 @@
 #include "Animation/AnimInstance.h"
 #include "BountyHunterAnimInstance.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class LONEWOLF_API UBountyHunterAnimInstance : public UAnimInstance
 {
 	GENERATED_BODY()
-	
-
 
 public:
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	// Speed of the Bounty Hunter.
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float speed;
+	// If true, Bounty Hunter is dead. If false, is alive.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	bool isDead;
+	bool bIsDead;
+	// If true, Bounty Hunter is aiming.
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool bIsAiming;
+	// If true, player is in basic attack range for the Bounty Hunter to shoot.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bCanBasicAttack;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool bIsBasicAttack;
+	// If true, Bounty Hunter can set a trap at it's location.
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bCanSetTrap;
+	// Rotator for the mesh.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FRotator LookAtRotation;
+	// If true, Bounty Hunter is in hard crowd control.
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool bIsHardCC;
 
 protected:
 	UFUNCTION()
@@ -37,11 +45,7 @@ protected:
 	UFUNCTION()
 	void AnimNotify_PlaceTrap();
 
-
-
 	class ABountyHunter* BountyHunter;
 
 	friend class ABountyHunter;
-	
-	
 };
