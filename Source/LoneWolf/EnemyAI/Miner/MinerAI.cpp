@@ -63,14 +63,14 @@ AMinerAI::AMinerAI()
 		DefaultWeapon = (UClass*)WeaponAsset.Class;
 	}
 	// Get the arrow to be projected on the ground.
-	ConstructorHelpers::FClassFinder<AActor>DecalArrowActor(TEXT("Blueprint'/Game/Blueprints/Enemies/Miner/MinerVisualTelegraph_ChargeBP.MinerVisualTelegraph_ChargeBP_C'"));
+	ConstructorHelpers::FClassFinder<AActor>DecalArrowActor(TEXT("Blueprint'/Game/Blueprints/Enemies/MinerAI/MinerVisualTelegraph_ChargeBP.MinerVisualTelegraph_ChargeBP_C'"));
 	if (DecalArrowActor.Class)
 	{
 		//UE_LOG(LogTemp, Display, TEXT("WE HAVE FOUND THE ARROW CLASS"));
 		ArrowDecalClass = (UClass*)DecalArrowActor.Class;
 	}
 	
-	ConstructorHelpers::FClassFinder<AActor>DecalCircleActor(TEXT("Blueprint'/Game/Blueprints/Enemies/Miner/MinerVisualTelegraph_StompBP.MinerVisualTelegraph_StompBP_C'"));
+	ConstructorHelpers::FClassFinder<AActor>DecalCircleActor(TEXT("Blueprint'/Game/Blueprints/Enemies/MinerAI/MinerVisualTelegraph_StompBP.MinerVisualTelegraph_StompBP_C'"));
 	if (DecalCircleActor.Class)
 	{
 		//UE_LOG(LogTemp, Display, TEXT("WE HAVE FOUND THE ARROW CLASS"));
@@ -341,7 +341,7 @@ void AMinerAI::Stomp()
 		{
 			TArray<FOverlapResult> HitResult;
 			GetWorld()->OverlapMultiByObjectType(HitResult, GetActorLocation(), FQuat::Identity, FCollisionObjectQueryParams(FCollisionObjectQueryParams::InitType::AllDynamicObjects), FCollisionShape::MakeSphere(StompRadius), FCollisionQueryParams());
-			DrawDebugSphere(GetWorld(), GetActorLocation(), StompRadius, 32, FColor::Red, false, 1.5f);
+			//DrawDebugSphere(GetWorld(), GetActorLocation(), StompRadius, 32, FColor::Red, false, 1.5f);
 			for (size_t i = 0; i < HitResult.Num(); i++)
 			{
 				if (ALoneWolfCharacter* RecastedResult = Cast<ALoneWolfCharacter>(HitResult[i].GetActor()))
@@ -351,7 +351,6 @@ void AMinerAI::Stomp()
 						RecastedResult->AddStatusEffect(UStatusEffect_HardCrowdControl::StaticClass(), false, StompStunDuration, 0.f, this);
 					}
 				}
-			
 			}
 		}
 		Effects = CharacterState::NONE;

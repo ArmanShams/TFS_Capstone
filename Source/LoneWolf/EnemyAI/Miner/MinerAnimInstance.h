@@ -28,6 +28,9 @@ protected:
 	virtual void AnimNotify_ChargeEnd();
 
 	UFUNCTION()
+	virtual void AnimNotify_Stomp();
+
+	UFUNCTION()
 	virtual void AnimNotify_ReturnToIdle();
 
 
