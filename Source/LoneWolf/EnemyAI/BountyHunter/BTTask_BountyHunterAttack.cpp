@@ -22,6 +22,7 @@ EBTNodeResult::Type UBTTask_BountyHunterAttack::ExecuteTask(UBehaviorTreeCompone
 	return Super::ExecuteTask(OwnerComp, NodeMemory);
 }
 
+EBTNodeResult::Type UBTTask_BountyHunterAttack::AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	return Super::AbortTask(OwnerComp, NodeMemory);
 }
