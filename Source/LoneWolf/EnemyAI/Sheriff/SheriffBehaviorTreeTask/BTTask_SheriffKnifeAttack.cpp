@@ -12,9 +12,9 @@ UBTTask_SheriffKnifeAttack::UBTTask_SheriffKnifeAttack()
 EBTNodeResult::Type UBTTask_SheriffKnifeAttack::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	UBehaviorTreeComponent* BehaviorTree = &OwnerComp;
-	if (ASheriffAI* Controller = Cast<ASheriffAI>(BehaviorTree->GetAIOwner()))
+	if (ASheriffAIController* Controller = Cast<ASheriffAIController>(BehaviorTree->GetAIOwner()))
 	{
-		// Cast<ASheriffAI>(Controller->GetPawn())->KnifeAttack();
+		Cast<ASheriffAI>(Controller->GetPawn())->SwingKnife();
 	}
 	return Super::ExecuteTask(OwnerComp, NodeMemory);
 }

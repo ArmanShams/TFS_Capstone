@@ -11,12 +11,10 @@ class LONEWOLF_API UBTTask_SheriffRevolverAttack : public UBTTaskNode
 	GENERATED_BODY()
 public:
 	UBTTask_SheriffRevolverAttack();
-	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
-
-private:
-	virtual EBTNodeResult::Type AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
-
-protected:
-	friend class ASheriffAI;
+//	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
+//private:
+//	virtual EBTNodeResult::Type AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
+//protected:
+//	friend class ASheriffAI;
 
 };

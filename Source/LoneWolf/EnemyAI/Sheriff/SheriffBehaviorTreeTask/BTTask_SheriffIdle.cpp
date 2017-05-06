@@ -12,9 +12,9 @@ UBTTask_SheriffIdle::UBTTask_SheriffIdle()
 EBTNodeResult::Type UBTTask_SheriffIdle::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	UBehaviorTreeComponent* BehaviorTree = &OwnerComp;
-	if (ASheriffAI* Controller = Cast<ASheriffAI>(BehaviorTree->GetAIOwner()))
+	if (ASheriffAIController* Controller = Cast<ASheriffAIController>(BehaviorTree->GetAIOwner()))
 	{
-		// Cast<ASheriffAI>(Controller->GetPawn())->SetMinerState(MinerState::IDLE);
+		Cast<ASheriffAI>(Controller->GetPawn())->SetSheriffState(SheriffState::IDLE);
 	}
 	return Super::ExecuteTask(OwnerComp, NodeMemory);
 }

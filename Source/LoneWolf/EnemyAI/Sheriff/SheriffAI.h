@@ -34,7 +34,7 @@ public:
 	virtual void AddStatusEffect(TSubclassOf<class UStatusEffectBase> ClassToCreateFrom, bool bShouldPerformTickAction, bool bShouldDealDamage, float LifeTime, float DamageToDeal, float TickRate, ALoneWolfCharacter* CharacterThatInflictedStatusEffect) override;
 
 	virtual class AWeapon* EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip) override;
-	virtual AWeapon* GetEquippedWeapon();
+	virtual AWeapon* GetEquippedWeapon() override;
 
 	virtual bool bIsInRange();
 	virtual bool bIsInRange(float OveriddenDesiredRange);
@@ -83,9 +83,10 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 		float LassoAttackRange;
 
-	void SwingKnife();
-	void ShootRevolver();
 	void Lasso();
+	void Shoot();
+	void Casting();
+	void SwingKnife();
 
 	TSubclassOf<AWeapon> KnifeWeapon;
 	TSubclassOf<AWeapon> RevolverWeapon;
@@ -105,5 +106,5 @@ protected:
 	friend class UBTTask_SheriffLasso;
 	friend class UBTTask_SheriffCasting;
 	friend class UBTTask_SheriffKnifeAttack;
-	friend class UBTTask_SheriffRevolverAttack;
+	friend class UBTTask_SheriffShotgunAttack;
 };
