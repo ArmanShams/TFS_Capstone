@@ -23,6 +23,7 @@ ACharacterController::ACharacterController()
 	RollSpeed = 400.f;
 	Health = 100.f;
 	Rage = 0.f;
+	AimOffsetYaw = 0.f;
 	RageDrainPerSecond = 4.f;
 	TurnRate = 0.25f;
 	bIsRolling = false;
@@ -405,7 +406,9 @@ void ACharacterController::OnMouseMove(float scale)
 				PlayerController->ProjectWorldLocationToScreen(GetMesh()->GetComponentLocation(), CenterPoint);
 
 				FVector Diff = FVector(MousePosition.X - CenterPoint.X, MousePosition.Y - CenterPoint.Y, 0.f);
-				float NewYaw = Diff.Rotation().Yaw;
+
+				//GetMesh()->GetSocketRotation()
+				AimOffsetYaw = Diff.Rotation().Yaw;
 				
 				//if (GetMovementComponent()->GetLastInputVector() == FVector::ZeroVector)
 				{

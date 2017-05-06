@@ -22,6 +22,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float AnimMovementDirection;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float AimOffsetYaw;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bPrimaryFire;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bSecondaryFiring;
