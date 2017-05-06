@@ -79,5 +79,5 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, U
 			UGameplayStatics::ApplyDamage(OtherActor, Damage, RecastedOwner->GetController(), Owner, TSubclassOf<UDamageType>());
 		}
 	}
-	SetLifeSpan(0.1f);
+	this->Destroy();
 }

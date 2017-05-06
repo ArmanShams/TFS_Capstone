@@ -98,6 +98,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character")
 	float AimSnapRadius;
 	float Rage;
+	float AimOffsetYaw;
 	float AnimMovementSpeed;
 	float AnimMovementDirection;
 

@@ -4,6 +4,8 @@
 #include "LoneWolf.h"
 #include "Enemy.h"
 #include "AIController.h"
+#include "Perception/AIPerceptionComponent.h"
+#include "Perception/AISense.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyAllTypes.h"
 #include "BrainComponent.h"
@@ -81,7 +83,10 @@ float AEnemy::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEv
 		float RageGeneratedFromDamage = DamageAmount * 1.8f;
 
 		player->AddRage(RageGeneratedFromDamage);
-
+		if (AAIController* Controller = Cast<AAIController>(GetController()))
+		{
+			Controller->GetBrainComponent()->GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), Cast<AActor>(player));
+		}
 		if (NewHealth <= 0.f)
 		{
 			player->AddRage(RageGeneratedFromDamage * 2.0f);

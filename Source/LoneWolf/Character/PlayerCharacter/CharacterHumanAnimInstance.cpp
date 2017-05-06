@@ -31,7 +31,7 @@ void UCharacterHumanAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 			AnimMovementSpeed = CharacterController->AnimMovementSpeed * 600.f;
 			AnimMovementDirection = CharacterController->AnimMovementDirection * 150.f;
-
+			AimOffsetYaw = CharacterController->AimOffsetYaw;
 			if (bPrimaryFire)
 			{
 				CharacterController->bAnimPrimaryFire = bPrimaryFire;
