@@ -131,11 +131,7 @@ void ASheriffAI::Tick(float DeltaSeconds)
 		}
 		break;
 	case SheriffState::LASSO:
-		CurrentlyEquippedWeapon = GetEquippedWeapon();
-		if (CurrentlyEquippedWeapon->GetClass() != LassoWeapon)
-		{
-			EquipNewWeapon(LassoWeapon);
-		}
+
 		//if (bIsInRange(LassoAttackRange))
 		//{
 		//}
@@ -243,45 +239,48 @@ void ASheriffAI::Lasso()
 	SetSheriffState(SheriffState::LASSO);
 	UE_LOG(LogTemp, Display, TEXT("Sheriff is trying to use lasso"));
 
-	if (DefaultWeapon = LassoWeapon)
-	{
-		UE_LOG(LogTemp, Display, TEXT("Sheriff is using the lasso ability"));
-	}	
+	CurrentlyEquippedWeapon = GetEquippedWeapon();
+	//if (CurrentlyEquippedWeapon->GetClass() != LassoWeapon)
+	//{
+	//	UE_LOG(LogTemp, Display, TEXT("Sheriff is using the lasso ability"));
+	//	EquipNewWeapon(LassoWeapon);
+	//}
+		
 	//if (DefaultWeapon = LassoWeapon)
 	//{
-	//	if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
-	//	{
-	//		if (BlackboardComponent->GetValueAsObject(TEXT("Target")) != NULL)
-	//		{
-	//			if (ACharacterController* PlayerReference = Cast<ACharacterController>(BlackboardComponent->GetValueAsObject(TEXT("Target"))))
-	//			{
-	//				UE_LOG(LogTemp, Display, TEXT("Sheriff tried to lasso the player"));
+	if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
+	{
+		if (BlackboardComponent->GetValueAsObject(TEXT("Target")) != NULL)
+		{
+			if (ACharacterController* PlayerReference = Cast<ACharacterController>(BlackboardComponent->GetValueAsObject(TEXT("Target"))))
+			{
+				// UE_LOG(LogTemp, Display, TEXT("Sheriff tried to lasso the player"));
 
-	//				CurrentLocation = GetActorLocation();
-	//				PlayerLocation = PlayerReference->GetActorLocation();
-	//				DistanceToPlayer = FVector::Dist(CurrentLocation, PlayerLocation);
+				CurrentLocation = GetActorLocation();
+				PlayerLocation = PlayerReference->GetActorLocation();
+				DistanceToPlayer = FVector::Dist(CurrentLocation, PlayerLocation);
 
-	//				 If the player gets pulled into the Sheriff's knife attack range, he will let go of the rope to swing his knife
-	//				CushionSpace = KnifeAttackRange;
+				//If the player gets pulled into the Sheriff's knife attack range, he will let go of the rope to swing his knife
+					CushionSpace = KnifeAttackRange;
 
-	//				if (DistanceToPlayer > CushionSpace)
-	//				{
-	//					LassoCableComponent->CableLength = LassoLength;
-	//					LassoCableComponent->SetAttachEndTo(PlayerReference, GetMesh()->GetSocketBoneName("pelvis"));
-	//					FVector PullDirecton = PullingVelocity * (PlayerReference->GetActorLocation() - GetActorLocation());
-	//					PlayerReference->GetMovementComponent()->AddInputVector(PullDirecton);
+				if (DistanceToPlayer > CushionSpace)
+				{
+					LassoCableComponent->CableLength = LassoLength;
+					LassoCableComponent->SetAttachEndTo(PlayerReference, GetMesh()->GetSocketBoneName("pelvis"));
+					FVector PullDirecton = PullingVelocity * (PlayerReference->GetActorLocation() - GetActorLocation());
+					PlayerReference->GetMovementComponent()->AddInputVector(PullDirecton);
 
-	//					AddStatusEffect(UStatusEffect_SoftCrowdControl::StaticClass(), false, 2.f, 0.f, this);
-	//				}
+					AddStatusEffect(UStatusEffect_SoftCrowdControl::StaticClass(), false, 2.f, 0.f, this);
+				}
 
-	//				if (DistanceToPlayer < CushionSpace)
-	//				{
-	//					LassoCableComponent->SetAttachEndTo(this, GetMesh()->GetSocketBoneName("RightHand"));
-	//				}
-	//			}
-	//		}
-	//	}
-	//}
+				if (DistanceToPlayer < CushionSpace)
+				{
+					LassoCableComponent->SetAttachEndTo(this, GetMesh()->GetSocketBoneName("RightHand"));
+				}
+			}
+		}
+	}
+
 }
 
 AWeapon* ASheriffAI::EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip)
