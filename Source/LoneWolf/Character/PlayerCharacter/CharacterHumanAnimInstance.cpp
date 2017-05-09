@@ -28,7 +28,7 @@ void UCharacterHumanAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			bReloading = CharacterController->bShouldEnterReload;
 			bIsInHardCC = CharacterController->bIsInHardCC;
 			bIsInSoftCC = CharacterController->bIsInSoftCC;
-
+			CurrentForm = CharacterController->CurrentForm;
 			AnimMovementSpeed = CharacterController->AnimMovementSpeed * 600.f;
 			AnimMovementDirection = CharacterController->AnimMovementDirection * 150.f;
 			AimOffsetYaw = CharacterController->AimOffsetYaw;
@@ -86,6 +86,50 @@ void UCharacterHumanAnimInstance::AnimNotify_EndPrimaryFire()
 		{
 			bPrimaryFire = false;
 			CharacterController->bAnimPrimaryFire = bPrimaryFire;
+		}
+	}
+}
+
+void UCharacterHumanAnimInstance::AnimNotify_DisableInputAndMakeInvulnerable()
+{
+	if (GetWorld()->HasBegunPlay())
+	{
+		if (CharacterController != NULL)
+		{
+			CharacterController->RevokeControlAndBecomeInvulnerable();
+		}
+	}
+}
+
+void UCharacterHumanAnimInstance::AnimNotify_EnableInputAndRevokeInvulnerable()
+{
+	if (GetWorld()->HasBegunPlay())
+	{
+		if (CharacterController != NULL)
+		{
+			CharacterController->RestoreControlAndRevokeInvulnerable();
+		}
+	}
+}
+
+void UCharacterHumanAnimInstance::AnimNotify_ReplaceMesh()
+{
+	if (GetWorld()->HasBegunPlay())
+	{
+		if (CharacterController != NULL)
+		{
+			CharacterController->TransformIntoWolf();
+		}
+	}
+}
+
+void UCharacterHumanAnimInstance::RecenterMeshOnCursor()
+{
+	if (GetWorld()->HasBegunPlay())
+	{
+		if (CharacterController != NULL)
+		{
+			CharacterController->bRecenterMesh = true;
 		}
 	}
 }

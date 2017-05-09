@@ -59,7 +59,7 @@ FText UUIWidget::GetAmmoValue()
 	// Old method, doesn't support localization
 	//FString AmmoValue = FString::Printf(TEXT("Ammo: %i/%i"), PlayerWeapon->CurrentAmmo, PlayerWeapon->MagazineCapacity);
 	// New method, supports localization.
-	if (PlayerWeapon != NULL)
+	if (PlayerWeapon != NULL && Player->CurrentForm == TransformationState::HUMAN)
 	{
 		FFormatNamedArguments Arguments;
 		Arguments.Add("CurrentAmmo", FText::AsNumber(PlayerWeapon->CurrentAmmo));

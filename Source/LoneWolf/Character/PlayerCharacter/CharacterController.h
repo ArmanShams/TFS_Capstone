@@ -75,6 +75,10 @@ protected:
 	bool bEnterReloadAnimation();
 	void Reload();
 	virtual void Die() override;
+	virtual void TransformIntoWolf();
+	virtual void TransformIntoHuman();
+	virtual void RevokeControlAndBecomeInvulnerable();
+	virtual void RestoreControlAndRevokeInvulnerable();
 
 	bool bShouldEnterReload;
 	bool bShouldEnterRoll;
@@ -82,6 +86,7 @@ protected:
 	bool bAnimSecondaryFire;
 	bool bIsMeleeAttacking;
 	bool bIsRolling;
+	bool bRecenterMesh;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Camera")
 	float CameraArmDistance;
@@ -122,10 +127,19 @@ protected:
 	TSubclassOf<class UUserWidget> wDeadHud;
 
 
-
 	// Variable to store the widget after creating it.
 	class UUserWidget* InGameHud;
 	class UUserWidget* DeadHud;
+
+
+	// Animation classes
+	class UClass* WolfAnimationClass;
+	class UClass* HumanAnimationClass;
+
+	// Mesh assets
+	USkeletalMesh* WolfMesh;
+	USkeletalMesh* HumanMesh;
+
 
 	UPROPERTY(BlueprintReadOnly, Category = "PlayerTransformationState")
 	TransformationState CurrentForm;
