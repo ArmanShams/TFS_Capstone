@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Animation/AnimInstance.h"
+#include "Character/PlayerCharacter/CharacterController.h"
 #include "CharacterHumanAnimInstance.generated.h"
 
 /**
@@ -38,6 +39,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bIsInSoftCC;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TransformationState CurrentForm;
 
 	UFUNCTION()
 	void AnimNotify_Reload();
@@ -51,8 +54,18 @@ protected:
 	UFUNCTION()
 	void AnimNotify_EndPrimaryFire();
 
+	UFUNCTION()
+	void AnimNotify_DisableInputAndMakeInvulnerable();
+
+	UFUNCTION()
+	void AnimNotify_EnableInputAndRevokeInvulnerable();
+
+	UFUNCTION()
+	void AnimNotify_ReplaceMesh();
+
 	UFUNCTION(BlueprintCallable, category = "Mesh")
 	void RecenterMeshOnCursor();
+
 
 	class ACharacterController* CharacterController;
 

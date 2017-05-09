@@ -28,6 +28,8 @@ protected:
 	UFUNCTION()
 	void AnimNotify_MeleeAtkEnd();
 
+	UFUNCTION()
+	void EnterWolfState();
 
 	class ACharacterController* CharacterController;
 

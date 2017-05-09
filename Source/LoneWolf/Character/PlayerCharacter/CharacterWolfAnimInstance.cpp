@@ -56,3 +56,11 @@ void UCharacterWolfAnimInstance::AnimNotify_MeleeAtkEnd()
 	}
 }
 
+void UCharacterWolfAnimInstance::EnterWolfState()
+{
+	if (CharacterController != NULL)
+	{
+
+	}
+}
+
