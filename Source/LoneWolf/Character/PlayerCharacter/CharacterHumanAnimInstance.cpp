@@ -89,3 +89,14 @@ void UCharacterHumanAnimInstance::AnimNotify_EndPrimaryFire()
 		}
 	}
 }
+
+void UCharacterHumanAnimInstance::RecenterMeshOnCursor()
+{
+	if (GetWorld()->HasBegunPlay())
+	{
+		if (CharacterController != NULL)
+		{
+			CharacterController->bRecenterMesh = true;
+		}
+	}
+}

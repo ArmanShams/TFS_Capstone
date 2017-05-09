@@ -82,6 +82,7 @@ protected:
 	bool bAnimSecondaryFire;
 	bool bIsMeleeAttacking;
 	bool bIsRolling;
+	bool bRecenterMesh;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Camera")
 	float CameraArmDistance;

@@ -33,7 +33,7 @@ ACharacterController::ACharacterController()
 	bAnimSecondaryFire = false;
 	bIsInHardCC = false;
 	bIsInSoftCC = false;
-
+	bRecenterMesh = false;
 
 
 	AimSnapHalfHeight = 256.f;
@@ -410,12 +410,15 @@ void ACharacterController::OnMouseMove(float scale)
 				//GetMesh()->GetSocketRotation()
 				AimOffsetYaw = Diff.Rotation().Yaw;
 				
-				//if (GetMovementComponent()->GetLastInputVector() == FVector::ZeroVector)
+				if (bRecenterMesh)
 				{
-					//GetMesh()->SetRelativeRotation(FMath::RInterpTo(GetMesh()->RelativeRotation, FRotator(0.f, NewYaw, 0.f), GetWorld()->GetDeltaSeconds(), TurnRate));
+					//UE_LOG(LogTemp, Display, TEXT("Mesh relative rotation Yaw: %f, AimOffSetYaw: %f"), GetMesh()->RelativeRotation.Yaw, AimOffsetYaw);
+					GetMesh()->SetRelativeRotation(FMath::RInterpTo(GetMesh()->RelativeRotation, FRotator(0.f, AimOffsetYaw, 0.f), GetWorld()->GetDeltaSeconds(), TurnRate));
+					if (GetMesh()->RelativeRotation.Yaw <= AimOffsetYaw + 25.f && GetMesh()->RelativeRotation.Yaw >= AimOffsetYaw - 25.f)
+					{
+						bRecenterMesh = false;
+					}
 				}
-				//
-
 				// Only adjust gun position if the player isn't reloading.
 				if (!bShouldEnterReload)
 				{

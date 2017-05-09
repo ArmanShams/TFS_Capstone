@@ -51,8 +51,8 @@ protected:
 	UFUNCTION()
 	void AnimNotify_EndPrimaryFire();
 
-
-
+	UFUNCTION(BlueprintCallable, category = "Mesh")
+	void RecenterMeshOnCursor();
 
 	class ACharacterController* CharacterController;
 
