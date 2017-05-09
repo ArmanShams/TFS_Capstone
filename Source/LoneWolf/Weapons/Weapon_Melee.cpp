@@ -49,7 +49,7 @@ bool AWeapon_Melee::Fire()
 	return false;
 }
 
-bool AWeapon_Melee::Fire(AttackTypes::MeleeAttackType NewAttackType)
+bool AWeapon_Melee::Fire(UAttackTypes::MeleeAttackType NewAttackType)
 {
 	if (Fire())
 	{
@@ -68,7 +68,7 @@ bool AWeapon_Melee::AltFire()
 	return false;
 }
 
-bool AWeapon_Melee::AltFire(AttackTypes::MeleeAttackType NewAttackType)
+bool AWeapon_Melee::AltFire(UAttackTypes::MeleeAttackType NewAttackType)
 {
 	if (AltFire())
 	{
@@ -78,7 +78,7 @@ bool AWeapon_Melee::AltFire(AttackTypes::MeleeAttackType NewAttackType)
 	return false;
 }
 
-void AWeapon_Melee::SetAttackType(AttackTypes::MeleeAttackType NewAttackType)
+void AWeapon_Melee::SetAttackType(UAttackTypes::MeleeAttackType NewAttackType)
 {
 	AttackType = NewAttackType;
 }
@@ -104,13 +104,13 @@ void AWeapon_Melee::OnMeleeWeaponOverlapBegin(UPrimitiveComponent * HitComponent
 	float DamageToDeal = DamagePerAttack;
 	switch (AttackType)
 	{
-	case AttackTypes::NONE:
+	case UAttackTypes::NONE:
 		break;
-	case AttackTypes::SWIFT:
+	case UAttackTypes::SWIFT:
 		break;
-	case AttackTypes::LIGHT:
+	case UAttackTypes::LIGHT:
 		break;
-	case AttackTypes::HEAVY:
+	case UAttackTypes::HEAVY:
 		UE_LOG(LogTemp, Display, TEXT("I AM HEAVY"));
 		DamageToDeal *= 1.5f;
 		break;

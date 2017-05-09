@@ -7,9 +7,10 @@
 #include "Weapons/Weapon_Ranged.h"
 #include "Weapons/Weapon_PlayerRevolver.h"
 #include "Blueprint/UserWidget.h"
-#include "Character/StatusEffects/StatusEffectBase.h"
-#include "Character/StatusEffects/StatusEffect_HardCrowdControl.h"
-#include "Character/StatusEffects/StatusEffect_TestDerivative.h"
+#include "Character/StatusEffects/StatusEffects.h"
+//#include "Character/StatusEffects/StatusEffectBase.h"
+//#include "Character/StatusEffects/StatusEffect_HardCrowdControl.h"
+//#include "Character/StatusEffects/StatusEffect_TestDerivative.h"
 #include "AimSnapSurface.h"
 
 ACharacterController::ACharacterController()
@@ -81,7 +82,7 @@ ACharacterController::ACharacterController()
 		WolfWeapon = (UClass*)WolfMeleeWeaponAsset.Class;
 	}
 	Effects = CharacterState::NONE;
-	CurrentMeleeAttackType = AttackTypes::NONE;
+	CurrentMeleeAttackType = UAttackTypes::NONE;
 	CurrentForm = TransformationState::HUMAN;
 
 	
@@ -94,8 +95,8 @@ void ACharacterController::BeginPlay()
 	AimSnapCapsule->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	MoveSpeedActual = MoveSpeedBase;
 
-	WolfMesh = LoadObject<USkeletalMesh>(NULL, TEXT("SkeletalMesh'/Game/MixamoAnimPack/Mixamo_Adam/Mesh/Maximo_Adam.Maximo_Adam'"), NULL, LOAD_None, NULL);
-	FString AnimClassStringWolf = "Class'/Game/Animation/Wolf/CharacterControllerWolfPlaceholder.CharacterControllerWolfPlaceholder_C'";
+	WolfMesh = LoadObject<USkeletalMesh>(NULL, TEXT("SkeletalMesh'/Game/Geometry/Characters/Werewolf/SK_Werewolf.SK_Werewolf'"), NULL, LOAD_None, NULL);
+	FString AnimClassStringWolf = "AnimBlueprint'/Game/Animation/Wolf/CharacterControllerWolf_AnimBP.CharacterControllerWolf_AnimBP_C'";
 	WolfAnimationClass = LoadObject<UClass>(NULL, *AnimClassStringWolf);
 
 	HumanMesh = GetMesh()->SkeletalMesh;
@@ -146,13 +147,21 @@ void ACharacterController::BeginPlay()
 	}
 }
 
-void ACharacterController::Tick( float DeltaSeconds )
+void ACharacterController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 	FVector LastInputVector = GetMovementComponent()->GetLastInputVector();
 	if (bIsRolling && RollDirection != FVector::ZeroVector)
 	{
-		GetMovementComponent()->AddInputVector(RollDirection * RollSpeed);
+		if (CurrentForm == TransformationState::WOLF)
+		{
+			GetMovementComponent()->AddInputVector(RollDirection * (RollSpeed * 1.5f));
+		}
+		else
+		{
+			GetMovementComponent()->AddInputVector(RollDirection * RollSpeed);
+		}
+		
 	}
 
 	/*
@@ -189,24 +198,11 @@ void ACharacterController::Tick( float DeltaSeconds )
 			{
 				bAnimSecondaryFire = RecastWeaponToRevolver->IsFanFiring();
 			}
-			/*if (bAnimPrimaryFire)
-			{
-				bAnimPrimaryFire = false;
-			}*/
 		}
 		if (Rage >= MAXRAGE)
 		{
 			CurrentForm = TransformationState::WOLF;
 			UE_LOG(LogTemp, Display, TEXT("Player 'Transformed' to wolf"));
-
-			//USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(NULL, TEXT("SkeletalMesh'/Game/Geometry/Characters/Werewolf/M_Werewolf.M_Werewolf'"), NULL, LOAD_None, NULL);
-
-			//USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(NULL, TEXT("SkeletalMesh'/Game/MixamoAnimPack/Mixamo_Adam/Mesh/Maximo_Adam.Maximo_Adam'"), NULL, LOAD_None, NULL);
-
-			//FString AnimClassStringWolf = "Class'/Game/Animation/Wolf/CharacterControllerWolfPlaceholder.CharacterControllerWolfPlaceholder_C'";
-
-			//WolfAnimationClass = LoadObject<UClass>(NULL, *AnimClassStringWolf);
-		
 		}
 		break;
 	case TransformationState::WOLF:
@@ -411,6 +407,11 @@ void ACharacterController::OnMouseMove(float scale)
 						bRecenterMesh = false;
 					}
 				}
+				if (CurrentForm == TransformationState::WOLF)
+				{
+					GetMesh()->SetRelativeRotation(FMath::RInterpTo(GetMesh()->RelativeRotation, FRotator(0.f, AimOffsetYaw, 0.f), GetWorld()->GetDeltaSeconds(), TurnRate));
+				}
+
 				// Only adjust gun position if the player isn't reloading.
 				if (!bShouldEnterReload)
 				{
@@ -555,8 +556,12 @@ void ACharacterController::OnShootPressed()
 			}
 			break;
 		case TransformationState::WOLF:
-			bIsMeleeAttacking = true;
-			CurrentMeleeAttackType = AttackTypes::LIGHT;
+			if (!bIsMeleeAttacking && CurrentMeleeAttackType == UAttackTypes::NONE)
+			{
+				//UE_LOG(LogTemp, Display, TEXT("HEV"));
+				bIsMeleeAttacking = true;
+				CurrentMeleeAttackType = UAttackTypes::LIGHT;
+			}
 			break;
 		default:
 			break;
@@ -585,8 +590,12 @@ void ACharacterController::OnAltShootPressed()
 			}
 			break;
 		case TransformationState::WOLF:
-			bIsMeleeAttacking = true;
-			CurrentMeleeAttackType = AttackTypes::HEAVY;
+			if (!bIsMeleeAttacking && CurrentMeleeAttackType == UAttackTypes::NONE)
+			{
+				//UE_LOG(LogTemp, Display, TEXT("HEV"));
+				bIsMeleeAttacking = true;
+				CurrentMeleeAttackType = UAttackTypes::HEAVY;
+			}
 			break;
 		default:
 			break;
@@ -704,7 +713,7 @@ void ACharacterController::TransformIntoWolf()
 
 		CurrentlyEquippedWeapon = GetWorld()->SpawnActor<AWeapon>(WolfWeapon);
 		//CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(90.f, 180.f, 0.f));
-		CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("WeaponSocket"));
+		CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("rightclaw"));
 		CurrentlyEquippedWeapon->SetOwner(this);
 	}
 }
