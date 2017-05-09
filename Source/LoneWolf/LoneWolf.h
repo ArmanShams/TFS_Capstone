@@ -22,7 +22,7 @@
 
 #pragma once
 UENUM(BlueprintType)
-namespace AttackTypes
+namespace UAttackTypes
 {
 	enum MeleeAttackType
 	{

@@ -8,17 +8,51 @@
 #include "Weapons/Weapon_Ranged.h"
 
 
-
 void UCharacterWolfAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
-	Super::NativeUpdateAnimation(DeltaSeconds);
-
-	CharacterController = Cast<ACharacterController>(TryGetPawnOwner());
-
-	if (CharacterController)
+	if (GetWorld()->HasBegunPlay())
 	{
-		bCanAttack = CharacterController->bIsMeleeAttacking;
-		CurrentMeleeAttackType = CharacterController->CurrentMeleeAttackType;
+		Super::NativeUpdateAnimation(DeltaSeconds);
+
+		CharacterController = Cast<ACharacterController>(TryGetPawnOwner());
+
+		if (CharacterController != NULL)
+		{
+			bRolling = CharacterController->bIsRolling;
+			//if (!bPrimaryFire)
+			{
+				//bPrimaryFire = CharacterController->bAnimPrimaryFire;
+			}
+			bCanAttack = CharacterController->IsMeleeAttacking();
+			//bSecondaryFiring = CharacterController->bAnimSecondaryFire;
+			bIsDead = CharacterController->Health <= 0.f;
+			//bReloading = CharacterController->bShouldEnterReload;
+			bIsInHardCC = CharacterController->bIsInHardCC;
+			bIsInSoftCC = CharacterController->bIsInSoftCC;
+			CurrentForm = CharacterController->CurrentForm;
+			CurrentMeleeAttackType = CharacterController->CurrentMeleeAttackType;
+			AnimMovementSpeed = CharacterController->AnimMovementSpeed * 600.f;
+			AnimMovementDirection = CharacterController->AnimMovementDirection * 150.f;
+			AimOffsetYaw = CharacterController->AimOffsetYaw;
+			
+			switch (CurrentMeleeAttackType)
+			{
+			case UAttackTypes::NONE:
+				AttackType = AttackTypeWrapper::NONE;
+				break;
+			case UAttackTypes::SWIFT:
+				break;
+			case UAttackTypes::LIGHT:
+				AttackType = AttackTypeWrapper::LIGHT;
+				break;
+			case UAttackTypes::HEAVY:
+				AttackType = AttackTypeWrapper::HEAVY;
+				break;
+			default:
+				AttackType = AttackTypeWrapper::NONE;
+				break;
+			}
+		}
 	}
 }
 
@@ -26,14 +60,18 @@ void UCharacterWolfAnimInstance::AnimNotify_MeleeAtkStart()
 {
 	if (GetWorld()->HasBegunPlay())
 	{
-		if (bCanAttack)
+		if (AWeapon_Melee* RecastWeapon = Cast<AWeapon_Melee>(CharacterController->CurrentlyEquippedWeapon))
 		{
-			//UE_LOG(LogTemp, Display, TEXT("We are in the beam"));
-			//call a function on our characters to enable colliders on melee weapons
-			if (Cast<AWeapon_Melee>(CharacterController->CurrentlyEquippedWeapon))
+			if (bCanAttack)
 			{
-				Cast<AWeapon_Melee>(CharacterController->CurrentlyEquippedWeapon)->ToggleCollider();
-				Cast<AWeapon_Melee>(CharacterController->CurrentlyEquippedWeapon)->SetAttackType(CurrentMeleeAttackType);
+				//UE_LOG(LogTemp, Display, TEXT("We are in the beam"));
+				RecastWeapon->ToggleCollider();
+				RecastWeapon->SetAttackType(CurrentMeleeAttackType);
+			}
+			if (bRolling)
+			{
+				RecastWeapon->ToggleCollider();
+				RecastWeapon->SetAttackType(UAttackTypes::HEAVY);
 			}
 		}
 	}
@@ -44,23 +82,54 @@ void UCharacterWolfAnimInstance::AnimNotify_MeleeAtkEnd()
 	if (GetWorld()->HasBegunPlay())
 	{
 		bCanAttack = false;
-
-		if (Cast<AWeapon_Melee>(CharacterController->CurrentlyEquippedWeapon))
+		if (AWeapon_Melee* RecastWeapon = Cast<AWeapon_Melee>(CharacterController->CurrentlyEquippedWeapon))
 		{
-			Cast<AWeapon_Melee>(CharacterController->CurrentlyEquippedWeapon)->ToggleCollider();
-			Cast<AWeapon_Melee>(CharacterController->CurrentlyEquippedWeapon)->bHasHit = false;
-			Cast<AWeapon_Melee>(CharacterController->CurrentlyEquippedWeapon)->SetAttackType(AttackTypes::NONE);
-			CharacterController->CurrentMeleeAttackType = AttackTypes::NONE;
+			RecastWeapon->ToggleCollider();
+			RecastWeapon->bHasHit = false;
+			RecastWeapon->SetAttackType(UAttackTypes::NONE);
+			CharacterController->CurrentMeleeAttackType = UAttackTypes::NONE;
 			CharacterController->bIsMeleeAttacking = false;
 		}
 	}
 }
 
-void UCharacterWolfAnimInstance::EnterWolfState()
+void UCharacterWolfAnimInstance::AnimNotify_ToggleRollState()
 {
-	if (CharacterController != NULL)
+	if (GetWorld()->HasBegunPlay())
 	{
-
+		if (CharacterController != NULL)
+		{
+			CharacterController->bIsRolling = !CharacterController->bIsRolling;
+			CharacterController->RollDirection = FVector::ZeroVector;
+			UE_LOG(LogTemp, Display, TEXT("Ending Roll"));
+		}
 	}
+}
+
+void UCharacterWolfAnimInstance::AnimNotify_DisableInputAndMakeInvulnerable()
+{
+	if (GetWorld()->HasBegunPlay())
+	{
+		if (CharacterController != NULL)
+		{
+			CharacterController->RevokeControlAndBecomeInvulnerable();
+		}
+	}
+}
+
+void UCharacterWolfAnimInstance::AnimNotify_EnableInputAndRevokeInvulnerable()
+{
+	if (GetWorld()->HasBegunPlay())
+	{
+		if (CharacterController != NULL)
+		{
+			CharacterController->RestoreControlAndRevokeInvulnerable();
+		}
+	}
+}
+
+void UCharacterWolfAnimInstance::AnimNotify_ReplaceMesh()
+{
+
 }
 

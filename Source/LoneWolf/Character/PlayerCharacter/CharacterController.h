@@ -143,7 +143,7 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "PlayerTransformationState")
 	TransformationState CurrentForm;
-	AttackTypes::MeleeAttackType CurrentMeleeAttackType;
+	UAttackTypes::MeleeAttackType CurrentMeleeAttackType;
 	CharacterState::StatusEffect Effects;
 
 	FVector RollDirection;
