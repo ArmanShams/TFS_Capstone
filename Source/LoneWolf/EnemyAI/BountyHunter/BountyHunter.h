@@ -5,9 +5,6 @@
 #include "EnemyAI/Enemy.h"
 #include "BountyHunter.generated.h"
 
-/**
- * 
- */
 UENUM(BlueprintType)
 enum class BounterHunterState : uint8
 {
@@ -40,10 +37,8 @@ public:
 	virtual void SetBountyHunterState(BounterHunterState NewState);
 
 protected:
-	// Returns true if the actor's Status Effects is a 'softCC'. Defined in Design Document
-	virtual bool bIsSoftCC() override;
-	// Returns true if the actor's Status Effects is a 'hardCC'. Defined in Design Document
-	virtual bool bIsHardCC() override;
+	virtual bool bIsSoftCC() override;			// Returns true if the actor's Status Effects is a 'softCC'. Defined in Design Document
+	virtual bool bIsHardCC() override;			// Returns true if the actor's Status Effects is a 'hardCC'. Defined in Design Document
 	virtual AWeapon* EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip) override;
 
 	UFUNCTION()
@@ -52,14 +47,14 @@ protected:
 	UFUNCTION()
 	void OnActorBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+	UPROPERTY(EditDefaultsOnly)
+		uint8 MaximumTrapsAllowed;
+
+	bool bPlayRecoilAnimation;
+
 	virtual void Attack();
 
 	virtual void EquipWeapon(TSubclassOf<AWeapon> WeaponToEquip);
-
-
-	bool bPlayRecoilAnimation;
-	UPROPERTY(EditDefaultsOnly)
-	uint8 MaximumTrapsAllowed;
 
 	TSubclassOf<class ABearTrap> BearTrapClass;
 	ABearTrap* BearTrapPlaced;
@@ -67,7 +62,7 @@ protected:
 	TArray<AActor*> TrapArray;
 	BounterHunterState CurrentState;
 
-
 	friend class ABearTrap;
 	friend class UBTTask_BountyHunterAttack;
+	friend class UBTTask_BountyHunterPlaceTrap;
 };

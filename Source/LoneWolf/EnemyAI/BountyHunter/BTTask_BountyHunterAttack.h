@@ -5,9 +5,6 @@
 #include "BehaviorTree/BTTaskNode.h"
 #include "BTTask_BountyHunterAttack.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class LONEWOLF_API UBTTask_BountyHunterAttack : public UBTTaskNode
 {
