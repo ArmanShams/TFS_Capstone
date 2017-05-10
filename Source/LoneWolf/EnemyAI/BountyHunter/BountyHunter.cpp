@@ -17,7 +17,7 @@ ABountyHunter::ABountyHunter()
 	PrimaryActorTick.bCanEverTick = true;
 	RootComponent = GetCapsuleComponent();
 	GetMesh()->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
-	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ABountyHunter::OnActorBeginOverlap);
+	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ABountyHunter ::OnActorBeginOverlap);
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 	Health = MAXHEALTH;
@@ -32,15 +32,13 @@ ABountyHunter::ABountyHunter()
 
 	ConstructorHelpers::FClassFinder<AWeapon>WeaponAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/Weapon_RifleBP.Weapon_RifleBP_C'"));
 	if (WeaponAsset.Class)
-	{
-		//UE_LOG(LogTemp, Display, TEXT("Found the rifle."));
+	{// UE_LOG(LogTemp, Display, TEXT("Found the rifle."));
 		DefaultWeapon = (UClass*)WeaponAsset.Class;
 	}
 
 	ConstructorHelpers::FClassFinder<ABearTrap>TrapAsset(TEXT("Blueprint'/Game/Blueprints/Enemies/BountyHunterAI/BearTrapBP.BearTrapBP_C'"));
 	if (TrapAsset.Class)
-	{
-		//UE_LOG(LogTemp, Display, TEXT("Found the trap."));
+	{// UE_LOG(LogTemp, Display, TEXT("Found the trap."));
 		BearTrapClass = (UClass*)TrapAsset.Class;
 	}
 }
@@ -92,15 +90,6 @@ void ABountyHunter::Tick(float DeltaTime)
 			}
 		}
 	}
-
-
-	/*if (bIsInRange())
-	{
-		if (CurrentlyEquippedWeapon != NULL)
-		{
-			CurrentlyEquippedWeapon->Fire();
-		}
-	}*/
 }
 
 float ABountyHunter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
@@ -160,9 +149,7 @@ bool ABountyHunter::bIsHardCC()
 
 void ABountyHunter::Destroyed()
 {
-	// Any actors spawned by this that need to be destroyed/cleaned up should be done so here before Super::Destroyed() is called.
-
-	Super::Destroyed();
+	Super::Destroyed();	// Any actors spawned by this that need to be destroyed/cleaned up should be done so here before Super::Destroyed() is called.
 }
 
 
@@ -178,10 +165,8 @@ void ABountyHunter::SetBountyHunterState(BounterHunterState NewState)
 
 AWeapon* ABountyHunter::EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip)
 {
-	//Super::EquipNewWeapon(WeaponToEquip);
 	CurrentlyEquippedWeapon = Super::EquipNewWeapon(WeaponToEquip);
-	//CurrentlyEquippedWeapon->SetActorLocation(GetMesh()->GetSocketLocation(FName("hand_r")));
-	CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(30.f, -90.f, 90.f));
+	CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(30.f, -90.f, 90.f)); //CurrentlyEquippedWeapon->SetActorLocation(GetMesh()->GetSocketLocation(FName("hand_r")));
 	return CurrentlyEquippedWeapon;
 }
 
@@ -229,6 +214,7 @@ void ABountyHunter::Attack()
 		if (CurrentlyEquippedWeapon->CanFire())
 		{
 			CurrentState = BounterHunterState::READYINGATTACK;
+			CurrentlyEquippedWeapon->Fire();
 			bPlayRecoilAnimation = true;
 		}
 		/*
@@ -246,8 +232,5 @@ void ABountyHunter::Attack()
 
 void ABountyHunter::EquipWeapon(TSubclassOf<AWeapon> WeaponToEquip)
 {
-	//Super::EquipWeapon(WeaponToEquip);
-	//CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepWorldTransform, FName("RightHand"));
-	//CurrentlyEquippedWeapon->SetActorLocation(GetMesh()->GetSocketLocation(FName("RightHand")));
-	//CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(180.f, 180.f, 0.f));
+
 }
