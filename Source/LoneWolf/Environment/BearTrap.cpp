@@ -12,15 +12,22 @@
 ABearTrap::ABearTrap()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	
 	TrapCollider = CreateDefaultSubobject<USphereComponent>(TEXT("TrapCollider"));
 	TrapCollider->SetupAttachment(RootComponent);
+
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> BearTrapSkeletalMesh(TEXT("SkeletalMesh'/Game/Geometry/World/M_BearTrap.M_BearTrap'"));
+	MeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Skeletal Mesh Component"));
+	MeshComponent->SetupAttachment(TrapCollider);
+	MeshComponent->SetSkeletalMesh(BearTrapSkeletalMesh.Object);
+
 	radius = 30.f;
 	Damage = 5;
 	TrapCollider->SetCollisionProfileName(TEXT("Traps"));
 	TrapCollider->SetSphereRadius(radius);
 	TrapCollider->OnComponentBeginOverlap.AddDynamic(this, &ABearTrap::OnComponentBeginOverlap);
 	TrapCollider->OnComponentEndOverlap.AddDynamic(this, &ABearTrap::OnComponentEndOverlap);
-	bIsVisible = false;
+	//bIsVisible = false;
 	BountyHunter = NULL;
 }
 
@@ -32,10 +39,10 @@ void ABearTrap::BeginPlay()
 void ABearTrap::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (bIsVisible)
-	{
-		this->SetActorHiddenInGame(false);
-	}
+	//if (bIsVisible)
+	//{
+	//	this->SetActorHiddenInGame(false);
+	//}
 }
 
 void ABearTrap::SetOwner(AActor* NewOwner)
@@ -69,8 +76,8 @@ void ABearTrap::OnComponentEndOverlap(UPrimitiveComponent* OverlappedComp, AActo
 {
 	if (ACharacterController* Player = Cast<ACharacterController>(OtherActor))
 	{
-		bIsVisible = true;
-		this->SetActorHiddenInGame(true);
+		// bIsVisible = true;
+		// this->SetActorHiddenInGame(true);
 		UE_LOG(LogTemp, Display, TEXT("The trap activated and applied damage to you"));
 		if (BountyHunter != NULL)
 		{

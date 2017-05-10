@@ -28,7 +28,10 @@ public:
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "Collision")
-		USphereComponent* TrapCollider;
+	USphereComponent* TrapCollider;
+
+	UPROPERTY(EditDefaultsOnly)
+	USkeletalMeshComponent* MeshComponent;
 
 	class ATrapLocations* LocationBeingOccupied;
 

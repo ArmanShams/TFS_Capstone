@@ -15,7 +15,7 @@ EBTNodeResult::Type UBTTask_BountyHunterPlaceTrap::ExecuteTask(UBehaviorTreeComp
 	UBehaviorTreeComponent* BehaviorTree = &OwnerComp;
 	if (ABountyHunterAIController* Controller = Cast<ABountyHunterAIController>(BehaviorTree->GetAIOwner()))
 	{
-		//Cast<ABountyHunter>(Controller->GetPawn())->SetBearTrap();
+		//Cast<ABountyHunter>(Controller->GetPawn())->SetBearTrap(NewTrapLocation, SweepResult);
 	}
 	return Super::ExecuteTask(OwnerComp, NodeMemory);
 }

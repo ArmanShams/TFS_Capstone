@@ -17,7 +17,7 @@ ABountyHunter::ABountyHunter()
 	PrimaryActorTick.bCanEverTick = true;
 	RootComponent = GetCapsuleComponent();
 	GetMesh()->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
-	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ABountyHunter ::OnActorBeginOverlap);
+	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ABountyHunter::OnActorBeginOverlap);
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 	Health = MAXHEALTH;
@@ -166,7 +166,7 @@ void ABountyHunter::SetBountyHunterState(BounterHunterState NewState)
 AWeapon* ABountyHunter::EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip)
 {
 	CurrentlyEquippedWeapon = Super::EquipNewWeapon(WeaponToEquip);
-	CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(30.f, -90.f, 90.f)); //CurrentlyEquippedWeapon->SetActorLocation(GetMesh()->GetSocketLocation(FName("hand_r")));
+	CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(30.f, -90.f, 90.f)); // CurrentlyEquippedWeapon->SetActorLocation(GetMesh()->GetSocketLocation(FName("hand_r")));
 	return CurrentlyEquippedWeapon;
 }
 
@@ -174,13 +174,13 @@ void ABountyHunter::SetBearTrap(ATrapLocations* NewTrapLocation, const FHitResul
 {
 	if (!NewTrapLocation->bIsOccupied)
 	{
-		UE_LOG(LogTemp, Display, TEXT("The trap location is now occupied"));
+		//UE_LOG(LogTemp, Display, TEXT("The trap location is now occupied"));
 		if (BearTrapClass != NULL)
 		{
 			if (TrapArray.Num() >= MaximumTrapsAllowed)
 			{
-				AActor* TrapToDelete = TrapArray.Pop();
-				TrapToDelete->SetLifeSpan(0.1f);
+				//AActor* TrapToDelete = TrapArray.Pop();
+				//TrapToDelete->SetLifeSpan(0.1f);
 				UE_LOG(LogTemp, Display, TEXT("Element popped from Trap Array"));
 			}
 			BearTrapPlaced = GetWorld()->SpawnActor<ABearTrap>(BearTrapClass);
@@ -202,6 +202,7 @@ void ABountyHunter::OnActorBeginOverlap(UPrimitiveComponent * OverlappedComp, AA
 {
 	if (ATrapLocations* RecastedOverlappingActor = Cast<ATrapLocations>(OtherActor))
 	{
+		UE_LOG(LogTemp, Display, TEXT("The Bounty Hunter passed a location where a trap could be put"));
 		SetBearTrap(RecastedOverlappingActor, SweepResult);
 		RecastedOverlappingActor->bIsOccupied = true;
 	}
@@ -217,20 +218,9 @@ void ABountyHunter::Attack()
 			CurrentlyEquippedWeapon->Fire();
 			bPlayRecoilAnimation = true;
 		}
-		/*
-		if (CurrentlyEquippedWeapon->Fire())
-		{
-			bPlayRecoilAnimation = true;
-		}
-		else
-		{
-			bPlayRecoilAnimation = false;
-		}
-		*/
 	}
 }
 
 void ABountyHunter::EquipWeapon(TSubclassOf<AWeapon> WeaponToEquip)
 {
-
 }
