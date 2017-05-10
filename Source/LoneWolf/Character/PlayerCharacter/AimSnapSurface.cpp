@@ -21,33 +21,65 @@ AAimSnapSurface::AAimSnapSurface()
 	Collider->CanCharacterStepUpOn = StepUpResponseByte;
 	Collider->SetCanEverAffectNavigation(false);
 	Collider->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Overlap);
-
+	bIsOverlapped = false;
 }
 
 void AAimSnapSurface::BeginPlay()
 {
-	//Super::BeginPlay();
-	
+	Super::BeginPlay();
 }
 
 // Called every frame
-void AAimSnapSurface::Tick( float DeltaTime )
+void AAimSnapSurface::Tick(float DeltaTime)
 {
-	Super::Tick( DeltaTime );
-
+	Super::Tick(DeltaTime);
+	
 }
 
 void AAimSnapSurface::SetActive(bool bShouldBeActive)
 {
 	if (bShouldBeActive)
 	{
-		Collider->SetCollisionResponseToChannel(ECC_GameTraceChannel6, ECollisionResponse::ECR_Block);
+		EnableCollision();
 		return;
 	}
 	else
 	{
-		Collider->SetCollisionResponseToChannel(ECC_GameTraceChannel6, ECollisionResponse::ECR_Ignore);
+		DisableCollision();
 		return;
 	}
+}
+
+void AAimSnapSurface::EnableCollision()
+{
+	bIsEnabled = true;
+	Collider->SetCollisionResponseToChannel(ECC_GameTraceChannel6, ECollisionResponse::ECR_Block);
+}
+
+void AAimSnapSurface::DisableCollision()
+{
+	bIsEnabled = false;
+	Collider->SetCollisionResponseToChannel(ECC_GameTraceChannel6, ECollisionResponse::ECR_Ignore);
+}
+
+bool AAimSnapSurface::IsBeingOverlapped()
+{
+	TArray<UPrimitiveComponent*> T;
+	Collider->GetOverlappingComponents(T);
+	if (T.Num() > 0)
+	{
+		bIsOverlapped = true;
+	}
+	else
+	{
+		bIsOverlapped = false;
+	}
+
+	return bIsOverlapped;
+}
+
+bool AAimSnapSurface::GetIsActive()
+{
+	return bIsEnabled;
 }
 
