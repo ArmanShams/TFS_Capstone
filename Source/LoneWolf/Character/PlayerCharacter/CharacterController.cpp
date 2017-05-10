@@ -420,32 +420,48 @@ void ACharacterController::OnMouseMove(float scale)
 						if (Cast<AWeapon_Ranged>(CurrentlyEquippedWeapon))
 						{
 							FRotator DesiredWeaponRotation = GetActorRotation();
-
-							FHitResult OutHitResultHorizontalAdjust(ForceInit);
-							if (PlayerController->GetHitResultUnderCursor(ECollisionChannel::ECC_Camera, false, OutHitResultHorizontalAdjust))
+							FRotator OldRotation = CurrentlyEquippedWeapon->GetActorRotation();
+							//FHitResult OutHitResultHorizontalAdjust(ForceInit);
+							//if (PlayerController->GetHitResultUnderCursor(ECollisionChannel::ECC_GameTraceChannel6, false, OutHitResultHorizontalAdjust))
+							//{
+							//	
+							//}
+							FHitResult OutHitResultResult(ForceInit);
+							if (PlayerController->GetHitResultUnderCursor(ECollisionChannel::ECC_GameTraceChannel6, false, OutHitResultResult))
 							{
-								FVector DirectionHorizontal = FVector(OutHitResultHorizontalAdjust.Location.X - GetActorLocation().X, OutHitResultHorizontalAdjust.Location.Y - GetActorLocation().Y, OutHitResultHorizontalAdjust.Location.Z - GetActorLocation().Z);
-								if (DirectionHorizontal.Size() > 300.f)
+								FVector DirectionHorizontal = FVector(OutHitResultResult.Location.X - GetActorLocation().X, OutHitResultResult.Location.Y - GetActorLocation().Y, OutHitResultResult.Location.Z - GetActorLocation().Z);
+								if (DirectionHorizontal.Size() > 140.f)
 								{
-									FRotator YawRotation = (OutHitResultHorizontalAdjust.Location - CurrentlyEquippedWeapon->GetActorLocation()).Rotation();
+									FVector Direction = OutHitResultResult.Location + FVector::UpVector * 128.f - CurrentlyEquippedWeapon->GetActorLocation();
+									FRotator RotationInDirection = FRotationMatrix::MakeFromX(Direction).Rotator();
+									DesiredWeaponRotation.Pitch = RotationInDirection.Pitch;
+								}
+								else
+								{
+									DesiredWeaponRotation.Pitch = 0.f;
+								}
+								if (DirectionHorizontal.Size() > 200.f)
+								{
+									FRotator YawRotation = (OutHitResultResult.Location - CurrentlyEquippedWeapon->GetActorLocation()).Rotation();
 									DesiredWeaponRotation.Yaw = YawRotation.Yaw;
 								}
 								else
 								{
-									FRotator YawRotation = (GetActorLocation() + (GetMesh()->GetRightVector() * 256.f) - CurrentlyEquippedWeapon->GetActorLocation()).Rotation();
-									DesiredWeaponRotation.Yaw = YawRotation.Yaw;
+									DesiredWeaponRotation.Yaw = OldRotation.Yaw;
 								}
+								//FVector DirectionHorizontal = FVector(OutHitResultResult.Location.X - GetActorLocation().X, OutHitResultResult.Location.Y - GetActorLocation().Y, OutHitResultResult.Location.Z - GetActorLocation().Z);
 							}
-							FHitResult OutHitResultVerticalResult(ForceInit);
-							if (PlayerController->GetHitResultUnderCursor(ECollisionChannel::ECC_GameTraceChannel6, false, OutHitResultVerticalResult))
+							else
 							{
-								FVector DirectionHorizontal = FVector(OutHitResultVerticalResult.Location.X - GetActorLocation().X, OutHitResultVerticalResult.Location.Y - GetActorLocation().Y, OutHitResultVerticalResult.Location.Z - GetActorLocation().Z);
-								if (DirectionHorizontal.Size() > 140.f)
+								//(GetActorLocation() + (GetMesh()->GetRightVector() * 256.f) - CurrentlyEquippedWeapon->GetActorLocation()).Rotation();
+								DesiredWeaponRotation = OldRotation;
+								DesiredWeaponRotation.Pitch = 0.f;
+								DesiredWeaponRotation.Yaw = GetMesh()->RelativeRotation.Yaw;
+								if (Diff.Size() > 50.f)
 								{
-									FVector Direction = OutHitResultVerticalResult.Location + FVector::UpVector * 128.f - CurrentlyEquippedWeapon->GetActorLocation();
-									FRotator RotationInDirection = FRotationMatrix::MakeFromX(Direction).Rotator();
-									DesiredWeaponRotation.Pitch = RotationInDirection.Pitch;
+									DesiredWeaponRotation.Yaw = Diff.Rotation().Yaw;
 								}
+								
 							}
 							CurrentlyEquippedWeapon->SetActorRotation(FMath::RInterpTo(CurrentlyEquippedWeapon->GetActorRotation(), DesiredWeaponRotation, GetWorld()->GetDeltaSeconds(), TurnRate * TurnRate));
 						}
@@ -637,7 +653,7 @@ void ACharacterController::OnAimSnapBeginOverlap(UPrimitiveComponent* Overlapped
 	if (AAimSnapSurface* RecastedSurface = Cast<AAimSnapSurface>(OtherActor))
 	{
 		// UE_LOG(LogTemp, Display, TEXT("Activating an aimsnap area %s"), *OtherActor->GetName());
-		// DrawDebugLine(GetWorld(), GetActorLocation(), OtherActor->GetActorLocation(), FColor(0, 255, 0), false, 0.05f, 0, 12.333f);
+		DrawDebugLine(GetWorld(), GetActorLocation(), OtherActor->GetActorLocation(), FColor(0, 255, 0), false, 0.05f, 0, 12.333f);
 		RecastedSurface->SetActive(true);
 	}
 }
@@ -647,7 +663,7 @@ void ACharacterController::OnAimSnapOverlapEnd(UPrimitiveComponent* OverlappedCo
 	if (AAimSnapSurface* RecastedSurface = Cast<AAimSnapSurface>(OtherActor))
 	{
 		// UE_LOG(LogTemp, Display, TEXT("DeActivating an aimsnap area %s"), *OtherActor->GetName());
-		// DrawDebugLine(GetWorld(), GetActorLocation(), OtherActor->GetActorLocation(), FColor(255, 0, 0), false, 0.05f, 0, 12.333f);
+		DrawDebugLine(GetWorld(), GetActorLocation(), OtherActor->GetActorLocation(), FColor(255, 0, 0), false, 0.05f, 0, 12.333f);
 		RecastedSurface->SetActive(false);
 	}
 }

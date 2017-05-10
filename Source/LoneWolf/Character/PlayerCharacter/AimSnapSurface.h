@@ -14,12 +14,19 @@ public:
 	AAimSnapSurface();
 
 	virtual void BeginPlay() override;
-	virtual void Tick( float DeltaSeconds ) override;
+	virtual void Tick(float DeltaSeconds) override;
 	virtual void SetActive(bool bShouldBeActive);
+	virtual void EnableCollision();
+	virtual void DisableCollision();
+	virtual bool IsBeingOverlapped();
+	virtual bool GetIsActive();
 
+	bool bIsOverlapped;
+	UPROPERTY(VisibleAnywhere)
+	bool bIsEnabled;
 protected:
 	UPROPERTY(EditInstanceOnly)
 	class UBoxComponent* Collider;
 	
-	//bool bIsActive
+
 };
