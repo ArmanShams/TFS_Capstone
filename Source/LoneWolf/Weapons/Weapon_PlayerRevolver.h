@@ -26,6 +26,7 @@ public:
 	virtual bool HasAmmo() override;
 	virtual bool CanReload() override;
 	virtual bool IsFanFiring();
+	virtual void StopFanFire();
 
 	UPROPERTY(EditDefaultsOnly)
 	float FanFireInterval;

@@ -161,21 +161,91 @@ void ACharacterController::Tick(float DeltaSeconds)
 		{
 			GetMovementComponent()->AddInputVector(RollDirection * RollSpeed);
 		}
-		
 	}
 
+	float LookYaw = DiffYaw;
+	if (LookYaw < 0.f)
+	{
+		LookYaw += 360.f;
+	}
+	//UE_LOG(LogTemp, Display, TEXT("Mesh rotation yaw = %f"), LookYaw);
+
+	LookDirection = RelativeFacingDirection(LookYaw);
+	
+
+	switch (LookDirection)
+	{
+	case EightDirectional::NONE:
+		UE_LOG(LogTemp, Display, TEXT("NOPE"));
+		break;
+	case EightDirectional::RIGHT:
+		//UE_LOG(LogTemp, Display, TEXT("Mesh rotation yaw = %f"), LookYaw);
+		UE_LOG(LogTemp, Display, TEXT("Player is looking relatively right."));
+		break;
+	case EightDirectional::DOWN_RIGHT:
+		UE_LOG(LogTemp, Display, TEXT("Player is looking relatively down and to the right."));
+		break;
+	case EightDirectional::DOWN:
+		UE_LOG(LogTemp, Display, TEXT("Player is looking relatively down"));
+		break;
+	case EightDirectional::DOWN_LEFT:
+		UE_LOG(LogTemp, Display, TEXT("Player is looking relatively down and to the left."));
+		break;
+	case EightDirectional::LEFT:
+		UE_LOG(LogTemp, Display, TEXT("Player is looking relatively left."));
+		break;
+	case EightDirectional::UP_LEFT:
+		UE_LOG(LogTemp, Display, TEXT("Player is looking relatively up and to the left."));
+		break;
+	case EightDirectional::UP:
+		UE_LOG(LogTemp, Display, TEXT("Player is looking relatively up."));
+		break;
+	case EightDirectional::UP_RIGHT:
+		UE_LOG(LogTemp, Display, TEXT("Player is looking relatively up and to the right."));
+		break;
+	default:
+		break;
+	}
+
+
+	MoveDirection = RelativeMovementDirection();
+	switch (MoveDirection)
+	{
+	case EightDirectional::NONE:
+		break;
+	case EightDirectional::RIGHT:
+		//UE_LOG(LogTemp, Display, TEXT("I AM MOVING RIGHT"));
+		break;
+	case EightDirectional::DOWN_RIGHT:
+		//UE_LOG(LogTemp, Display, TEXT("I AM MOVING DOWN AND RIGHT"));
+		break;
+	case EightDirectional::DOWN:		
+		//UE_LOG(LogTemp, Display, TEXT("I AM MOVING DOWN"));
+		break;
+	case EightDirectional::DOWN_LEFT:
+		//UE_LOG(LogTemp, Display, TEXT("I AM MOVING DOWN AND LEFT"));
+		break;
+	case EightDirectional::LEFT:
+		//UE_LOG(LogTemp, Display, TEXT("I AM MOVING LEFT"));
+		break;
+	case EightDirectional::UP_LEFT:
+		//UE_LOG(LogTemp, Display, TEXT("I AM MOVING UP AND LEFT"));
+		break;
+	case EightDirectional::UP:
+		//UE_LOG(LogTemp, Display, TEXT("I AM MOVING UP"));
+		break;
+	case EightDirectional::UP_RIGHT:
+		//UE_LOG(LogTemp, Display, TEXT("I AM MOVING UP AND RIGHT"));
+		break;
+	default:
+		break;
+	}
 	/*
 	if (LastInputVector != FVector::ZeroVector)
 	{
 		AnimMovementSpeed = LastInputVector.Size();
 	}
 	
-	float MeshYaw = GetMesh()->RelativeRotation.Yaw;
-	if (MeshYaw < 0.f)
-	{
-		MeshYaw += 360.f;
-	}
-	UE_LOG(LogTemp, Display, TEXT("Mesh rotation yaw = %f"), MeshYaw);
 	
 	if (GetMovementComponent()->GetLastInputVector() == FVector::ZeroVector)
 	{
@@ -354,6 +424,18 @@ void ACharacterController::OnMoveForward(float scale)
 {
 	if (!bIsRolling && !bIsInSoftCC)
 	{
+		if (scale > 0.02f)
+		{
+			VerticalMove = 1;	
+		}
+		else if (scale < -0.02f)
+		{
+			VerticalMove = -1;
+		}
+		else
+		{
+			VerticalMove = 0;
+		}
 		GetMovementComponent()->AddInputVector(GetActorForwardVector() * scale * MoveSpeedActual);
 	}
 }
@@ -362,18 +444,18 @@ void ACharacterController::OnMoveRight(float scale)
 {
 	if (!bIsRolling && !bIsInSoftCC)
 	{
-		/*
-		float MeshYaw = GetMesh()->RelativeRotation.Yaw;
-
-		if (MeshYaw < 0.1f)
+		if (scale > 0.f)
 		{
-			AnimMovementDirection = scale;
+			HorizontalMove = 1;
+		}
+		else if (scale < 0.f)
+		{
+			HorizontalMove = -1;
 		}
 		else
 		{
-			AnimMovementDirection = -scale;
+			HorizontalMove = 0;
 		}
-		*/
 		GetMovementComponent()->AddInputVector(GetActorRightVector() * scale * MoveSpeedActual);
 	}
 }
@@ -397,7 +479,8 @@ void ACharacterController::OnMouseMove(float scale)
 
 				//GetMesh()->GetSocketRotation()
 				AimOffsetYaw = Diff.Rotation().Yaw;
-				
+				DiffYaw = Diff.Rotation().Yaw;
+
 				if (bRecenterMesh)
 				{
 					//UE_LOG(LogTemp, Display, TEXT("Mesh relative rotation Yaw: %f, AimOffSetYaw: %f"), GetMesh()->RelativeRotation.Yaw, AimOffsetYaw);
@@ -421,11 +504,8 @@ void ACharacterController::OnMouseMove(float scale)
 						{
 							FRotator DesiredWeaponRotation = GetActorRotation();
 							FRotator OldRotation = CurrentlyEquippedWeapon->GetActorRotation();
-							//FHitResult OutHitResultHorizontalAdjust(ForceInit);
-							//if (PlayerController->GetHitResultUnderCursor(ECollisionChannel::ECC_GameTraceChannel6, false, OutHitResultHorizontalAdjust))
-							//{
-							//	
-							//}
+
+
 							FHitResult OutHitResultResult(ForceInit);
 							if (PlayerController->GetHitResultUnderCursor(ECollisionChannel::ECC_GameTraceChannel6, false, OutHitResultResult))
 							{
@@ -500,6 +580,10 @@ void ACharacterController::OnRollPressed()
 	if (!bIsInHardCC)
 	{
 		Roll();
+		if (AWeapon_PlayerRevolver* RecastWeapon = Cast<AWeapon_PlayerRevolver>(CurrentlyEquippedWeapon))
+		{
+			RecastWeapon->StopFanFire();
+		}
 	}
 }
 
@@ -533,6 +617,10 @@ void ACharacterController::OnReloadPressed()
 			{
 				bShouldEnterReload = true;
 			}
+			if (AWeapon_PlayerRevolver* RecastAsRevolver = Cast<AWeapon_PlayerRevolver>(RecastWeapon))
+			{
+				RecastAsRevolver->StopFanFire();
+			}
 		}
 		break;
 	case TransformationState::WOLF:
@@ -541,6 +629,16 @@ void ACharacterController::OnReloadPressed()
 		break;
 	}
 	
+}
+
+EightDirectional ACharacterController::GetRelativeFacing()
+{
+	return LookDirection;
+}
+
+EightDirectional ACharacterController::GetRelativeMovement()
+{
+	return MoveDirection;
 }
 
 void ACharacterController::EquipRevolver()
@@ -765,3 +863,85 @@ void ACharacterController::RestoreControlAndRevokeInvulnerable()
 	}
 }
 
+EightDirectional ACharacterController::RelativeFacingDirection(float Rotation)
+{
+	if (Rotation <= 45.f || Rotation >= 315.f)
+	{
+		if (Rotation <= 90.f && Rotation >= 0.f)
+		{
+			return EightDirectional::DOWN_RIGHT;
+		}
+		return EightDirectional::RIGHT;
+	}
+	if (Rotation <= 90.f && Rotation >= 0.f)
+	{
+		//return EightDirectional::DOWN_RIGHT;
+	}
+	if (Rotation <= 135.f && Rotation >= 45.f)
+	{
+		//return EightDirectional::DOWN;
+	}
+	if (Rotation <= 180.f || Rotation >= 90.f)
+	{
+		//return EightDirectional::DOWN_LEFT;
+	}
+	if (Rotation <= 45.f || Rotation >= 325.f)
+	{
+		//return EightDirectional::RIGHT;
+	}
+	if (Rotation <= 45.f || Rotation >= 325.f)
+	{
+		//return EightDirectional::RIGHT;
+	}
+	
+	return EightDirectional::NONE;	
+}
+
+EightDirectional ACharacterController::RelativeMovementDirection()
+{
+	switch (VerticalMove)
+	{
+	case -1:
+		switch (HorizontalMove)
+		{
+		case -1:
+			return EightDirectional::DOWN_LEFT;
+			break;
+		case 1:
+			return EightDirectional::DOWN_RIGHT;
+			break;
+		default:
+			return EightDirectional::DOWN;
+			break;
+		}
+		break;
+	case 1:
+		switch (HorizontalMove)
+		{
+		case -1:
+			return EightDirectional::UP_LEFT;
+			break;
+		case 1:
+			return EightDirectional::UP_RIGHT;
+			break;
+		default:
+			return EightDirectional::UP;
+			break;
+		}
+		break;
+	default:
+		switch (HorizontalMove)
+		{
+		case -1:
+			return EightDirectional::LEFT;
+			break;
+		case 1:
+			return EightDirectional::RIGHT;
+			break;
+		default:
+			return EightDirectional::NONE;
+			break;
+		}
+		break;
+	}
+}

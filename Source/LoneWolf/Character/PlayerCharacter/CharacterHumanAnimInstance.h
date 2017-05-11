@@ -38,6 +38,9 @@ protected:
 	bool bIsInHardCC;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bIsInSoftCC;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	int32 ForwardMovementMultiplier;
+
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TransformationState CurrentForm;

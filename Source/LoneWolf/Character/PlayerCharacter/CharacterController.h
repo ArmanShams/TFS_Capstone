@@ -15,6 +15,20 @@ enum class TransformationState : uint8
 	WOLF		UMETA(DisplayName = "Wolf")
 };
 
+UENUM(BlueprintType)
+enum class EightDirectional : uint8
+{
+	NONE			UMETA(DisplayName = "NONE"),
+	RIGHT			UMETA(DisplayName = "Right"),
+	DOWN_RIGHT		UMETA(DisplayName = "Down Right"),
+	DOWN			UMETA(DisplayName = "Down"),
+	DOWN_LEFT		UMETA(DisplayName = "Down Left"),
+	LEFT			UMETA(DisplayName = "Left"),
+	UP_LEFT			UMETA(DisplayName = "Up Left"),
+	UP				UMETA(DisplayName = "Up"),
+	UP_RIGHT		UMETA(DisplayName = "Up Right"),
+};
+
 UCLASS(Blueprintable)
 class LONEWOLF_API ACharacterController : public ALoneWolfCharacter
 {
@@ -53,8 +67,13 @@ public:
 	void Roll();
 	void OnReloadPressed();
 
+	EightDirectional GetRelativeFacing();
+	EightDirectional GetRelativeMovement();
+
+
 	// SOON TO BE REMOVED
 	void EquipRevolver();
+
 
 	//UFUNCTION()
 	//void OnComponentBeginOverlap(AActor* other);
@@ -79,6 +98,9 @@ protected:
 	virtual void TransformIntoHuman();
 	virtual void RevokeControlAndBecomeInvulnerable();
 	virtual void RestoreControlAndRevokeInvulnerable();
+	
+	EightDirectional RelativeFacingDirection(float Rotation);
+	EightDirectional RelativeMovementDirection();
 
 	bool bShouldEnterReload;
 	bool bShouldEnterRoll;
@@ -103,9 +125,13 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character")
 	float AimSnapRadius;
 	float Rage;
+	float DiffYaw;
 	float AimOffsetYaw;
 	float AnimMovementSpeed;
 	float AnimMovementDirection;
+
+	int8 HorizontalMove;
+	int8 VerticalMove;
 
 	UPROPERTY(Category = Camera, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* CameraComponent;
@@ -145,6 +171,8 @@ protected:
 	TransformationState CurrentForm;
 	UAttackTypes::MeleeAttackType CurrentMeleeAttackType;
 	CharacterState::StatusEffect Effects;
+	EightDirectional LookDirection;
+	EightDirectional MoveDirection;
 
 	FVector RollDirection;
 

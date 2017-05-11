@@ -32,6 +32,35 @@ void UCharacterHumanAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			AnimMovementSpeed = CharacterController->AnimMovementSpeed * 600.f;
 			AnimMovementDirection = CharacterController->AnimMovementDirection * 150.f;
 			AimOffsetYaw = CharacterController->AimOffsetYaw;
+			switch (CharacterController->GetRelativeFacing())
+			{
+			case EightDirectional::NONE:
+
+				break;
+			case EightDirectional::RIGHT:
+				if (CharacterController->GetRelativeMovement() == EightDirectional::LEFT)
+				{
+					ForwardMovementMultiplier = -1;
+				}
+				break;
+			case EightDirectional::DOWN_RIGHT:
+				break;
+			case EightDirectional::DOWN:
+				break;
+			case EightDirectional::DOWN_LEFT:
+				break;
+			case EightDirectional::LEFT:
+				break;
+			case EightDirectional::UP_LEFT:
+				break;
+			case EightDirectional::UP:
+				break;
+			case EightDirectional::UP_RIGHT:
+				break;
+			default:
+				break;
+			}
+
 			if (bPrimaryFire)
 			{
 				CharacterController->bAnimPrimaryFire = bPrimaryFire;
