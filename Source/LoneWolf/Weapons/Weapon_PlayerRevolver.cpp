@@ -102,3 +102,8 @@ bool AWeapon_PlayerRevolver::IsFanFiring()
 	return bFanFiring;
 }
 
+void AWeapon_PlayerRevolver::StopFanFire()
+{
+	bFanFiring = false;
+}
+
