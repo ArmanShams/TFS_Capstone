@@ -152,7 +152,6 @@ void ABountyHunter::Destroyed()
 	Super::Destroyed();	// Any actors spawned by this that need to be destroyed/cleaned up should be done so here before Super::Destroyed() is called.
 }
 
-
 bool ABountyHunter::bCanTriggerRecoilAnimation()
 {
 	return bPlayRecoilAnimation;
@@ -173,14 +172,14 @@ AWeapon* ABountyHunter::EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip)
 void ABountyHunter::SetBearTrap(ATrapLocations* NewTrapLocation, const FHitResult& SweepResult)
 {
 	if (!NewTrapLocation->bIsOccupied)
-	{
+	{ // bSetTrap();
 		//UE_LOG(LogTemp, Display, TEXT("The trap location is now occupied"));
 		if (BearTrapClass != NULL)
 		{
 			if (TrapArray.Num() >= MaximumTrapsAllowed)
 			{
-				//AActor* TrapToDelete = TrapArray.Pop();
-				//TrapToDelete->SetLifeSpan(0.1f);
+				AActor* TrapToDelete = TrapArray.Pop();
+				TrapToDelete->SetLifeSpan(0.1f);
 				UE_LOG(LogTemp, Display, TEXT("Element popped from Trap Array"));
 			}
 			BearTrapPlaced = GetWorld()->SpawnActor<ABearTrap>(BearTrapClass);
@@ -193,7 +192,7 @@ void ABountyHunter::SetBearTrap(ATrapLocations* NewTrapLocation, const FHitResul
 		}
 	}
 	else
-	{
+	{ // bSetTrap();
 		UE_LOG(LogTemp, Display, TEXT("The Trap Location is already occupied, the bounty hunter will not try to place a trap here"));
 	}
 }
@@ -215,12 +214,13 @@ void ABountyHunter::Attack()
 		if (CurrentlyEquippedWeapon->CanFire())
 		{
 			CurrentState = BounterHunterState::READYINGATTACK;
-			CurrentlyEquippedWeapon->Fire();
 			bPlayRecoilAnimation = true;
+			//CurrentlyEquippedWeapon->Fire();
 		}
 	}
 }
 
 void ABountyHunter::EquipWeapon(TSubclassOf<AWeapon> WeaponToEquip)
 {
+
 }

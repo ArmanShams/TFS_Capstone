@@ -39,8 +39,8 @@ void UBountyHunterAnimInstance::AnimNotify_Shoot()
 {
 	if (GetWorld()->HasBegunPlay())
 	{
-		BountyHunter->GetEquippedWeapon()->Fire();
-		BountyHunter->SetBountyHunterState(BounterHunterState::IDLE);
+		BountyHunter->SetBountyHunterState(BounterHunterState::ATTACKING);
+		BountyHunter->Attack();
 	}
 }
 
@@ -48,6 +48,7 @@ void UBountyHunterAnimInstance::AnimNotify_PlaceTrap()
 {
 	if (GetWorld()->HasBegunPlay())
 	{
+		BountyHunter->SetBountyHunterState(BounterHunterState::SETTINGTRAP);
 		//BountyHunter->SetBearTrap();
 	}
 }

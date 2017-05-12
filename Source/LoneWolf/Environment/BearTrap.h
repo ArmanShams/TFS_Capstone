@@ -16,11 +16,11 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 
 	UPROPERTY(EditAnywhere)
-		float radius;
+	float radius;
 	float Damage;
 
 	UPROPERTY(EditAnywhere)
-		bool bIsVisible;
+	bool bIsVisible;
 
 	virtual void SetOwner(AActor* NewOwner) override;
 

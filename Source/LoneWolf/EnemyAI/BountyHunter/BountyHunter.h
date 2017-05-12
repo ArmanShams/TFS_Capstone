@@ -10,7 +10,8 @@ enum class BounterHunterState : uint8
 {
 	IDLE			UMETA(DisplayName = "Idle"),
 	READYINGATTACK	UMETA(DisplayName = "PreparingToAttack"),
-	ATTACKING		UMETA(DisplayName = "Attacking")
+	ATTACKING		UMETA(DisplayName = "Attacking"),
+	SETTINGTRAP		UMETA(DisplayName = "PlacingTrap")
 };
 
 UCLASS(Blueprintable)
@@ -63,6 +64,7 @@ protected:
 	BounterHunterState CurrentState;
 
 	friend class ABearTrap;
+	friend class UBountyHunterAnimInstance;
 	friend class UBTTask_BountyHunterAttack;
 	friend class UBTTask_BountyHunterPlaceTrap;
 };
