@@ -171,7 +171,7 @@ void ACharacterController::Tick(float DeltaSeconds)
 	//UE_LOG(LogTemp, Display, TEXT("Mesh rotation yaw = %f"), LookYaw);
 
 	LookDirection = RelativeFacingDirection(LookYaw);
-	
+	MoveDirection = RelativeMovementDirection();
 
 	switch (LookDirection)
 	{
@@ -207,51 +207,37 @@ void ACharacterController::Tick(float DeltaSeconds)
 		break;
 	}
 
-
-	MoveDirection = RelativeMovementDirection();
-	switch (MoveDirection)
-	{
-	case EightDirectional::NONE:
-		break;
-	case EightDirectional::RIGHT:
-		//UE_LOG(LogTemp, Display, TEXT("I AM MOVING RIGHT"));
-		break;
-	case EightDirectional::DOWN_RIGHT:
-		//UE_LOG(LogTemp, Display, TEXT("I AM MOVING DOWN AND RIGHT"));
-		break;
-	case EightDirectional::DOWN:		
-		//UE_LOG(LogTemp, Display, TEXT("I AM MOVING DOWN"));
-		break;
-	case EightDirectional::DOWN_LEFT:
-		//UE_LOG(LogTemp, Display, TEXT("I AM MOVING DOWN AND LEFT"));
-		break;
-	case EightDirectional::LEFT:
-		//UE_LOG(LogTemp, Display, TEXT("I AM MOVING LEFT"));
-		break;
-	case EightDirectional::UP_LEFT:
-		//UE_LOG(LogTemp, Display, TEXT("I AM MOVING UP AND LEFT"));
-		break;
-	case EightDirectional::UP:
-		//UE_LOG(LogTemp, Display, TEXT("I AM MOVING UP"));
-		break;
-	case EightDirectional::UP_RIGHT:
-		//UE_LOG(LogTemp, Display, TEXT("I AM MOVING UP AND RIGHT"));
-		break;
-	default:
-		break;
-	}
-	/*
-	if (LastInputVector != FVector::ZeroVector)
-	{
-		AnimMovementSpeed = LastInputVector.Size();
-	}
-	
-	
-	if (GetMovementComponent()->GetLastInputVector() == FVector::ZeroVector)
-	{
-		AnimMovementSpeed = 0.0f;
-	}
-	*/
+	//switch (MoveDirection)
+	//{
+	//case EightDirectional::NONE:
+	//	break;
+	//case EightDirectional::RIGHT:
+	//	//UE_LOG(LogTemp, Display, TEXT("I AM MOVING RIGHT"));
+	//	break;
+	//case EightDirectional::DOWN_RIGHT:
+	//	//UE_LOG(LogTemp, Display, TEXT("I AM MOVING DOWN AND RIGHT"));
+	//	break;
+	//case EightDirectional::DOWN:		
+	//	//UE_LOG(LogTemp, Display, TEXT("I AM MOVING DOWN"));
+	//	break;
+	//case EightDirectional::DOWN_LEFT:
+	//	//UE_LOG(LogTemp, Display, TEXT("I AM MOVING DOWN AND LEFT"));
+	//	break;
+	//case EightDirectional::LEFT:
+	//	//UE_LOG(LogTemp, Display, TEXT("I AM MOVING LEFT"));
+	//	break;
+	//case EightDirectional::UP_LEFT:
+	//	//UE_LOG(LogTemp, Display, TEXT("I AM MOVING UP AND LEFT"));
+	//	break;
+	//case EightDirectional::UP:
+	//	//UE_LOG(LogTemp, Display, TEXT("I AM MOVING UP"));
+	//	break;
+	//case EightDirectional::UP_RIGHT:
+	//	//UE_LOG(LogTemp, Display, TEXT("I AM MOVING UP AND RIGHT"));
+	//	break;
+	//default:
+	//	break;
+	//}
 
 	switch (CurrentForm)
 	{
@@ -613,13 +599,13 @@ void ACharacterController::OnReloadPressed()
 	case TransformationState::HUMAN:
 		if (AWeapon_Ranged* RecastWeapon = Cast<AWeapon_Ranged>(CurrentlyEquippedWeapon))
 		{
-			if (RecastWeapon->CanReload())
-			{
-				bShouldEnterReload = true;
-			}
 			if (AWeapon_PlayerRevolver* RecastAsRevolver = Cast<AWeapon_PlayerRevolver>(RecastWeapon))
 			{
 				RecastAsRevolver->StopFanFire();
+			}
+			if (RecastWeapon->CanReload())
+			{
+				bShouldEnterReload = true;
 			}
 		}
 		break;
@@ -865,35 +851,43 @@ void ACharacterController::RestoreControlAndRevokeInvulnerable()
 
 EightDirectional ACharacterController::RelativeFacingDirection(float Rotation)
 {
-	if (Rotation <= 45.f || Rotation >= 315.f)
+	if (Rotation <= 22.5f || Rotation >= 337.5f)
 	{
-		if (Rotation <= 90.f && Rotation >= 0.f)
+		/*if (Rotation <= 90.f && Rotation >= 0.f)
 		{
 			return EightDirectional::DOWN_RIGHT;
-		}
+		}*/
 		return EightDirectional::RIGHT;
 	}
-	if (Rotation <= 90.f && Rotation >= 0.f)
+	if (Rotation <= 67.5f && Rotation >= 22.5f)
 	{
-		//return EightDirectional::DOWN_RIGHT;
+		return EightDirectional::DOWN_RIGHT;
 	}
-	if (Rotation <= 135.f && Rotation >= 45.f)
+	if (Rotation <= 113.5f && Rotation >= 67.5f)
 	{
-		//return EightDirectional::DOWN;
+		return EightDirectional::DOWN;
 	}
-	if (Rotation <= 180.f || Rotation >= 90.f)
+	if (Rotation <= 158.5f && Rotation >= 113.5f)
 	{
-		//return EightDirectional::DOWN_LEFT;
+		return EightDirectional::DOWN_LEFT;
 	}
-	if (Rotation <= 45.f || Rotation >= 325.f)
+	if (Rotation <= 203.5f && Rotation >= 158.5f)
 	{
-		//return EightDirectional::RIGHT;
+		return EightDirectional::LEFT;
 	}
-	if (Rotation <= 45.f || Rotation >= 325.f)
+	if (Rotation <= 248.5f && Rotation >= 203.5f)
 	{
-		//return EightDirectional::RIGHT;
+		return EightDirectional::UP_LEFT;
 	}
-	
+	if (Rotation <= 293.5f && Rotation >= 248.5f)
+	{
+		return EightDirectional::UP;
+	}
+	if (Rotation <= 337.5f && Rotation >= 293.5f)
+	{
+		return EightDirectional::UP_RIGHT;
+	}
+
 	return EightDirectional::NONE;	
 }
 
