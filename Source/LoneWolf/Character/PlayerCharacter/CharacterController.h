@@ -98,7 +98,7 @@ protected:
 	virtual void TransformIntoHuman();
 	virtual void RevokeControlAndBecomeInvulnerable();
 	virtual void RestoreControlAndRevokeInvulnerable();
-	
+	virtual void OrientMeshToMovementDirection();
 	EightDirectional RelativeFacingDirection(float Rotation);
 	EightDirectional RelativeMovementDirection();
 

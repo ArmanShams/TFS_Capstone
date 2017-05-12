@@ -412,10 +412,18 @@ void ACharacterController::OnMoveForward(float scale)
 	{
 		if (scale > 0.02f)
 		{
+			if (LookDirection != MoveDirection)
+			{
+				OrientMeshToMovementDirection();
+			}
 			VerticalMove = 1;	
 		}
 		else if (scale < -0.02f)
 		{
+			if (LookDirection != MoveDirection)
+			{
+				OrientMeshToMovementDirection();
+			}
 			VerticalMove = -1;
 		}
 		else
@@ -432,16 +440,25 @@ void ACharacterController::OnMoveRight(float scale)
 	{
 		if (scale > 0.f)
 		{
+			if (LookDirection != MoveDirection)
+			{
+				OrientMeshToMovementDirection();
+			}
 			HorizontalMove = 1;
 		}
 		else if (scale < 0.f)
 		{
+			if (LookDirection != MoveDirection)
+			{
+				OrientMeshToMovementDirection();
+			}
 			HorizontalMove = -1;
 		}
 		else
 		{
 			HorizontalMove = 0;
 		}
+		
 		GetMovementComponent()->AddInputVector(GetActorRightVector() * scale * MoveSpeedActual);
 	}
 }
@@ -846,6 +863,42 @@ void ACharacterController::RestoreControlAndRevokeInvulnerable()
 			EnableInput(RecastController);
 			Effects = CharacterState::NONE;
 		}
+	}
+}
+
+void ACharacterController::OrientMeshToMovementDirection()
+{
+	switch (LookDirection)
+	{
+	case EightDirectional::NONE:
+		//UE_LOG(LogTemp, Display, TEXT("NOPE"));
+		break;
+	case EightDirectional::RIGHT:
+		GetMesh()->SetRelativeRotation(FMath::RInterpTo(GetMesh()->RelativeRotation, FRotator(0.f, 0.f, 0.f), GetWorld()->GetDeltaSeconds(), TurnRate));
+		break;
+	case EightDirectional::DOWN_RIGHT:
+		GetMesh()->SetRelativeRotation(FMath::RInterpTo(GetMesh()->RelativeRotation, FRotator(0.f, 45.f, 0.f), GetWorld()->GetDeltaSeconds(), TurnRate));
+		break;
+	case EightDirectional::DOWN:
+		GetMesh()->SetRelativeRotation(FMath::RInterpTo(GetMesh()->RelativeRotation, FRotator(0.f, 90.f, 0.f), GetWorld()->GetDeltaSeconds(), TurnRate));
+		break;
+	case EightDirectional::DOWN_LEFT:
+		GetMesh()->SetRelativeRotation(FMath::RInterpTo(GetMesh()->RelativeRotation, FRotator(0.f, 135.f, 0.f), GetWorld()->GetDeltaSeconds(), TurnRate));
+		break;
+	case EightDirectional::LEFT:
+		GetMesh()->SetRelativeRotation(FMath::RInterpTo(GetMesh()->RelativeRotation, FRotator(0.f, 180.f, 0.f), GetWorld()->GetDeltaSeconds(), TurnRate));
+		break;
+	case EightDirectional::UP_LEFT:
+		GetMesh()->SetRelativeRotation(FMath::RInterpTo(GetMesh()->RelativeRotation, FRotator(0.f, 225.f, 0.f), GetWorld()->GetDeltaSeconds(), TurnRate));
+		break;
+	case EightDirectional::UP:
+		GetMesh()->SetRelativeRotation(FMath::RInterpTo(GetMesh()->RelativeRotation, FRotator(0.f, 280.f, 0.f), GetWorld()->GetDeltaSeconds(), TurnRate));
+		break;
+	case EightDirectional::UP_RIGHT:
+		GetMesh()->SetRelativeRotation(FMath::RInterpTo(GetMesh()->RelativeRotation, FRotator(0.f, 325.f, 0.f), GetWorld()->GetDeltaSeconds(), TurnRate));
+		break;
+	default:
+		break;
 	}
 }
 
