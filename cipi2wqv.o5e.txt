@@ -1,0 +1,118 @@
+﻿Merge remote-tracking branch 'refs/remotes/origin/master' into BountyHunter
+
+# Conflicts:
+#	Binaries/Win64/LoneWolfEditor.target
+#	Binaries/Win64/UE4Editor-LoneWolf.dll
+#	Binaries/Win64/UE4Editor-LoneWolf.pdb
+#	Binaries/Win64/UE4Editor.modules
+#
+# It looks like you may be committing a merge.
+# If this is not correct, please remove the file
+#	.git/MERGE_HEAD
+# and try again.
+
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+# On branch BountyHunter
+# Your branch is behind 'origin/BountyHunter' by 8 commits, and can be fast-forwarded.
+#   (use "git pull" to update your local branch)
+#
+# All conflicts fixed but you are still merging.
+#
+# Changes to be committed:
+#	new file:   Binaries/Win64/UE4Editor-LoneWolf-3455.pdb
+#	new file:   Binaries/Win64/UE4Editor-LoneWolf-5782.dll
+#	new file:   Binaries/Win64/UE4Editor-LoneWolf-5782.pdb
+#	new file:   Binaries/Win64/UE4Editor-LoneWolf-9845.dll
+#	modified:   Config/DefaultEditor.ini
+#	new file:   Content/Animation/Bartender/ANIM_BARTENDER_LIGHT_UP.uasset
+#	new file:   Content/Animation/Bartender/ANIM_BARTENDER_THROW.uasset
+#	deleted:    Content/Animation/Bartender/ANIM_BartenderRun.uasset
+#	new file:   Content/Animation/Bartender/ANIM_Bartender_Run.uasset
+#	modified:   Content/Animation/Bartender/BartenderBlendSpace1D.uasset
+#	modified:   Content/Animation/Miner/ANIM_Miner_Stun.uasset
+#	modified:   Content/Animation/Miner/MinerAnimBP.uasset
+#	modified:   Content/Animation/Vincent/ANIM_FanFire.uasset
+#	new file:   Content/Animation/Vincent/ANIM_RUN_FIXED.uasset
+#	modified:   Content/Animation/Vincent/ANIM_Reload.uasset
+#	deleted:    Content/Animation/Vincent/ANIM_Run.uasset
+#	modified:   Content/Animation/Vincent/ANIM_RunForward.uasset
+#	modified:   Content/Animation/Vincent/ANIM_RunLeft.uasset
+#	modified:   Content/Animation/Vincent/ANIM_RunRight.uasset
+#	modified:   Content/Animation/Vincent/Character_Controller_AnimBP.uasset
+#	modified:   Content/Animation/Vincent/SK_Vincent_Skeleton_BlendSpace.uasset
+#	modified:   Content/Animation/Wolf/CharacterControllerWolf_AnimBP.uasset
+#	new file:   Content/Audio/SFX/A_SE_Spacialization.uasset
+#	modified:   Content/Audio/SFX/A_SFX_CicadasAmbience.uasset
+#	modified:   Content/Audio/SFX/A_SFX_HandgunFanFire.uasset
+#	modified:   Content/Audio/SFX/A_SFX_HandgunRegularFire.uasset
+#	modified:   Content/Audio/SFX/A_SFX_HandgunReload.uasset
+#	modified:   Content/Audio/SFX/A_SFX_HorseAmbience_01.uasset
+#	modified:   Content/Audio/SFX/A_SFX_HorseAmbience_02.uasset
+#	modified:   Content/Audio/SFX/A_SFX_KnifeSwing.uasset
+#	modified:   Content/Audio/SFX/A_SFX_Molotov.uasset
+#	modified:   Content/Audio/SFX/A_SFX_RifleFire_01.uasset
+#	modified:   Content/Audio/SFX/A_SFX_RifleFire_02.uasset
+#	modified:   Content/Audio/SFX/A_SFX_TrainAmbience.uasset
+#	modified:   Content/Audio/SFX/A_SFX_WaterDripAmbience.uasset
+#	modified:   Content/Audio/SFX/A_SFX_WaterRunningAmbience.uasset
+#	new file:   Content/Audio/SFX/A_SFX_WaterRunningAmbienceSpacialization.uasset
+#	modified:   Content/Audio/SFX/A_SFX_WolfAmbience.uasset
+#	modified:   Content/Blueprints/Enemies/MinerAI/MinerBP.uasset
+#	modified:   Content/Blueprints/Weapons/KnifeBP_Arman.uasset
+#	new file:   Content/FX/Stars/ANIM_Star.uasset
+#	new file:   Content/FX/Stars/BPStars.uasset
+#	new file:   Content/FX/Stars/MAT_Star.uasset
+#	deleted:    Content/FX/Stars/M_star.uasset
+#	renamed:    Content/FX/Stars/P_dizzy.uasset -> Content/FX/Stars/P_Stunned.uasset
+#	new file:   Content/FX/Stars/SK_Star.uasset
+#	new file:   Content/FX/Stars/SK_StarPhysicsAsset.uasset
+#	new file:   Content/FX/Stars/SK_StarSkeleton.uasset
+#	new file:   Content/FX/Stars/StarParams.uasset
+#	deleted:    Content/FX/Stars/Star_dizzy.uasset
+#	renamed:    Content/FX/Stars/STAR.uasset -> Content/FX/Stars/TX_Star.uasset
+#	deleted:    Content/FX/Stars/star_mesh.uasset
+#	deleted:    Content/FX/Stars/star_mesh_Anim.uasset
+#	deleted:    Content/FX/Stars/star_mesh_PhysicsAsset.uasset
+#	deleted:    Content/FX/Stars/star_mesh_Skeleton.uasset
+#	modified:   Content/Geometry/Characters/Bartender/SK_Scarlett.uasset
+#	modified:   Content/Geometry/World/M_Barrel.uasset
+#	modified:   Content/Geometry/World/M_CabinetA.uasset
+#	modified:   Content/Geometry/World/M_CabinetB.uasset
+#	modified:   Content/Geometry/World/M_CabinetC.uasset
+#	new file:   Content/Geometry/World/M_Cauldron.uasset
+#	new file:   Content/Geometry/World/M_RockBig.uasset
+#	new file:   Content/Geometry/World/M_Skull_Single.uasset
+#	new file:   Content/Geometry/World/M_Skulls.uasset
+#	new file:   Content/Materials/MAT_CabinetC.uasset
+#	modified:   Content/Materials/MAT_Glyphs.uasset
+#	new file:   Content/Materials/MI_CabinetB.uasset
+#	new file:   Content/Materials/MI_CabinetC.uasset
+#	new file:   Content/Materials/MI_Skull.uasset
+#	modified:   Content/Textures/MonValley_A_LookoutPoint_2k.uasset
+#	modified:   Content/Textures/TX_CabinetA_ARM.uasset
+#	modified:   Content/Textures/TX_CabinetA_C.uasset
+#	modified:   Content/Textures/TX_CabinetA_N.uasset
+#	new file:   Content/Textures/TX_CabinetB_ARM.uasset
+#	new file:   Content/Textures/TX_CabinetB_C.uasset
+#	new file:   Content/Textures/TX_CabinetB_N.uasset
+#	new file:   Content/Textures/TX_CabinetC_ARM.uasset
+#	new file:   Content/Textures/TX_CabinetC_C.uasset
+#	new file:   Content/Textures/TX_CabinetC_N.uasset
+#	renamed:    Content/Textures/glyphs.uasset -> Content/Textures/TX_Glyphs.uasset
+#	copied:     Content/Textures/MonValley_A_LookoutPoint_2k.uasset -> Content/Textures/TX_PlaceholderCubeMap.uasset
+#	new file:   Content/Textures/TX_Rockbig_N.uasset
+#	new file:   Content/Textures/TX_Skull_ARM.uasset
+#	new file:   Content/Textures/TX_Skull_C.uasset
+#	new file:   Content/Textures/TX_Skull_N.uasset
+#	modified:   Source/LoneWolf/Character/PlayerCharacter/CharacterController.cpp
+#	modified:   Source/LoneWolf/Character/PlayerCharacter/CharacterController.h
+#	modified:   Source/LoneWolf/Character/PlayerCharacter/CharacterHumanAnimInstance.cpp
+#	modified:   Source/LoneWolf/Character/PlayerCharacter/CharacterHumanAnimInstance.h
+#	modified:   Source/LoneWolf/Character/PlayerCharacter/CharacterWolfAnimInstance.cpp
+#	modified:   Source/LoneWolf/Character/PlayerCharacter/CharacterWolfAnimInstance.h
+#	modified:   Source/LoneWolf/Weapons/Weapon_PlayerRevolver.cpp
+#	modified:   Source/LoneWolf/Weapons/Weapon_PlayerRevolver.h
+#
+
