@@ -150,6 +150,8 @@ void ACharacterController::BeginPlay()
 void ACharacterController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+
+
 	FVector LastInputVector = GetMovementComponent()->GetLastInputVector();
 	if (bIsRolling && RollDirection != FVector::ZeroVector)
 	{
@@ -173,6 +175,7 @@ void ACharacterController::Tick(float DeltaSeconds)
 	LookDirection = RelativeFacingDirection(LookYaw);
 	MoveDirection = RelativeMovementDirection();
 
+	// Debug statements for eight axis movement and rotation.
 
 	//switch (LookDirection)
 	//{
@@ -316,7 +319,7 @@ void ACharacterController::SetupPlayerInputComponent(class UInputComponent* InIn
 		InInputComponent->BindAction(TEXT("Reload"), IE_Pressed, this, &ThisClass::OnReloadPressed);
 
 		// Debug key binding, remove later.
-		//InInputComponent->BindAction(TEXT("DebugRage"), IE_Pressed, this, &ThisClass::OnDebugRagePressed);
+		InInputComponent->BindAction(TEXT("DebugRage"), IE_Pressed, this, &ThisClass::OnDebugRagePressed);
 	}
 }
 void ACharacterController::AddRage(float RageToAdd)
