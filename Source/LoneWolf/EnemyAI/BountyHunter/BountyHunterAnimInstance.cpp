@@ -49,6 +49,5 @@ void UBountyHunterAnimInstance::AnimNotify_PlaceTrap()
 	if (GetWorld()->HasBegunPlay())
 	{
 		BountyHunter->SetBountyHunterState(BounterHunterState::SETTINGTRAP);
-		//BountyHunter->SetBearTrap();
 	}
 }

@@ -10,7 +10,10 @@ enum class BounterHunterState : uint8
 {
 	IDLE			UMETA(DisplayName = "Idle"),
 	READYINGATTACK	UMETA(DisplayName = "PreparingToAttack"),
+	AIMING			UMETA(DisplayName = "Aiming"),
 	ATTACKING		UMETA(DisplayName = "Attacking"),
+	FLEEING			UMETA(DisplayName = "Fleeing"),
+	CRITICALLEVEL	UMETA(DisplayName = "Critical Level"),
 	SETTINGTRAP		UMETA(DisplayName = "PlacingTrap")
 };
 
@@ -43,15 +46,29 @@ protected:
 	virtual AWeapon* EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip) override;
 
 	UFUNCTION()
-	void SetBearTrap(ATrapLocations* NewTrapLocation, const FHitResult & SweepResult);
+		void SetBearTrap(ATrapLocations* NewTrapLocation, const FHitResult & SweepResult);
+
+	bool bCanPlaceTrap();
 
 	UFUNCTION()
-	void OnActorBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+		void OnActorBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UPROPERTY(EditDefaultsOnly)
-		uint8 MaximumTrapsAllowed;
+	uint8 MaximumTrapsAllowed;
+
+	UPROPERTY(EditDefaultsOnly)
+	float CriticalHealth;
+
+	UPROPERTY(EditDefaultsOnly)
+	float FleeDistance;
+
+	//FVector LocationToFlee(ACharacterController* CharacterToFleeFrom);
 
 	bool bPlayRecoilAnimation;
+	bool bPlayBearTrapAnimation;
+
+	//bool bShouldFlee;
+	virtual void Flee(ACharacterController* CharacterToFleeFrom);
 
 	virtual void Attack();
 
