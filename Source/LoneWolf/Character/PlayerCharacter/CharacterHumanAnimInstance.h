@@ -70,7 +70,6 @@ protected:
 	UFUNCTION(BlueprintCallable, category = "Mesh")
 	void RecenterMeshOnCursor();
 
-
 	class ACharacterController* CharacterController;
 
 	friend class ACharacterController;
