@@ -60,6 +60,9 @@ public:
 	// The distance the Miner will be able to use the Charge, not the length of the charge itself.
 	UPROPERTY(EditDefaultsOnly)
 	float DistanceToUseCharge;
+	// The minimum distance the miner needs to be from the target to use the charge.
+	UPROPERTY(EditDefaultsOnly)
+	float MinimumChargeDistance;
 	// The offset from the Miner where the visual telegraph for the charge will spawn.
 	UPROPERTY(EditDefaultsOnly)
 	float ArrowSpawnOffset;

@@ -48,8 +48,10 @@ protected:
 	virtual bool bIsHardCC();
 	virtual bool bIsSoftCC();
 	virtual void Die();
-
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character")
 	bool bIsInHardCC;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character")
 	bool bIsInSoftCC;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character")
