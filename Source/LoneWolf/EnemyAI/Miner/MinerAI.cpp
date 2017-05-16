@@ -33,6 +33,8 @@ AMinerAI::AMinerAI()
 
 	DistanceToUseCharge = 1500.f;
 
+	MinimumChargeDistance = 500.f;
+
 	ArrowSpawnOffset = 150.f;
 
 	ChargeSpeed = 2000.f;
@@ -156,7 +158,18 @@ void AMinerAI::Tick(float DeltaSeconds)
 		BlackboardComponent->SetValueAsBool(TEXT("IsHardCC"), bIsInHardCC);
 		BlackboardComponent->SetValueAsBool(TEXT("IsSoftCC"), bIsInSoftCC);
 		BlackboardComponent->SetValueAsBool(TEXT("IsInMeleeRange"), bIsInRange());
-		BlackboardComponent->SetValueAsBool(TEXT("IsInRangeToCharge"), bIsInRange(DistanceToUseCharge));
+
+		if (bIsInRange(DistanceToUseCharge))
+		{
+			if (AActor* RecastTarget = Cast<AActor>(BlackboardComponent->GetValueAsObject("Target")))
+			{
+				FVector DistanceVector = RecastTarget->GetActorLocation() - GetActorLocation();
+				if (DistanceVector.Size() >= MinimumChargeDistance)
+				{
+					BlackboardComponent->SetValueAsBool(TEXT("IsInRangeToCharge"), bIsInRange(DistanceToUseCharge));
+				}
+			}
+		}
 		BlackboardComponent->SetValueAsBool(TEXT("IsInRangeToStomp"), bIsInRange(DistanceToUseStomp));
 		BlackboardComponent->SetValueAsEnum(TEXT("StatusEffect"), Effects);
 		BlackboardComponent->SetValueAsEnum(TEXT("EnemyState"), (uint8)CurrentState);
@@ -315,6 +328,18 @@ void AMinerAI::SetMinerState(MinerState NewStateToEnter)
 void AMinerAI::Attack()
 {
 	CurrentState = MinerState::ATTACKING;
+	if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
+	{
+		if (AActor* RecastTarget = Cast<AActor>(BlackboardComponent->GetValueAsObject("Target")))
+		{
+			FVector TargetLocation = RecastTarget->GetActorLocation();
+			FVector DirectionToTarget = TargetLocation - GetActorLocation();
+			FRotator NewRotation = GetActorRotation();
+			NewRotation.Yaw = DirectionToTarget.Rotation().Yaw;
+
+			SetActorRotation(NewRotation);
+		}
+	}
 }
 
 void AMinerAI::StartStomp()

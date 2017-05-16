@@ -150,6 +150,8 @@ void ACharacterController::BeginPlay()
 void ACharacterController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+
+
 	FVector LastInputVector = GetMovementComponent()->GetLastInputVector();
 	if (bIsRolling && RollDirection != FVector::ZeroVector)
 	{
@@ -173,40 +175,41 @@ void ACharacterController::Tick(float DeltaSeconds)
 	LookDirection = RelativeFacingDirection(LookYaw);
 	MoveDirection = RelativeMovementDirection();
 
-	switch (LookDirection)
-	{
-	case EightDirectional::NONE:
-		UE_LOG(LogTemp, Display, TEXT("NOPE"));
-		break;
-	case EightDirectional::RIGHT:
-		//UE_LOG(LogTemp, Display, TEXT("Mesh rotation yaw = %f"), LookYaw);
-		UE_LOG(LogTemp, Display, TEXT("Player is looking relatively right."));
-		break;
-	case EightDirectional::DOWN_RIGHT:
-		UE_LOG(LogTemp, Display, TEXT("Player is looking relatively down and to the right."));
-		break;
-	case EightDirectional::DOWN:
-		UE_LOG(LogTemp, Display, TEXT("Player is looking relatively down"));
-		break;
-	case EightDirectional::DOWN_LEFT:
-		UE_LOG(LogTemp, Display, TEXT("Player is looking relatively down and to the left."));
-		break;
-	case EightDirectional::LEFT:
-		UE_LOG(LogTemp, Display, TEXT("Player is looking relatively left."));
-		break;
-	case EightDirectional::UP_LEFT:
-		UE_LOG(LogTemp, Display, TEXT("Player is looking relatively up and to the left."));
-		break;
-	case EightDirectional::UP:
-		UE_LOG(LogTemp, Display, TEXT("Player is looking relatively up."));
-		break;
-	case EightDirectional::UP_RIGHT:
-		UE_LOG(LogTemp, Display, TEXT("Player is looking relatively up and to the right."));
-		break;
-	default:
-		break;
-	}
+	// Debug statements for eight axis movement and rotation.
 
+	//switch (LookDirection)
+	//{
+	//case EightDirectional::NONE:
+	//	UE_LOG(LogTemp, Display, TEXT("NOPE"));
+	//	break;
+	//case EightDirectional::RIGHT:
+	//	//UE_LOG(LogTemp, Display, TEXT("Mesh rotation yaw = %f"), LookYaw);
+	//	UE_LOG(LogTemp, Display, TEXT("Player is looking relatively right."));
+	//	break;
+	//case EightDirectional::DOWN_RIGHT:
+	//	UE_LOG(LogTemp, Display, TEXT("Player is looking relatively down and to the right."));
+	//	break;
+	//case EightDirectional::DOWN:
+	//	UE_LOG(LogTemp, Display, TEXT("Player is looking relatively down"));
+	//	break;
+	//case EightDirectional::DOWN_LEFT:
+	//	UE_LOG(LogTemp, Display, TEXT("Player is looking relatively down and to the left."));
+	//	break;
+	//case EightDirectional::LEFT:
+	//	UE_LOG(LogTemp, Display, TEXT("Player is looking relatively left."));
+	//	break;
+	//case EightDirectional::UP_LEFT:
+	//	UE_LOG(LogTemp, Display, TEXT("Player is looking relatively up and to the left."));
+	//	break;
+	//case EightDirectional::UP:
+	//	UE_LOG(LogTemp, Display, TEXT("Player is looking relatively up."));
+	//	break;
+	//case EightDirectional::UP_RIGHT:
+	//	UE_LOG(LogTemp, Display, TEXT("Player is looking relatively up and to the right."));
+	//	break;
+	//default:
+	//	break;
+	//}
 	//switch (MoveDirection)
 	//{
 	//case EightDirectional::NONE:
@@ -316,7 +319,7 @@ void ACharacterController::SetupPlayerInputComponent(class UInputComponent* InIn
 		InInputComponent->BindAction(TEXT("Reload"), IE_Pressed, this, &ThisClass::OnReloadPressed);
 
 		// Debug key binding, remove later.
-		//InInputComponent->BindAction(TEXT("DebugRage"), IE_Pressed, this, &ThisClass::OnDebugRagePressed);
+		InInputComponent->BindAction(TEXT("DebugRage"), IE_Pressed, this, &ThisClass::OnDebugRagePressed);
 	}
 }
 void ACharacterController::AddRage(float RageToAdd)
@@ -360,7 +363,7 @@ bool ACharacterController::GetbIsInSoftCC()
 
 float ACharacterController::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
 {
-	if (!bIsRolling &&  Effects != CharacterState::INVULNERABLE)
+	if (!bIsRolling &&  Effects != CharacterState::INVULNERABLE && Health > 0.f)
 	{
 		float NewHealth = Health;
 		NewHealth -= DamageAmount;
