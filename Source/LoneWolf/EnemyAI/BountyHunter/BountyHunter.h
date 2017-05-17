@@ -6,7 +6,7 @@
 #include "BountyHunter.generated.h"
 
 UENUM(BlueprintType)
-enum class BounterHunterState : uint8
+enum class BountyHunterState : uint8
 {
 	IDLE			UMETA(DisplayName = "Idle"),
 	READYINGATTACK	UMETA(DisplayName = "PreparingToAttack"),
@@ -37,7 +37,7 @@ public:
 	virtual bool GetbIsInSoftCC() override;
 	virtual void Destroyed() override;
 	virtual bool bCanTriggerRecoilAnimation();
-	virtual void SetBountyHunterState(BounterHunterState NewState);
+	virtual void SetBountyHunterState(BountyHunterState NewState);
 
 protected:
 	virtual bool bIsSoftCC() override;
@@ -45,20 +45,18 @@ protected:
 	virtual AWeapon* EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip) override;
 
 	UFUNCTION()
-		void SetBearTrap(ATrapLocations* NewTrapLocation, const FHitResult & SweepResult);
+	void SetBearTrap(ATrapLocations* NewTrapLocation, const FHitResult & SweepResult);
 
 	UFUNCTION()
-		void OnActorBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	void OnActorBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	virtual void Attack();
 
-	virtual void EquipWeapon(TSubclassOf<AWeapon> WeaponToEquip);
-
 	bool bPlayRecoilAnimation;
-	bool bCanFire;
+	bool bCanTriggerFireAnimation;
 
 	UPROPERTY(EditDefaultsOnly)
-		uint8 MaximumTrapsAllowed;
+	uint8 MaximumTrapsAllowed;
 
 	FVector PositionToMove;
 
@@ -66,7 +64,7 @@ protected:
 	ABearTrap* BearTrapPlaced;
 
 	TArray<AActor*> TrapArray;
-	BounterHunterState CurrentState;
+	BountyHunterState CurrentState;
 
 	bool bPlayBearTrapAnimation;
 

@@ -43,7 +43,13 @@ protected:
 	void AnimNotify_Shoot();
 
 	UFUNCTION()
-	void AnimNotify_PlaceTrap();
+	void AnimNotify_PlaceTrap();	
+
+	UFUNCTION()
+	void AnimNotify_Aim();
+
+	UFUNCTION()
+	void AnimNotify_ReturnToIdle();
 
 	class ABountyHunter* BountyHunter;
 

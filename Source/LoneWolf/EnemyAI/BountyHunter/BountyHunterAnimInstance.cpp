@@ -21,7 +21,7 @@ void UBountyHunterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 					if (bool t = BountyHunter->bCanTriggerRecoilAnimation())
 					{
 						bCanBasicAttack = t;
-						BountyHunter->GetEquippedWeapon()->Fire();
+						//BountyHunter->GetEquippedWeapon()->Fire();
 					}
 					else
 					{
@@ -41,14 +41,30 @@ void UBountyHunterAnimInstance::AnimNotify_Shoot()
 {
 	if (GetWorld()->HasBegunPlay())
 	{
-		BountyHunter->SetBountyHunterState(BounterHunterState::ATTACKING);
+		BountyHunter->SetBountyHunterState(BountyHunterState::ATTACKING);
 	}
 }
 
 void UBountyHunterAnimInstance::AnimNotify_PlaceTrap()
 {
-	//if (GetWorld()->HasBegunPlay())
-	//{
-	//	BountyHunter->SetBountyHunterState(BounterHunterState::SETTINGTRAP);
-	//}
+	if (GetWorld()->HasBegunPlay())
+	{
+		BountyHunter->SetBountyHunterState(BountyHunterState::SETTINGTRAP);
+	}
+}
+
+void UBountyHunterAnimInstance::AnimNotify_Aim()
+{
+	if (GetWorld()->HasBegunPlay())
+	{
+		BountyHunter->SetBountyHunterState(BountyHunterState::AIMING);
+	}
+}
+
+void UBountyHunterAnimInstance::AnimNotify_ReturnToIdle()
+{
+	if (GetWorld()->HasBegunPlay())
+	{
+		BountyHunter->SetBountyHunterState(BountyHunterState::IDLE);
+	}
 }

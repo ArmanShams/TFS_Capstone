@@ -28,7 +28,7 @@ ABountyHunter::ABountyHunter()
 	AttackRange = 3000.0f;
 	MaximumTrapsAllowed = 3;
 	bPlayRecoilAnimation = false;
-	CurrentState = BounterHunterState::IDLE;
+	CurrentState = BountyHunterState::IDLE;
 
 	ConstructorHelpers::FClassFinder<AWeapon>WeaponAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/Weapon_RifleBP.Weapon_RifleBP_C'"));
 	if (WeaponAsset.Class)
@@ -48,13 +48,13 @@ ABountyHunter::ABountyHunter()
 void ABountyHunter::BeginPlay()
 {
 	Super::BeginPlay();
-	bCanFire = false;
 	EquipNewWeapon(DefaultWeapon);
 }
 
 void ABountyHunter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
 	if (bPlayRecoilAnimation)
 	{
 		bPlayRecoilAnimation = false;
@@ -66,7 +66,7 @@ void ABountyHunter::Tick(float DeltaTime)
 		BlackboardComponent->SetValueAsBool(TEXT("bCanAttackTarget"), bIsInRange());
 		BlackboardComponent->SetValueAsVector(TEXT("AttackingPoisiton"), PositionToMove);
 
-		if (CurrentState == BounterHunterState::READYINGATTACK && CurrentlyEquippedWeapon != NULL)
+		if (CurrentState == BountyHunterState::READYINGATTACK && CurrentlyEquippedWeapon != NULL)
 		{
 			if (BlackboardComponent->GetValueAsObject(TEXT("Target")) != NULL)
 			{
@@ -79,6 +79,8 @@ void ABountyHunter::Tick(float DeltaTime)
 					{
 						FRotator YawRotation = (RecastTarget->GetActorLocation() - CurrentlyEquippedWeapon->GetActorLocation()).Rotation();
 						DesiredWeaponRotation.Yaw = YawRotation.Yaw;
+
+						CurrentlyEquippedWeapon->Fire();
 					}
 					else
 					{
@@ -162,7 +164,7 @@ bool ABountyHunter::bCanTriggerRecoilAnimation()
 	return bPlayRecoilAnimation;
 }
 
-void ABountyHunter::SetBountyHunterState(BounterHunterState NewState)
+void ABountyHunter::SetBountyHunterState(BountyHunterState NewState)
 {
 	CurrentState = NewState;
 }
@@ -176,7 +178,7 @@ AWeapon* ABountyHunter::EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip)
 
 void ABountyHunter::SetBearTrap(ATrapLocations* NewTrapLocation, const FHitResult& SweepResult)
 {
-	if (CurrentState == BounterHunterState::SETTINGTRAP && !NewTrapLocation->bIsOccupied)
+	if (CurrentState == BountyHunterState::SETTINGTRAP && !NewTrapLocation->bIsOccupied)
 	{ // bSetTrap();
 		UE_LOG(LogTemp, Display, TEXT("The trap location is now occupied"));
 		if (BearTrapClass != NULL)
@@ -207,6 +209,7 @@ void ABountyHunter::OnActorBeginOverlap(UPrimitiveComponent * OverlappedComp, AA
 {
 	if (ATrapLocations* RecastedOverlappingActor = Cast<ATrapLocations>(OtherActor))
 	{
+		SetBountyHunterState(BountyHunterState::SETTINGTRAP);
 		SetBearTrap(RecastedOverlappingActor, SweepResult);
 		RecastedOverlappingActor->bIsOccupied = true;
 	}
@@ -218,13 +221,9 @@ void ABountyHunter::Attack()
 	{
 		if (CurrentlyEquippedWeapon->CanFire())
 		{
-			CurrentState = BounterHunterState::READYINGATTACK;
+			CurrentState = BountyHunterState::READYINGATTACK;
 			bPlayRecoilAnimation = true;
 		}
 	}
 }
 
-void ABountyHunter::EquipWeapon(TSubclassOf<AWeapon> WeaponToEquip)
-{
-
-}
