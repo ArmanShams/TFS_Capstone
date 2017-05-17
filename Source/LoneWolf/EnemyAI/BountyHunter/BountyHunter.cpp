@@ -20,7 +20,6 @@ ABountyHunter::ABountyHunter()
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ABountyHunter::OnActorBeginOverlap);
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
-	CurrentState = BounterHunterState::IDLE;
 	Health = MAXHEALTH;
 	MoveSpeed = .01f;
 	TurnRate = 0.25f;
@@ -28,19 +27,20 @@ ABountyHunter::ABountyHunter()
 	AttackFrequency = 1.f;
 	AttackRange = 3000.0f;
 	MaximumTrapsAllowed = 3;
-	FleeDistance = 200.0f;
 	bPlayRecoilAnimation = false;
-
+	CurrentState = BounterHunterState::IDLE;
 
 	ConstructorHelpers::FClassFinder<AWeapon>WeaponAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/Weapon_RifleBP.Weapon_RifleBP_C'"));
 	if (WeaponAsset.Class)
 	{
+		//UE_LOG(LogTemp, Display, TEXT("Found the rifle."));
 		DefaultWeapon = (UClass*)WeaponAsset.Class;
 	}
 
 	ConstructorHelpers::FClassFinder<ABearTrap>TrapAsset(TEXT("Blueprint'/Game/Blueprints/Enemies/BountyHunterAI/BearTrapBP.BearTrapBP_C'"));
 	if (TrapAsset.Class)
 	{
+		//UE_LOG(LogTemp, Display, TEXT("Found the trap."));
 		BearTrapClass = (UClass*)TrapAsset.Class;
 	}
 }
@@ -48,8 +48,8 @@ ABountyHunter::ABountyHunter()
 void ABountyHunter::BeginPlay()
 {
 	Super::BeginPlay();
+	bCanFire = false;
 	EquipNewWeapon(DefaultWeapon);
-	bPlayBearTrapAnimation = false;
 }
 
 void ABountyHunter::Tick(float DeltaTime)
@@ -59,26 +59,21 @@ void ABountyHunter::Tick(float DeltaTime)
 	{
 		bPlayRecoilAnimation = false;
 	}
-
-	if (Health <= CriticalHealth)
-	{
-		SetBountyHunterState(BounterHunterState::CRITICALLEVEL);
-	}
-
 	if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
 	{
 		BlackboardComponent->SetValueAsBool(TEXT("IsHardCC"), bIsInHardCC);
 		BlackboardComponent->SetValueAsBool(TEXT("IsSoftCC"), bIsInSoftCC);
 		BlackboardComponent->SetValueAsBool(TEXT("bCanAttackTarget"), bIsInRange());
-		BlackboardComponent->SetValueAsBool(TEXT("bCanSetTrap"), bCanPlaceTrap());
+		BlackboardComponent->SetValueAsVector(TEXT("AttackingPoisiton"), PositionToMove);
 
-		if (BlackboardComponent->GetValueAsObject(TEXT("Target")) != NULL)
+		if (CurrentState == BounterHunterState::READYINGATTACK && CurrentlyEquippedWeapon != NULL)
 		{
-			if (ACharacterController* RecastTarget = Cast<ACharacterController>(BlackboardComponent->GetValueAsObject(TEXT("Target"))))
+			if (BlackboardComponent->GetValueAsObject(TEXT("Target")) != NULL)
 			{
-				if (CurrentState == BounterHunterState::READYINGATTACK && CurrentlyEquippedWeapon != NULL)
+				if (ACharacterController* RecastTarget = Cast<ACharacterController>(BlackboardComponent->GetValueAsObject(TEXT("Target"))))
 				{
 					FRotator DesiredWeaponRotation = GetActorRotation();
+
 					FVector DirectionToTarget = RecastTarget->GetActorLocation() - GetActorLocation();
 					if (DirectionToTarget.Size() > 300.f)
 					{
@@ -88,17 +83,13 @@ void ABountyHunter::Tick(float DeltaTime)
 					else
 					{
 						FRotator YawRotation = (GetActorLocation() + (GetMesh()->GetRightVector() * 256.f) - CurrentlyEquippedWeapon->GetActorLocation()).Rotation();
+						DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + GetMesh()->GetRightVector() * 256.f, FColor(255, 255, 255), false, 0.018f, 8, 12.333f);
 						DesiredWeaponRotation.Yaw = YawRotation.Yaw;
 					}
 					FRotator RotationInDirection = FRotationMatrix::MakeFromX(DirectionToTarget).Rotator();
 					DesiredWeaponRotation.Pitch = RotationInDirection.Pitch;
 
 					CurrentlyEquippedWeapon->SetActorRotation(FMath::RInterpTo(CurrentlyEquippedWeapon->GetActorRotation(), DesiredWeaponRotation, GetWorld()->GetDeltaSeconds(), 200.f));
-				}
-				if (CurrentState == BounterHunterState::CRITICALLEVEL)
-				{
-					Flee(RecastTarget);
-					//LocationToFlee(RecastTarget);
 				}
 			}
 		}
@@ -162,8 +153,9 @@ bool ABountyHunter::bIsHardCC()
 
 void ABountyHunter::Destroyed()
 {
-	Super::Destroyed();	// Any actors spawned by this that need to be destroyed/cleaned up should be done so here before Super::Destroyed() is called.
+	Super::Destroyed();
 }
+
 
 bool ABountyHunter::bCanTriggerRecoilAnimation()
 {
@@ -178,7 +170,7 @@ void ABountyHunter::SetBountyHunterState(BounterHunterState NewState)
 AWeapon* ABountyHunter::EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip)
 {
 	CurrentlyEquippedWeapon = Super::EquipNewWeapon(WeaponToEquip);
-	CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(30.f, -90.f, 90.f)); // CurrentlyEquippedWeapon->SetActorLocation(GetMesh()->GetSocketLocation(FName("hand_r")));
+	CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(30.f, -90.f, 90.f));
 	return CurrentlyEquippedWeapon;
 }
 
@@ -204,10 +196,6 @@ void ABountyHunter::SetBearTrap(ATrapLocations* NewTrapLocation, const FHitResul
 			TrapArray.Add(BearTrapPlaced);
 			UE_LOG(LogTemp, Display, TEXT("Bounty Hunter set a bear trap, trap added to array list"));
 		}
-		if (CurrentState != BounterHunterState::SETTINGTRAP)
-		{
-			UE_LOG(LogTemp, Display, TEXT("Bounty Hunter's state needs to be setting trap for this function to work."));
-		}
 		else
 		{ // bSetTrap();
 			UE_LOG(LogTemp, Display, TEXT("The Trap Location is already occupied, the bounty hunter will not try to place a trap here"));
@@ -215,65 +203,24 @@ void ABountyHunter::SetBearTrap(ATrapLocations* NewTrapLocation, const FHitResul
 	}
 }
 
-bool ABountyHunter::bCanPlaceTrap()
-{
-	if(CurrentState == BounterHunterState::SETTINGTRAP)
-	{
-		return true;
-	}
-	return false;
-}
-
 void ABountyHunter::OnActorBeginOverlap(UPrimitiveComponent * OverlappedComp, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
 {
 	if (ATrapLocations* RecastedOverlappingActor = Cast<ATrapLocations>(OtherActor))
 	{
-		UE_LOG(LogTemp, Display, TEXT("The Bounty Hunter passed a location where a trap could be put"));
 		SetBearTrap(RecastedOverlappingActor, SweepResult);
 		RecastedOverlappingActor->bIsOccupied = true;
 	}
 }
 
-void ABountyHunter::Flee(ACharacterController* CharacterToFleeFrom)
-{
-	UE_LOG(LogTemp, Display, TEXT("Attempting to flee"));
-}
-
-//FVector ABountyHunter::LocationToFlee(ACharacterController * CharacterToFleeFrom)
-//{
-//	FVector DirectionAwayFromTarget = RecastTarget->GetActorLocation() + GetActorLocation();
-//	FVector PlayerLocation = CharacterToFleeFrom->GetActorLocation();
-//	FVector CurrentLocation = GetActorLocation();
-//
-//	float Dist = FVector::Dist(PlayerLocation, CurrentLocation);
-//
-//	if (Dist <= FleeDistance)
-//	{
-//		UE_LOG(LogTemp, Display, TEXT("Attempting to flee"));
-//		FVector LocationToMove = CurrentLocation + FleeDistance;
-//	}
-//
-//	return FVector();
-//}
-
 void ABountyHunter::Attack()
 {
-	if (Health >= CriticalHealth)
+	if (CurrentlyEquippedWeapon != NULL)
 	{
-		if (CurrentlyEquippedWeapon != NULL)
+		if (CurrentlyEquippedWeapon->CanFire())
 		{
-			if (CurrentlyEquippedWeapon->CanFire())
-			{
-				SetBountyHunterState(BounterHunterState::ATTACKING);
-				bPlayRecoilAnimation = true;
-				//CurrentlyEquippedWeapon->Fire();
-			}
+			CurrentState = BounterHunterState::READYINGATTACK;
+			bPlayRecoilAnimation = true;
 		}
-	}
-	else
-	{
-		SetBountyHunterState(BounterHunterState::FLEEING);
-		UE_LOG(LogTemp, Display, TEXT("The Bounty Hunter is attempting to flee"));
 	}
 }
 

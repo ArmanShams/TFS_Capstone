@@ -3,6 +3,7 @@
 #include "LoneWolf.h"
 #include "EnemyAI/BountyHunter/BountyHunter.h"
 #include "BountyHunterAnimInstance.h"
+#include "Engine.h"
 
 void UBountyHunterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
@@ -20,6 +21,7 @@ void UBountyHunterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 					if (bool t = BountyHunter->bCanTriggerRecoilAnimation())
 					{
 						bCanBasicAttack = t;
+						BountyHunter->GetEquippedWeapon()->Fire();
 					}
 					else
 					{
@@ -40,14 +42,13 @@ void UBountyHunterAnimInstance::AnimNotify_Shoot()
 	if (GetWorld()->HasBegunPlay())
 	{
 		BountyHunter->SetBountyHunterState(BounterHunterState::ATTACKING);
-		BountyHunter->Attack();
 	}
 }
 
 void UBountyHunterAnimInstance::AnimNotify_PlaceTrap()
 {
-	if (GetWorld()->HasBegunPlay())
-	{
-		BountyHunter->SetBountyHunterState(BounterHunterState::SETTINGTRAP);
-	}
+	//if (GetWorld()->HasBegunPlay())
+	//{
+	//	BountyHunter->SetBountyHunterState(BounterHunterState::SETTINGTRAP);
+	//}
 }

@@ -13,7 +13,6 @@ enum class BounterHunterState : uint8
 	AIMING			UMETA(DisplayName = "Aiming"),
 	ATTACKING		UMETA(DisplayName = "Attacking"),
 	FLEEING			UMETA(DisplayName = "Fleeing"),
-	CRITICALLEVEL	UMETA(DisplayName = "Critical Level"),
 	SETTINGTRAP		UMETA(DisplayName = "PlacingTrap")
 };
 
@@ -41,38 +40,27 @@ public:
 	virtual void SetBountyHunterState(BounterHunterState NewState);
 
 protected:
-	virtual bool bIsSoftCC() override;			// Returns true if the actor's Status Effects is a 'softCC'. Defined in Design Document
-	virtual bool bIsHardCC() override;			// Returns true if the actor's Status Effects is a 'hardCC'. Defined in Design Document
+	virtual bool bIsSoftCC() override;
+	virtual bool bIsHardCC() override;
 	virtual AWeapon* EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip) override;
 
 	UFUNCTION()
 		void SetBearTrap(ATrapLocations* NewTrapLocation, const FHitResult & SweepResult);
 
-	bool bCanPlaceTrap();
-
 	UFUNCTION()
 		void OnActorBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
-	UPROPERTY(EditDefaultsOnly)
-	uint8 MaximumTrapsAllowed;
-
-	UPROPERTY(EditDefaultsOnly)
-	float CriticalHealth;
-
-	UPROPERTY(EditDefaultsOnly)
-	float FleeDistance;
-
-	//FVector LocationToFlee(ACharacterController* CharacterToFleeFrom);
-
-	bool bPlayRecoilAnimation;
-	bool bPlayBearTrapAnimation;
-
-	//bool bShouldFlee;
-	virtual void Flee(ACharacterController* CharacterToFleeFrom);
 
 	virtual void Attack();
 
 	virtual void EquipWeapon(TSubclassOf<AWeapon> WeaponToEquip);
+
+	bool bPlayRecoilAnimation;
+	bool bCanFire;
+
+	UPROPERTY(EditDefaultsOnly)
+		uint8 MaximumTrapsAllowed;
+
+	FVector PositionToMove;
 
 	TSubclassOf<class ABearTrap> BearTrapClass;
 	ABearTrap* BearTrapPlaced;
@@ -80,8 +68,9 @@ protected:
 	TArray<AActor*> TrapArray;
 	BounterHunterState CurrentState;
 
+	bool bPlayBearTrapAnimation;
+
 	friend class ABearTrap;
-	friend class UBountyHunterAnimInstance;
 	friend class UBTTask_BountyHunterAttack;
-	friend class UBTTask_BountyHunterPlaceTrap;
+	friend class UBountyHunterAnimInstance;
 };
