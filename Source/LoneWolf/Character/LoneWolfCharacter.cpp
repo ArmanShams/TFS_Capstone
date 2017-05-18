@@ -2,10 +2,7 @@
 
 #include "LoneWolf.h"
 #include "LoneWolfCharacter.h"
-#include "Character/StatusEffects/StatusEffectBase.h"
-#include "Character/StatusEffects/StatusEffect_HardCrowdControl.h"
-#include "Character/StatusEffects/StatusEffect_SoftCrowdControl.h"
-#include "Weapons/Weapon.h"
+
 
 ALoneWolfCharacter::ALoneWolfCharacter()
 {

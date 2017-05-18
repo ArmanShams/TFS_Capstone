@@ -28,7 +28,8 @@ ABartenderAI::ABartenderAI()
 	AttackRange = 250.0f;
 	
 	TimeForMolotovToReachTargetLocation = 4.0f;
-	
+
+	bIsAttacking = false;
 }
 
 void ABartenderAI::BeginPlay()
@@ -41,6 +42,16 @@ void ABartenderAI::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 
 	TimeSinceLastAttack += DeltaSeconds;
+
+	if (bIsAttacking)
+	{
+		UE_LOG(LogTemp, Display, TEXT("JAM"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Display, TEXT("NOJAM"));
+	}
+
 
 	if (TimeSinceLastAttack >= AttackFrequency)
 	{
@@ -129,7 +140,7 @@ void ABartenderAI::ThrowMolotov()
 			//{
 			//	if (RecastTarget->GetLastMovementInputVector() != FVector::ZeroVector)
 			//	{
-			//		TargetDestination += RecastTarget->GetLastMovementInputVector() * RecastTarget->GetVelocity().Size();
+			//		TargetDestination += RecastTarget->GetVelocity();
 			//	}
 			//}
 			SpawnedMolotov->SetMolotovVelocity(HitTargetLocationAtTime(SpawnedMolotov->GetActorLocation(), TargetDestination, FVector(0.f, 0.f, GetWorld()->GetGravityZ()), TimeForMolotovToReachTargetLocation));
@@ -138,6 +149,16 @@ void ABartenderAI::ThrowMolotov()
 			//DrawDebugLine(GetWorld(), HitTargetLocationAtTime(T->GetActorLocation(), GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation(), FVector(0.f, 0.f, GetWorld()->GetGravityZ()), 2.0f), 5.f, FColor(255, 0, 0), true, 8);
 		}
 	}
+}
+
+bool ABartenderAI::GetIsAttacking()
+{
+	return bIsAttacking;
+}
+
+void ABartenderAI::SetIsAttacking(bool NewValue)
+{
+	bIsAttacking = NewValue;
 }
 
 FVector ABartenderAI::HitTargetLocationAtTime(FVector StartPosition, FVector TargetPosition, FVector GravityBase, float TimeToTarget)

@@ -3,7 +3,10 @@
 #pragma once
 
 #include "GameFramework/Character.h"
+#include "Weapons/WeaponTypes.h"
+#include "Character/StatusEffects/StatusEffects.h"
 #include "LoneWolfCharacter.generated.h"
+
 
 UCLASS()
 class LONEWOLF_API ALoneWolfCharacter : public ACharacter
