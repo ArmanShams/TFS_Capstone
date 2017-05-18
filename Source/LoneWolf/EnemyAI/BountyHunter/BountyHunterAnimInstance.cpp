@@ -11,7 +11,7 @@ void UBountyHunterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	if (GetWorld()->HasBegunPlay())
 	{
 		BountyHunter = Cast<ABountyHunter>(TryGetPawnOwner());
-
+		
 		if (BountyHunter)
 		{
 			if (BountyHunter->bIsInRange())
@@ -33,6 +33,11 @@ void UBountyHunterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 					RecastWeapon->Reload();
 				}
 			}
+
+			//CurrentEnemyState = BountyHunter->CurrentState;
+			bCanBasicAttack = BountyHunter->bIsInRange();
+			bIsDead = BountyHunter->Health <= 0.0f;
+			bIsHardCC = BountyHunter->bIsInHardCC;
 		}	
 	}
 }
@@ -41,7 +46,8 @@ void UBountyHunterAnimInstance::AnimNotify_Shoot()
 {
 	if (GetWorld()->HasBegunPlay())
 	{
-		BountyHunter->SetBountyHunterState(BountyHunterState::ATTACKING);
+		bIsBasicAttack = true;
+		//BountyHunter->SetBountyHunterState(BountyHunterState::ATTACKING);
 	}
 }
 
@@ -49,15 +55,18 @@ void UBountyHunterAnimInstance::AnimNotify_PlaceTrap()
 {
 	if (GetWorld()->HasBegunPlay())
 	{
-		BountyHunter->SetBountyHunterState(BountyHunterState::SETTINGTRAP);
+		bCanSetTrap = true;
+		//BountyHunter->SetBountyHunterState(BountyHunterState::SETTINGTRAP);
 	}
 }
 
 void UBountyHunterAnimInstance::AnimNotify_Aim()
 {
+	
 	if (GetWorld()->HasBegunPlay())
 	{
-		BountyHunter->SetBountyHunterState(BountyHunterState::AIMING);
+		bIsAiming = true;
+		//BountyHunter->SetBountyHunterState(BountyHunterState::AIMING);
 	}
 }
 
@@ -65,6 +74,18 @@ void UBountyHunterAnimInstance::AnimNotify_ReturnToIdle()
 {
 	if (GetWorld()->HasBegunPlay())
 	{
-		BountyHunter->SetBountyHunterState(BountyHunterState::IDLE);
+		//if (BountyHunter->CurrentState(BountyHunterState::IDLE))
+		//{
+
+		//}
+	}
+}
+
+void UBountyHunterAnimInstance::AnimNotify_Stunned()
+{
+	if (GetWorld()->HasBegunPlay())
+	{
+		bIsHardCC = true;
+		//BountyHunter->SetBountyHunterState(BountyHunterState::Stunned);
 	}
 }

@@ -33,14 +33,12 @@ ABountyHunter::ABountyHunter()
 	ConstructorHelpers::FClassFinder<AWeapon>WeaponAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/Weapon_RifleBP.Weapon_RifleBP_C'"));
 	if (WeaponAsset.Class)
 	{
-		//UE_LOG(LogTemp, Display, TEXT("Found the rifle."));
 		DefaultWeapon = (UClass*)WeaponAsset.Class;
 	}
 
 	ConstructorHelpers::FClassFinder<ABearTrap>TrapAsset(TEXT("Blueprint'/Game/Blueprints/Enemies/BountyHunterAI/BearTrapBP.BearTrapBP_C'"));
 	if (TrapAsset.Class)
 	{
-		//UE_LOG(LogTemp, Display, TEXT("Found the trap."));
 		BearTrapClass = (UClass*)TrapAsset.Class;
 	}
 }
@@ -169,6 +167,11 @@ void ABountyHunter::SetBountyHunterState(BountyHunterState NewState)
 	CurrentState = NewState;
 }
 
+void ABountyHunter::Die()
+{
+	return Super::Die();
+}
+
 AWeapon* ABountyHunter::EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip)
 {
 	CurrentlyEquippedWeapon = Super::EquipNewWeapon(WeaponToEquip);
@@ -192,7 +195,6 @@ void ABountyHunter::SetBearTrap(ATrapLocations* NewTrapLocation, const FHitResul
 			}
 			BearTrapPlaced = GetWorld()->SpawnActor<ABearTrap>(BearTrapClass);
 			BearTrapPlaced->SetActorRelativeLocation(GetMesh()->GetSocketLocation("RightToe_End"));
-			// BearTrapPlaced->SetLifeSpan(5.0f);
 			BearTrapPlaced->SetOwner(this);
 			BearTrapPlaced->SetLocationBeingOccupied(NewTrapLocation);
 			TrapArray.Add(BearTrapPlaced);

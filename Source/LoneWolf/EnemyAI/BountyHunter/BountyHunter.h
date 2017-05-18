@@ -38,6 +38,7 @@ public:
 	virtual void Destroyed() override;
 	virtual bool bCanTriggerRecoilAnimation();
 	virtual void SetBountyHunterState(BountyHunterState NewState);
+	virtual void Die() override;
 
 protected:
 	virtual bool bIsSoftCC() override;
@@ -55,6 +56,7 @@ protected:
 	bool bPlayRecoilAnimation;
 	bool bCanTriggerFireAnimation;
 
+	//The maximum number of traps he is allowed to put in the world, extra traps will delete the obsolete trap.
 	UPROPERTY(EditDefaultsOnly)
 	uint8 MaximumTrapsAllowed;
 
