@@ -16,9 +16,9 @@ public:
 
 	virtual void BeginPlay() override;
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	virtual void SetUpStatusEffect(float DamageToDeal, float LifeTime, float TickRate, ALoneWolfCharacter* CharacterToAfflict, ALoneWolfCharacter* CharacterThatInflictedStatusEffect);
-	virtual void SetUpStatusEffect(bool bDealDamage, bool bPerformTickAction, float LifeTime, float TickRate, ALoneWolfCharacter* CharacterToAfflict, ALoneWolfCharacter* CharacterThatInflictedStatusEffect);
-	virtual void SetUpStatusEffect(bool bDealDamage, bool bPerformTickAction,  float LifeTime, float DamageToDeal, float TickRate, ALoneWolfCharacter* CharacterToAfflict, ALoneWolfCharacter* CharacterThatInflictedStatusEffect);
+	virtual void SetUpStatusEffect(float DamageToDeal, float LifeTime, float TickRate, class ALoneWolfCharacter* CharacterToAfflict, class ALoneWolfCharacter* CharacterThatInflictedStatusEffect);
+	virtual void SetUpStatusEffect(bool bDealDamage, bool bPerformTickAction, float LifeTime, float TickRate, class ALoneWolfCharacter* CharacterToAfflict, class ALoneWolfCharacter* CharacterThatInflictedStatusEffect);
+	virtual void SetUpStatusEffect(bool bDealDamage, bool bPerformTickAction,  float LifeTime, float DamageToDeal, float TickRate, class ALoneWolfCharacter* CharacterToAfflict, class ALoneWolfCharacter* CharacterThatInflictedStatusEffect);
 	virtual void ActionToPerformOnStatusTick();
 	virtual void DestroyComponent(bool bReparentChildren) override;
 
