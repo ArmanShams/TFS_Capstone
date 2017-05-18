@@ -62,7 +62,7 @@ void ABountyHunter::Tick(float DeltaTime)
 		BlackboardComponent->SetValueAsBool(TEXT("IsHardCC"), bIsInHardCC);
 		BlackboardComponent->SetValueAsBool(TEXT("IsSoftCC"), bIsInSoftCC);
 		BlackboardComponent->SetValueAsBool(TEXT("bCanAttackTarget"), bIsInRange());
-		BlackboardComponent->SetValueAsVector(TEXT("AttackingPoisiton"), PositionToMove);
+		BlackboardComponent->SetValueAsVector(TEXT("AttackingPosition"), PositionToMove);
 
 		if (CurrentState == BountyHunterState::READYINGATTACK && CurrentlyEquippedWeapon != NULL)
 		{
@@ -78,12 +78,12 @@ void ABountyHunter::Tick(float DeltaTime)
 						FRotator YawRotation = (RecastTarget->GetActorLocation() - CurrentlyEquippedWeapon->GetActorLocation()).Rotation();
 						DesiredWeaponRotation.Yaw = YawRotation.Yaw;
 
-						CurrentlyEquippedWeapon->Fire();
+						//CurrentlyEquippedWeapon->Fire();
 					}
 					else
 					{
 						FRotator YawRotation = (GetActorLocation() + (GetMesh()->GetRightVector() * 256.f) - CurrentlyEquippedWeapon->GetActorLocation()).Rotation();
-						DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + GetMesh()->GetRightVector() * 256.f, FColor(255, 255, 255), false, 0.018f, 8, 12.333f);
+						//DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + GetMesh()->GetRightVector() * 256.f, FColor(255, 255, 255), false, 0.018f, 8, 12.333f);
 						DesiredWeaponRotation.Yaw = YawRotation.Yaw;
 					}
 					FRotator RotationInDirection = FRotationMatrix::MakeFromX(DirectionToTarget).Rotator();

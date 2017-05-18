@@ -68,6 +68,8 @@ protected:
 	TArray<AActor*> TrapArray;
 	BountyHunterState CurrentState;
 
+	TArray<ATargetPoint> TrapLocations;
+
 	bool bPlayBearTrapAnimation;
 
 	friend class ABearTrap;
