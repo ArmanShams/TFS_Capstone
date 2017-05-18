@@ -586,9 +586,12 @@ void ACharacterController::OnRollPressed()
 	if (!bIsInHardCC)
 	{
 		Roll();
-		if (AWeapon_PlayerRevolver* RecastWeapon = Cast<AWeapon_PlayerRevolver>(CurrentlyEquippedWeapon))
+		if (CurrentlyEquippedWeapon != NULL)
 		{
-			RecastWeapon->StopFanFire();
+			if (AWeapon_PlayerRevolver* RecastWeapon = Cast<AWeapon_PlayerRevolver>(CurrentlyEquippedWeapon))
+			{
+				RecastWeapon->StopFanFire();
+			}
 		}
 	}
 }
@@ -617,15 +620,18 @@ void ACharacterController::OnReloadPressed()
 	case TransformationState::DEAD:
 		break;
 	case TransformationState::HUMAN:
-		if (AWeapon_Ranged* RecastWeapon = Cast<AWeapon_Ranged>(CurrentlyEquippedWeapon))
+		if (CurrentlyEquippedWeapon != NULL)
 		{
-			if (AWeapon_PlayerRevolver* RecastAsRevolver = Cast<AWeapon_PlayerRevolver>(RecastWeapon))
+			if (AWeapon_Ranged* RecastWeapon = Cast<AWeapon_Ranged>(CurrentlyEquippedWeapon))
 			{
-				RecastAsRevolver->StopFanFire();
-			}
-			if (RecastWeapon->CanReload())
-			{
-				bShouldEnterReload = true;
+				if (AWeapon_PlayerRevolver* RecastAsRevolver = Cast<AWeapon_PlayerRevolver>(RecastWeapon))
+				{
+					RecastAsRevolver->StopFanFire();
+				}
+				if (RecastWeapon->CanReload())
+				{
+					bShouldEnterReload = true;
+				}
 			}
 		}
 		break;
@@ -659,32 +665,35 @@ void ACharacterController::EquipRevolver()
 
 void ACharacterController::OnShootPressed()
 {
-	if (!bIsInHardCC && !bIsRolling)
+	if (CurrentlyEquippedWeapon != NULL)
 	{
-		switch (CurrentForm)
+		if (!bIsInHardCC && !bIsRolling)
 		{
-		case TransformationState::DEAD:
-			break;
-		case TransformationState::HUMAN:
-			if (!bShouldEnterReload)
+			switch (CurrentForm)
 			{
-				if (!bAnimPrimaryFire)
+			case TransformationState::DEAD:
+				break;
+			case TransformationState::HUMAN:
+				if (!bShouldEnterReload)
 				{
-					bAnimPrimaryFire = true;
-					CurrentlyEquippedWeapon->Fire();
+					if (!bAnimPrimaryFire)
+					{
+						bAnimPrimaryFire = true;
+						CurrentlyEquippedWeapon->Fire();
+					}
 				}
+				break;
+			case TransformationState::WOLF:
+				if (!bIsMeleeAttacking && CurrentMeleeAttackType == UAttackTypes::NONE)
+				{
+					//UE_LOG(LogTemp, Display, TEXT("HEV"));
+					bIsMeleeAttacking = true;
+					CurrentMeleeAttackType = UAttackTypes::LIGHT;
+				}
+				break;
+			default:
+				break;
 			}
-			break;
-		case TransformationState::WOLF:
-			if (!bIsMeleeAttacking && CurrentMeleeAttackType == UAttackTypes::NONE)
-			{
-				//UE_LOG(LogTemp, Display, TEXT("HEV"));
-				bIsMeleeAttacking = true;
-				CurrentMeleeAttackType = UAttackTypes::LIGHT;
-			}
-			break;
-		default:
-			break;
 		}
 	}
 }
@@ -696,29 +705,32 @@ void ACharacterController::OnShootReleased()
 
 void ACharacterController::OnAltShootPressed()
 {
-	if (!bIsInHardCC)
+	if (CurrentlyEquippedWeapon != NULL)
 	{
-		switch (CurrentForm)
+		if (!bIsInHardCC && !bIsRolling)
 		{
-		case TransformationState::DEAD:
-			break;
-		case TransformationState::HUMAN:
-			if (!bShouldEnterReload)
+			switch (CurrentForm)
 			{
-				bAnimSecondaryFire = true;
-				CurrentlyEquippedWeapon->AltFire();
+			case TransformationState::DEAD:
+				break;
+			case TransformationState::HUMAN:
+				if (!bShouldEnterReload)
+				{
+					bAnimSecondaryFire = true;
+					CurrentlyEquippedWeapon->AltFire();
+				}
+				break;
+			case TransformationState::WOLF:
+				if (!bIsMeleeAttacking && CurrentMeleeAttackType == UAttackTypes::NONE)
+				{
+					//UE_LOG(LogTemp, Display, TEXT("HEV"));
+					bIsMeleeAttacking = true;
+					CurrentMeleeAttackType = UAttackTypes::HEAVY;
+				}
+				break;
+			default:
+				break;
 			}
-			break;
-		case TransformationState::WOLF:
-			if (!bIsMeleeAttacking && CurrentMeleeAttackType == UAttackTypes::NONE)
-			{
-				//UE_LOG(LogTemp, Display, TEXT("HEV"));
-				bIsMeleeAttacking = true;
-				CurrentMeleeAttackType = UAttackTypes::HEAVY;
-			}
-			break;
-		default:
-			break;
 		}
 	}
 }
@@ -791,9 +803,12 @@ void ACharacterController::Reload()
 {
 	if (CurrentForm == TransformationState::HUMAN)
 	{
-		if (AWeapon_Ranged* RecastPlayerWeapon = Cast<AWeapon_Ranged>(CurrentlyEquippedWeapon))
+		if (CurrentlyEquippedWeapon != NULL)
 		{
-			RecastPlayerWeapon->Reload();
+			if (AWeapon_Ranged* RecastPlayerWeapon = Cast<AWeapon_Ranged>(CurrentlyEquippedWeapon))
+			{
+				RecastPlayerWeapon->Reload();
+			}
 		}
 	}
 }
@@ -821,15 +836,23 @@ void ACharacterController::TransformIntoWolf()
 {
 	if (WolfAnimationClass && WolfMesh)
 	{
-		GetMesh()->SetAnimInstanceClass(WolfAnimationClass);
-		GetMesh()->SetSkeletalMesh(WolfMesh);
-		
+		if (AWeapon_PlayerRevolver* RecastWeapon = Cast<AWeapon_PlayerRevolver>(CurrentlyEquippedWeapon))
+		{
+			if (RecastWeapon->IsFanFiring())
+			{
+				RecastWeapon->StopFanFire();
+			}
+		}
 
-		CurrentlyEquippedWeapon->Destroy();
+		CurrentlyEquippedWeapon->SetLifeSpan(0.2f);
 		CurrentlyEquippedWeapon = NULL;
 		bShouldEnterReload = false;
 		bAnimPrimaryFire = false;
 		bAnimSecondaryFire = false;
+
+		GetMesh()->SetAnimInstanceClass(WolfAnimationClass);
+		GetMesh()->SetSkeletalMesh(WolfMesh);
+		
 
 		CurrentlyEquippedWeapon = GetWorld()->SpawnActor<AWeapon>(WolfWeapon);
 		//CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(90.f, 180.f, 0.f));

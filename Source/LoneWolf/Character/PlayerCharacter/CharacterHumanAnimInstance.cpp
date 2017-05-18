@@ -413,7 +413,6 @@ void UCharacterHumanAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 					CharacterController->bAnimPrimaryFire = bPrimaryFire;
 				}
 			}
-
 		}
 	}
 }
