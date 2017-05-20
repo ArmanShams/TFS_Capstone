@@ -31,19 +31,34 @@ protected:
 	// If true, Bounty Hunter can set a trap at it's location.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bCanSetTrap;
-	// Rotator for the mesh.
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FRotator LookAtRotation;
+
 	// If true, Bounty Hunter is in hard crowd control.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bIsHardCC;
+	// Rotator for the mesh.
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FRotator LookAtRotation;
 
-protected:
-	UFUNCTION()
-	void AnimNotify_Shoot();
+	//UPROPERTY(BlueprintReadOnly)
+	//BountyHunterState CurrentEnemyState;
 
 	UFUNCTION()
-	void AnimNotify_PlaceTrap();
+	void AnimNotify_StartShooting();
+
+	UFUNCTION()
+	void AnimNotify_EndShooting();
+
+	UFUNCTION()
+	void AnimNotify_PlaceTrap();	
+
+	UFUNCTION()
+	void AnimNotify_Aim();
+
+	UFUNCTION()
+	void AnimNotify_ReturnToIdle();
+
+	UFUNCTION()
+	void AnimNotify_Stunned();
 
 	class ABountyHunter* BountyHunter;
 
