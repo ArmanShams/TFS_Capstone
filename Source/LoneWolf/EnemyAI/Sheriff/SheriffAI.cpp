@@ -32,7 +32,7 @@ ASheriffAI::ASheriffAI()
 	RevolverAttackRange = 125.0f;
 	LassoAttackRange = 175.0f;
 
-	FName LassoSocket = TEXT("RightHand");
+	FName LassoSocket = TEXT("hand_r");
 	LassoCableComponent = CreateDefaultSubobject<UCableComponent>(TEXT("Cable Component"));
 	LassoCableComponent->AttachTo(GetMesh(), LassoSocket);
 
@@ -42,7 +42,7 @@ ASheriffAI::ASheriffAI()
 		KnifeWeapon = (UClass*)KnifeAsset.Class;
 	}
 
-	ConstructorHelpers::FClassFinder<AWeapon>RevolverAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/SheriffRevolverBP.SheriffRevolverBP_C'"));
+	ConstructorHelpers::FClassFinder<AWeapon>RevolverAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/Sheriff/SheriffShotgunBP.SheriffShotgunBP_C'"));
 	if (RevolverAsset.Class)
 	{
 		RevolverWeapon = (UClass*)RevolverAsset.Class;
@@ -80,14 +80,14 @@ void ASheriffAI::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 	
 	// Update the blackboard component keys
-	if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
-	{
-		BlackboardComponent->SetValueAsBool(TEXT("bIsSoftCC"), bIsInSoftCC);
-		BlackboardComponent->SetValueAsBool(TEXT("bIsInKnifeRange"), bIsInRange(KnifeAttackRange));
-		BlackboardComponent->SetValueAsBool(TEXT("bIsInRevolverRange"), bIsInRange(RevolverAttackRange));
-		BlackboardComponent->SetValueAsBool(TEXT("bIsInLassoRange"), bIsInRange(LassoAttackRange));
-		BlackboardComponent->SetValueAsEnum(TEXT("CurrentState"), (uint8)CurrentState);
-	}
+	//if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
+	//{
+	//	BlackboardComponent->SetValueAsBool(TEXT("bIsSoftCC"), bIsInSoftCC);
+	//	BlackboardComponent->SetValueAsBool(TEXT("bIsInKnifeRange"), bIsInRange(KnifeAttackRange));
+	//	BlackboardComponent->SetValueAsBool(TEXT("bIsInRevolverRange"), bIsInRange(RevolverAttackRange));
+	//	BlackboardComponent->SetValueAsBool(TEXT("bIsInLassoRange"), bIsInRange(LassoAttackRange));
+	//	BlackboardComponent->SetValueAsEnum(TEXT("CurrentState"), (uint8)CurrentState);
+	//}
 
 	// Use functions for the appropriate state
 	switch (CurrentState)
@@ -275,7 +275,7 @@ void ASheriffAI::Lasso()
 
 				if (DistanceToPlayer < CushionSpace)
 				{
-					LassoCableComponent->SetAttachEndTo(this, GetMesh()->GetSocketBoneName("RightHand"));
+					LassoCableComponent->SetAttachEndTo(this, GetMesh()->GetSocketBoneName("hand_r"));
 				}
 			}
 		}
@@ -287,6 +287,6 @@ AWeapon* ASheriffAI::EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip)
 {
 	CurrentlyEquippedWeapon = Super::EquipNewWeapon(WeaponToEquip);
 	CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(90.0f, -90.f, 90.f));
-	CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("RightHand"));
+	CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("hand_r"));
 	return CurrentlyEquippedWeapon;
 }
