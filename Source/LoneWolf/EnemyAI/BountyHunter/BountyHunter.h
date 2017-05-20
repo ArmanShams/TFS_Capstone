@@ -95,8 +95,10 @@ protected:
 
 	//Blackboard Key Booleans
 	bool bSafeAttackingDistance;
+	bool bCanAttack;
 	bool bSearchingTrapLocations;
 	bool bIsPatrolling;
+	bool bIsFlee;
 
 	//Animation Booleans
 	bool bIsAiming;
@@ -106,6 +108,10 @@ protected:
 
 	//Friendships
 	friend class ABearTrap;
+	friend class UBTTask_BountyHunterAim;
+	friend class UBTTask_BountyHunterFlee;
 	friend class UBTTask_BountyHunterAttack;
+	friend class UBTTask_BountyHunterPlaceTrap;
 	friend class UBountyHunterAnimInstance;
+
 };
