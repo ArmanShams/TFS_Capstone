@@ -9,7 +9,6 @@ UENUM(BlueprintType)
 enum class BountyHunterState : uint8
 {
 	IDLE					UMETA(DisplayName = "Idle"),
-	READYINGATTACK			UMETA(DisplayName = "PreparingToAttack"),
 	AIMING					UMETA(DisplayName = "Aiming"),
 	ATTACKING				UMETA(DisplayName = "Attacking"),
 	FLEEING					UMETA(DisplayName = "Fleeing"),
@@ -62,22 +61,18 @@ protected:
 	//Distance to set traps
 	float SearchingLocations;
 	//Trap locations to move to.
-	UPROPERTY(EditInstanceOnly, Category = Enemy)
 	ATrapLocations* FirstTrapLocation;
-	//Trap locations to move to.
-	UPROPERTY(EditInstanceOnly, Category = Enemy)
 	ATrapLocations* SecondTrapLocation;
-	//Trap locations to move to.
-	UPROPERTY(EditInstanceOnly, Category = Enemy)
 	ATrapLocations* ThirdTrapLocation;
 	//UPROPERTY(EditInstanceOnly, Category = Enemy) TArray<class ATargetPoint*> TrapLocations; //Blackboard keys does not accept arrays
-	
+
 	//Class for traps
 	TSubclassOf<class ABearTrap> BearTrapClass;
 	ABearTrap* BearTrapPlaced;
 	TArray<AActor*> TrapArray;
 
-	//Enumerator state to control animations and functions
+	//Bounty Hunter Enumerator current state to control animations and functions
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enum)
 	BountyHunterState CurrentState;
 
 	//Check on BlackBoard Component target, flee from player character when conditions are met
@@ -86,19 +81,21 @@ protected:
 	FVector PositionToMove;
 
 	//Implemented Functions
-	virtual void Aim();
 	virtual void Attack();
+	virtual void FixWeaponRotation();
 	virtual void Flee(ACharacterController* PlayerToFleeFrom);
 	virtual void SetBearTrap(ATrapLocations* NewTrapLocation, const FHitResult & SweepResult);
 	UFUNCTION()
 	void OnActorBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	//Blackboard Key Booleans
-	bool bSafeAttackingDistance;
-	bool bCanAttack;
-	bool bSearchingTrapLocations;
-	bool bIsPatrolling;
-	bool bIsFlee;
+	bool bSafeAttackingDistance();
+	bool bCanAttack();
+	bool bSearchingTrapLocations();
+	bool bIsPatrolling();
+	bool bIsFlee();
+	bool bIsStunned;
+	bool bIsFleeing;
 
 	//Animation Booleans
 	bool bIsAiming;

@@ -15,9 +15,8 @@ public:
 
 protected:
 	// Speed of the Bounty Hunter.
-	//UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	//float speed;
-
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float speed;
 	// If true, Bounty Hunter is dead. If false, is alive.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bIsDead;
@@ -44,7 +43,10 @@ protected:
 	//BountyHunterState CurrentEnemyState;
 
 	UFUNCTION()
-	void AnimNotify_Shoot();
+	void AnimNotify_StartShooting();
+
+	UFUNCTION()
+	void AnimNotify_EndShooting();
 
 	UFUNCTION()
 	void AnimNotify_PlaceTrap();	

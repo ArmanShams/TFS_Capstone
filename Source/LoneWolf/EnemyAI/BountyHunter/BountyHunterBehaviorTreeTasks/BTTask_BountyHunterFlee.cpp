@@ -5,7 +5,6 @@
 
 UBTTask_BountyHunterFlee::UBTTask_BountyHunterFlee()
 {
-
 }
 
 EBTNodeResult::Type UBTTask_BountyHunterFlee::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
@@ -13,7 +12,6 @@ EBTNodeResult::Type UBTTask_BountyHunterFlee::ExecuteTask(UBehaviorTreeComponent
 	UBehaviorTreeComponent* BehaviorTree = &OwnerComp;
 	if (ABountyHunterAIController* Controller = Cast<ABountyHunterAIController>(BehaviorTree->GetAIOwner()))
 	{
-		UE_LOG(LogTemp, Display, TEXT("WE ARE IN THE BEAM"));
 		Cast<ABountyHunter>(Controller->GetPawn())->SetBountyHunterState(BountyHunterState::FLEEING);
 	}
 	return Super::ExecuteTask(OwnerComp, NodeMemory);

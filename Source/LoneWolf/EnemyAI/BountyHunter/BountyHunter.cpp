@@ -25,12 +25,11 @@ ABountyHunter::ABountyHunter()
 	TurnRate = 0.25f;
 	MaxRange = 300.f;
 	AttackFrequency = 1.f;
-	AttackRange = 500.f;
+	AttackRange = 1250.f;
 	MaximumTrapsAllowed = 3;
-	CushionSpace = 300.f;
-	PatrolDistance = 1500.f;
-	SearchingLocations = 2500.f;
-	bIsPatrolling = true;
+	CushionSpace = 500.f;
+	PatrolDistance = 1000.f;
+	SearchingLocations = 1100.f;
 	bPlayRecoilAnimation = false;
 	CurrentState = BountyHunterState::IDLE;
 
@@ -57,6 +56,7 @@ void ABountyHunter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+
 	if (bPlayRecoilAnimation)
 	{
 		bPlayRecoilAnimation = false;
@@ -64,18 +64,22 @@ void ABountyHunter::Tick(float DeltaTime)
 
 	if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
 	{
-		BlackboardComponent->SetValueAsBool(TEXT("IsHardCC"), bIsInHardCC);
-		BlackboardComponent->SetValueAsBool(TEXT("IsSoftCC"), bIsInSoftCC);
-		BlackboardComponent->SetValueAsBool(TEXT("bPatrolling"), bIsPatrolling);
-		BlackboardComponent->SetValueAsBool(TEXT("bIsFlee"), bIsFlee);
-		BlackboardComponent->SetValueAsBool(TEXT("bCanAttackTarget"), bCanAttack);
-		BlackboardComponent->SetValueAsBool(TEXT("bIsAttacking"), bIsAttacking);
-		BlackboardComponent->SetValueAsBool(TEXT("bSearchingLocations"), bSearchingTrapLocations);
-		BlackboardComponent->SetValueAsBool(TEXT("bSafeAttackingDistance"), bSafeAttackingDistance);
-		BlackboardComponent->SetValueAsVector(TEXT("AttackingPosition"), PositionToMove);
+		BlackboardComponent->SetValueAsBool(TEXT("IsHardCC"), bIsHardCC());
+		BlackboardComponent->SetValueAsBool(TEXT("IsSoftCC"), bIsSoftCC());
+		BlackboardComponent->SetValueAsBool(TEXT("bPatrolling"), bIsInRange(PatrolDistance));
+		BlackboardComponent->SetValueAsBool(TEXT("bIsFlee"), bIsFleeing);
+		BlackboardComponent->SetValueAsBool(TEXT("bCanAttackTarget"), bCanAttack());
+		BlackboardComponent->SetValueAsBool(TEXT("bIsAttacking"), bIsInRange(AttackRange));
+		BlackboardComponent->SetValueAsBool(TEXT("bSearchingLocations"), bIsInRange(SearchingLocations));
+		BlackboardComponent->SetValueAsBool(TEXT("bSafeAttackingDistance"), bSafeAttackingDistance());
 		BlackboardComponent->SetValueAsObject(TEXT("FirstTargetLocation"), FirstTrapLocation);
 		BlackboardComponent->SetValueAsObject(TEXT("FirstTargetLocation"), SecondTrapLocation);
 		BlackboardComponent->SetValueAsObject(TEXT("FirstTargetLocation"), ThirdTrapLocation);
+
+		bIsFlee();
+		bCanAttack();
+		bIsPatrolling();
+		bSearchingTrapLocations();
 
 		if (BlackboardComponent->GetValueAsObject(TEXT("Target")) != NULL)
 		{
@@ -84,79 +88,32 @@ void ABountyHunter::Tick(float DeltaTime)
 				FVector CurrentLocation = GetActorLocation();
 				FVector PlayerLocation = RecastedTarget->GetActorLocation();
 				FVector Direction = CurrentLocation - PlayerLocation;
-				float Distance = FVector::Dist(CurrentLocation, PlayerLocation);
-
-
-				UE_LOG(LogTemp, Display, TEXT("Distance: %f"), Distance);
-
-				if (bIsInRange(CushionSpace))
-				{
-					bIsFlee = true;
-					bCanAttack = false;
-				}
-
-				if (bIsInRange(AttackRange) && Distance > CushionSpace)
-				{
-					bCanAttack = true;
-				}
-				if (!bIsInRange())
-				{
-					bCanAttack = false;
-				}
-				//if (Distance > PatrolDistance)
-				//{
-				//	SetBountyHunterState(BountyHunterState::PATROLLING);
-				//}
-
-				//if (Distance > SearchingLocations)
-				//{
-				//	SetBountyHunterState(BountyHunterState::SEARCHFORTRAPLOCATIONS);
-				//}
-
-				//if (bIsInRange(AttackRange))
-				//{
-				//	SetBountyHunterState(BountyHunterState::ATTACKING);
-				//}
-				//if (bSafeAttackingDistance == false)
-				//{
-				//	SetBountyHunterState(BountyHunterState::FLEEING);
-				//}
-
+				float Distance = FVector::Dist(CurrentLocation, PlayerLocation);  //UE_LOG(LogTemp, Display, TEXT("Distance: %f"), Distance);
 				switch (CurrentState)
 				{
 				case BountyHunterState::IDLE:
-					//bIsAiming = false;
-					//bIsAttacking = false;
-					//bPlacingTrap = false;
-					//bIsPatrolling = false;
-					//bSearchingTrapLocations = false;
-					break;
-				case BountyHunterState::READYINGATTACK:
 					break;
 				case BountyHunterState::AIMING:
-					bIsAiming = true;
-					Aim();
+					FixWeaponRotation();
 					break;
 				case BountyHunterState::ATTACKING:
 					bIsAttacking = true;
 					Attack();
 					break;
 				case BountyHunterState::FLEEING:
-					bIsFlee = true;
-					//PositionToMove = PlayerLocation + Distance * -Direction;
-					UE_LOG(LogTemp, Display, TEXT("Run away"));
+					bPlacingTrap = false;
+					bIsAttacking = false;
+					bIsAiming = false;
+					bPlayRecoilAnimation = false;
 					Flee(RecastedTarget);
 					break;
 				case BountyHunterState::SETTINGTRAP:
-					bPlacingTrap = true;
 					break;
 				case BountyHunterState::HARDCC:
 					break;
 				case BountyHunterState::PATROLLING:
-					bIsPatrolling = true;
 					break;
 				case BountyHunterState::SEARCHFORTRAPLOCATIONS:
-					bSearchingTrapLocations = true;
 					break;
 				default:
 					break;
@@ -274,6 +231,7 @@ void ABountyHunter::SetBearTrap(ATrapLocations* NewTrapLocation, const FHitResul
 			else
 			{ // bSetTrap();
 			  //UE_LOG(LogTemp, Display, TEXT("The Trap Location is already occupied, the bounty hunter will not try to place a trap here"));
+				bPlacingTrap = false;
 			}
 		}
 	}
@@ -283,11 +241,63 @@ void ABountyHunter::OnActorBeginOverlap(UPrimitiveComponent * OverlappedComp, AA
 {
 	if (ATrapLocations* RecastedOverlappingActor = Cast<ATrapLocations>(OtherActor))
 	{
-		//SetBountyHunterState(BountyHunterState::SETTINGTRAP);
+		SetBountyHunterState(BountyHunterState::SETTINGTRAP);
+		bPlacingTrap = true;
 		SetBearTrap(RecastedOverlappingActor, SweepResult);
 		RecastedOverlappingActor->bIsOccupied = true;
 	}
 }
+
+bool ABountyHunter::bSafeAttackingDistance()
+{
+	if (bCanAttack() && CurrentState == BountyHunterState::ATTACKING)
+	{
+		bIsFleeing = false;
+		return true;
+	}
+	return false;
+}
+
+bool ABountyHunter::bCanAttack()
+{
+	if (bIsInRange(AttackRange) && !bIsFlee()) 
+	{
+		bIsFleeing = false;
+		return true;
+	}
+	return false;
+}
+
+bool ABountyHunter::bSearchingTrapLocations()
+{
+	if (bIsInRange(SearchingLocations))
+	{
+		return true;
+	}
+	return false;
+}
+
+bool ABountyHunter::bIsPatrolling()
+{
+	if (bIsInRange(PatrolDistance))
+	{
+		return true;
+	}
+	return false;
+}
+
+bool ABountyHunter::bIsFlee()
+{
+	if (bIsInRange(CushionSpace))
+	{
+		bIsFleeing = true;
+		bIsAttacking = false;
+		bIsAiming = false;
+		return bIsFleeing = true;
+	}
+	return bIsFleeing = false;
+}
+
 
 void ABountyHunter::Attack()
 {
@@ -295,25 +305,35 @@ void ABountyHunter::Attack()
 	{
 		if (CurrentlyEquippedWeapon->CanFire())
 		{
-			Aim();
+			FixWeaponRotation();
 			bPlayRecoilAnimation = true;
+			bPlacingTrap = false;
 		}
 	}
 }
 
 void ABountyHunter::Flee(ACharacterController* PlayerToFleeFrom)
 {
-	bSafeAttackingDistance = false;
 
 	FVector CurrentLocation = GetActorLocation();
 	FVector PlayerLocation = PlayerToFleeFrom->GetActorLocation();
+	FRotator RotationToPlayer = PlayerToFleeFrom->GetActorRotation();
 	FVector Direction = CurrentLocation - PlayerLocation;
 	float DistanceToPlayer = FVector::Dist(CurrentLocation, PlayerLocation);
-
-	PositionToMove = (PlayerLocation + CushionSpace) * Direction;
+	if (DistanceToPlayer <= (CushionSpace + 50.f))
+	{
+		SetBountyHunterState(BountyHunterState::FLEEING);
+		GetMovementComponent()->AddInputVector(DistanceToPlayer * Direction);
+		//GEngine->AddOnScreenDebugMessage(-1, 1.f , FColor::Red, FString::Printf(TEXT("BountyHunter in the beam")));
+	}
+	if (DistanceToPlayer > CushionSpace)
+	{
+		bIsFleeing = false;
+		SetBountyHunterState(BountyHunterState::AIMING);
+	}
 }
 
-void ABountyHunter::Aim()
+void ABountyHunter::FixWeaponRotation()
 {
 	if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
 	{
@@ -324,7 +344,6 @@ void ABountyHunter::Aim()
 				if (CurrentlyEquippedWeapon != NULL)
 				{
 					FRotator DesiredWeaponRotation = GetActorRotation();
-
 					FVector DirectionToTarget = RecastTarget->GetActorLocation() - GetActorLocation();
 					if (DirectionToTarget.Size() > 300.f)
 					{
@@ -347,4 +366,3 @@ void ABountyHunter::Aim()
 		}
 	}
 }
-
