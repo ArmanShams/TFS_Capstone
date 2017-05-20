@@ -12,8 +12,15 @@
 ABearTrap::ABearTrap()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	
 	TrapCollider = CreateDefaultSubobject<USphereComponent>(TEXT("TrapCollider"));
 	TrapCollider->SetupAttachment(RootComponent);
+
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> BearTrapSkeletalMesh(TEXT("SkeletalMesh'/Game/Geometry/World/M_BearTrap.M_BearTrap'"));
+	MeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Skeletal Mesh Component"));
+	MeshComponent->SetupAttachment(TrapCollider);
+	MeshComponent->SetSkeletalMesh(BearTrapSkeletalMesh.Object);
+
 	radius = 30.f;
 	Damage = 5;
 	TrapCollider->SetCollisionProfileName(TEXT("Traps"));
@@ -27,15 +34,12 @@ ABearTrap::ABearTrap()
 void ABearTrap::BeginPlay()
 {
 	Super::BeginPlay();
+	if(!bIsVisible) { this->SetActorHiddenInGame(true); }
 }
 
 void ABearTrap::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (bIsVisible)
-	{
-		this->SetActorHiddenInGame(false);
-	}
 }
 
 void ABearTrap::SetOwner(AActor* NewOwner)
@@ -45,10 +49,7 @@ void ABearTrap::SetOwner(AActor* NewOwner)
 
 void ABearTrap::Destroyed()
 {
-	if (LocationBeingOccupied != NULL)
-	{
-		LocationBeingOccupied->bIsOccupied = false;
-	}
+	if (LocationBeingOccupied != NULL)	{ LocationBeingOccupied->bIsOccupied = false; }
 	Super::Destroyed();
 }
 
@@ -61,7 +62,9 @@ void ABearTrap::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComp, AAc
 {
 	if (ACharacterController* Player = Cast<ACharacterController>(OtherActor))
 	{
-		UE_LOG(LogTemp, Display, TEXT("You've stepped on a trap"));
+		bIsVisible = true;
+		this->SetActorHiddenInGame(false);
+		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, FString::Printf(TEXT("You've stepped on a bear trap, dodge to avoid snapping your legs!")));
 	}
 }
 
@@ -69,8 +72,6 @@ void ABearTrap::OnComponentEndOverlap(UPrimitiveComponent* OverlappedComp, AActo
 {
 	if (ACharacterController* Player = Cast<ACharacterController>(OtherActor))
 	{
-		bIsVisible = true;
-		this->SetActorHiddenInGame(true);
 		UE_LOG(LogTemp, Display, TEXT("The trap activated and applied damage to you"));
 		if (BountyHunter != NULL)
 		{

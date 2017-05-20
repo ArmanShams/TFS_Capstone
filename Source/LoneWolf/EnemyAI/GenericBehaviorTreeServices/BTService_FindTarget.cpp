@@ -29,7 +29,7 @@ void UBTService_FindTarget::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* N
 			//UE_LOG(LogTemp, Display, TEXT("We are in the beam"));
 			OwnerComp.GetAIOwner()->StopMovement();
 		}
-		AActor* HostileActor = NULL; 
+		AActor* HostileActor = NULL;
 		for (int i = 0; i < HostileActors.Num(); i++)
 		{
 			if (Cast<ACharacterController>(HostileActors[i]))
@@ -45,9 +45,9 @@ void UBTService_FindTarget::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* N
 		return;
 	}
 
-	else if(PatrolPoints.Num() > 0)
+	else if (PatrolPoints.Num() > 0)
 	{
-		
+
 		RangePoint = FMath::RandRange(0, PatrolPoints.Num() - 1);
 		AActor* PatrolPoint = PatrolPoints[RangePoint];
 		OwnerComp.GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), PatrolPoint);
