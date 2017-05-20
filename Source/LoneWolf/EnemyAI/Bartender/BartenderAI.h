@@ -32,10 +32,14 @@ public:
 	virtual CharacterState::StatusEffect GetStatusEffect() override;
 	virtual void Destroyed() override;
 	
+
+	virtual void ThrowMolotov();
+	virtual bool GetIsAttacking();
+	virtual void SetIsAttacking(bool NewValue);
+	
 protected:
 	virtual AWeapon* EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip) override;
 
-	virtual void ThrowMolotov();
 
 
 	virtual FVector HitTargetLocationAtTime(FVector StartPosition, FVector TargetPosition, FVector GravityBase, float TimeToTarget);
@@ -49,4 +53,8 @@ protected:
 	float TimeForMolotovToReachTargetLocation;
 
 	bool bSpawned = false;
+	bool bIsAttacking;
+
+	friend class UBartenderAIAnimInstance;
+	friend class UBTTask_BountyHunterAttack;
 };
