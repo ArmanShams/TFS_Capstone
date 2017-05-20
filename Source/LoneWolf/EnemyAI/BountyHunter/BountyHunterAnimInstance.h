@@ -15,8 +15,9 @@ public:
 
 protected:
 	// Speed of the Bounty Hunter.
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float speed;
+	//UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	//float speed;
+
 	// If true, Bounty Hunter is dead. If false, is alive.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bIsDead;
@@ -31,6 +32,7 @@ protected:
 	// If true, Bounty Hunter can set a trap at it's location.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bCanSetTrap;
+
 	// If true, Bounty Hunter is in hard crowd control.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bIsHardCC;

@@ -12,12 +12,12 @@ class LONEWOLF_API ATrapLocations : public AActor
 	
 public:	
 	ATrapLocations();
+
 	UPROPERTY(EditDefaultsOnly, Category = "Collision")
 	USphereComponent* SphereCollider;
 
 	virtual void BeginPlay() override;
-	virtual void Tick( float DeltaSeconds ) override;
+	virtual void Tick(float DeltaSeconds) override;
 
 	bool bIsOccupied;
-	
 };

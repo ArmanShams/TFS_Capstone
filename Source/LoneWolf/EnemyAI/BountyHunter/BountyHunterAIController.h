@@ -5,9 +5,6 @@
 #include "AIController.h"
 #include "BountyHunterAIController.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class LONEWOLF_API ABountyHunterAIController : public AAIController
 {
@@ -21,5 +18,4 @@ public:
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	class UBehaviorTree* BountyHunterBTAsset;
-	
 };

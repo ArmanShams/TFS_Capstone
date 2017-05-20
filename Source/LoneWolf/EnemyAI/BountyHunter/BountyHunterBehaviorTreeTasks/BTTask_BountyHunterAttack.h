@@ -12,14 +12,10 @@ class LONEWOLF_API UBTTask_BountyHunterAttack : public UBTTaskNode
 
 public:
 	UBTTask_BountyHunterAttack();
-
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
 protected:
 	virtual EBTNodeResult::Type AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
 	friend class ABountyHunter;
-	
-	
-	
 };
