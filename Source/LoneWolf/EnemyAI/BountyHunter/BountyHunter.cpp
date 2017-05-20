@@ -94,6 +94,7 @@ void ABountyHunter::Tick(float DeltaTime)
 				case BountyHunterState::IDLE:
 					break;
 				case BountyHunterState::AIMING:
+					bIsAttacking = false;
 					FixWeaponRotation();
 					break;
 				case BountyHunterState::ATTACKING:
