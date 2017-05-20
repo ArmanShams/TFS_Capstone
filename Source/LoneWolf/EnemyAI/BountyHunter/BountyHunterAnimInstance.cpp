@@ -39,11 +39,12 @@ void UBountyHunterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			bCanSetTrap = BountyHunter->bPlacingTrap;
 			bIsDead = BountyHunter->Health <= 0.0f;
 			bIsHardCC = BountyHunter->bIsInHardCC;
-			
+
 			if (bIsBasicAttack == true)
 			{
-				//BountyHunter->CurrentlyEquippedWeapon->Fire();
+				BountyHunter->CurrentlyEquippedWeapon->Fire();
 			}
+
 		}	
 	}
 }
@@ -52,8 +53,10 @@ void UBountyHunterAnimInstance::AnimNotify_Shoot()
 {
 	//if (GetWorld()->HasBegunPlay())
 	//{
-	//	bIsBasicAttack = true;
+	//if (bIsBasicAttack == true)
+	//{
 	//	BountyHunter->CurrentlyEquippedWeapon->Fire();
+	//}
 	//	BountyHunter->SetBountyHunterState(BountyHunterState::ATTACKING);
 	//}
 }

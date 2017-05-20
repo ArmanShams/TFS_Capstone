@@ -15,7 +15,7 @@ EBTNodeResult::Type UBTTask_BountyHunterAttack::ExecuteTask(UBehaviorTreeCompone
 	UBehaviorTreeComponent* BehaviorTree = &OwnerComp;
 	if (ABountyHunterAIController* Controller = Cast<ABountyHunterAIController>(BehaviorTree->GetAIOwner()))
 	{
-		UE_LOG(LogTemp, Display, TEXT("WE ARE IN THE BEAM"));
+		//UE_LOG(LogTemp, Display, TEXT("WE ARE IN THE BEAM"));
 		Cast<ABountyHunter>(Controller->GetPawn())->SetBountyHunterState(BountyHunterState::ATTACKING);
 	}
 	return Super::ExecuteTask(OwnerComp, NodeMemory);

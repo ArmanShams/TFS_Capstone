@@ -28,8 +28,8 @@ ABountyHunter::ABountyHunter()
 	AttackRange = 3000.f;
 	MaximumTrapsAllowed = 3;
 	CushionSpace = 150.f;
-	PatrolDistance = 1000.f;
-	SearchingLocations = 1500.f;
+	PatrolDistance = 5000.f;
+	SearchingLocations = 5500.f;
 	bIsPatrolling = true;
 	bPlayRecoilAnimation = false;
 	CurrentState = BountyHunterState::IDLE;
@@ -70,6 +70,7 @@ void ABountyHunter::Tick(float DeltaTime)
 		BlackboardComponent->SetValueAsBool(TEXT("bCanAttackTarget"), bIsInRange());
 		BlackboardComponent->SetValueAsBool(TEXT("bIsAttacking"), bIsAttacking);
 		BlackboardComponent->SetValueAsBool(TEXT("bSearchingLocations"), bSearchingTrapLocations);
+		BlackboardComponent->SetValueAsBool(TEXT("bSafeAttackingDistance"), bSafeAttackingDistance);
 		BlackboardComponent->SetValueAsVector(TEXT("AttackingPosition"), PositionToMove);
 		BlackboardComponent->SetValueAsObject(TEXT("FirstTargetLocation"), FirstTrapLocation);
 		BlackboardComponent->SetValueAsObject(TEXT("FirstTargetLocation"), SecondTrapLocation);
@@ -79,35 +80,29 @@ void ABountyHunter::Tick(float DeltaTime)
 		{
 			if (ACharacterController* RecastedTarget = Cast<ACharacterController>(BlackboardComponent->GetValueAsObject(TEXT("Target"))))
 			{
+				Aim();
 				FVector CurrentLocation = GetActorLocation();
 				FVector PlayerLocation = RecastedTarget->GetActorLocation();
 				float Distance = FVector::Dist(CurrentLocation, PlayerLocation);
 
-				//if (CurrentState == BountyHunterState::IDLE && Distance >= PatrolDistance)
-				//{
-				//	SetBountyHunterState(BountyHunterState::PATROLLING);
-				//}
+				if (bIsInRange(PatrolDistance))
+				{
+					SetBountyHunterState(BountyHunterState::PATROLLING);
+				}
 
-				//if (CurrentState == BountyHunterState::PATROLLING && Distance >= SearchingLocations)
-				//{
-				//	SetBountyHunterState(BountyHunterState::SEARCHFORTRAPLOCATIONS);
-				//}
+				if (bIsInRange(SearchingLocations))
+				{
+					SetBountyHunterState(BountyHunterState::SEARCHFORTRAPLOCATIONS);
+				}
 
-				//if (Distance <= AttackRange)
-				//{
-				//	SetBountyHunterState(BountyHunterState::AIMING);
-				//	bIsAttacking = true;
-				//	DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + GetMesh()->GetRightVector() * AttackRange, FColor(255, 0, 0), false, 0.018f, 8, 12.333f);
-				//}
-
-				//if (Distance > AttackRange)
-				//{
-				//	SetBountyHunterState(BountyHunterState::IDLE);
-				//}
-				//if (bIsAttacking == true)
-				//{
-				//	SetBountyHunterState(BountyHunterState::ATTACKING);
-				//}
+				if (bIsInRange(AttackRange))
+				{
+					SetBountyHunterState(BountyHunterState::ATTACKING);
+				}
+				if (bSafeAttackingDistance == false)
+				{
+					SetBountyHunterState(BountyHunterState::FLEEING);
+				}
 
 				switch (CurrentState)
 				{
@@ -118,11 +113,11 @@ void ABountyHunter::Tick(float DeltaTime)
 					break;
 				case BountyHunterState::AIMING:
 					bIsAiming = true;
-					//UE_LOG(LogTemp, Display, TEXT("NO BEAM"));
 					Aim();
 					break;
 				case BountyHunterState::ATTACKING:
 					bIsAttacking = true;
+					Attack();
 					Aim();
 					break;
 				case BountyHunterState::FLEEING:
@@ -236,25 +231,25 @@ void ABountyHunter::SetBearTrap(ATrapLocations* NewTrapLocation, const FHitResul
 	{
 		if (CurrentState == BountyHunterState::SETTINGTRAP && !NewTrapLocation->bIsOccupied)
 		{ // bSetTrap();
-			UE_LOG(LogTemp, Display, TEXT("The trap location is now occupied"));
+			//UE_LOG(LogTemp, Display, TEXT("The trap location is now occupied"));
 			if (BearTrapClass != NULL)
 			{
 				if (TrapArray.Num() >= MaximumTrapsAllowed)
 				{
 					AActor* TrapToDelete = TrapArray.Pop();
 					TrapToDelete->SetLifeSpan(0.1f);
-					UE_LOG(LogTemp, Display, TEXT("Element popped from Trap Array"));
+					//UE_LOG(LogTemp, Display, TEXT("Element popped from Trap Array"));
 				}
 				BearTrapPlaced = GetWorld()->SpawnActor<ABearTrap>(BearTrapClass);
 				BearTrapPlaced->SetActorRelativeLocation(GetMesh()->GetSocketLocation("RightToe_End"));
 				BearTrapPlaced->SetOwner(this);
 				BearTrapPlaced->SetLocationBeingOccupied(NewTrapLocation);
 				TrapArray.Add(BearTrapPlaced);
-				UE_LOG(LogTemp, Display, TEXT("Bounty Hunter set a bear trap, trap added to array list"));
+				//UE_LOG(LogTemp, Display, TEXT("Bounty Hunter set a bear trap, trap added to array list"));
 			}
 			else
 			{ // bSetTrap();
-				UE_LOG(LogTemp, Display, TEXT("The Trap Location is already occupied, the bounty hunter will not try to place a trap here"));
+				//UE_LOG(LogTemp, Display, TEXT("The Trap Location is already occupied, the bounty hunter will not try to place a trap here"));
 			}
 		}
 	}
@@ -284,22 +279,16 @@ void ABountyHunter::Attack()
 
 void ABountyHunter::Flee(ACharacterController* PlayerToFleeFrom)
 {
+	bSafeAttackingDistance = false;
+	
 	FVector CurrentLocation = GetActorLocation();
 	FVector PlayerLocation = PlayerToFleeFrom->GetActorLocation();
+	FVector Direction = CurrentLocation - PlayerLocation;
 	float DistanceToPlayer = FVector::Dist(CurrentLocation, PlayerLocation);
-	PositionToMove = CurrentLocation;
 
-	if (bSafeAttackingDistance == true)
-	{
-		bSafeAttackingDistance = true;
+	FVector LocationToMoveTo = CurrentLocation;
 
-	}
-
-	if (bSafeAttackingDistance == false)
-	{
-		bSafeAttackingDistance = false;
-
-	}
+	PositionToMove = PlayerLocation + CushionSpace * Direction;
 }
 
 void ABountyHunter::Aim()
@@ -310,7 +299,7 @@ void ABountyHunter::Aim()
 		{
 			if (ACharacterController* RecastTarget = Cast<ACharacterController>(BlackboardComponent->GetValueAsObject(TEXT("Target"))))
 			{
-				if (CurrentState == BountyHunterState::AIMING && CurrentlyEquippedWeapon != NULL)
+				if (CurrentlyEquippedWeapon != NULL)
 				{
 					FRotator DesiredWeaponRotation = GetActorRotation();
 
