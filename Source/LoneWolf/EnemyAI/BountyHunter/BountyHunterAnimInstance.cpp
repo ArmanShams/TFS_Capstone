@@ -2,23 +2,32 @@
 
 #include "LoneWolf.h"
 #include "EnemyAI/BountyHunter/BountyHunter.h"
-#include "BountyHunterAnimInstance.h"
+#include "EnemyAI/BountyHunter/BountyHunterAIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyAllTypes.h"
+#include "BountyHunterAnimInstance.h"
 #include "Engine.h"
+
+void UBountyHunterAnimInstance::NativeInitializaAnimation()
+{
+
+}
 
 void UBountyHunterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
-	Super::NativeUpdateAnimation(DeltaSeconds);
 	if (GetWorld()->HasBegunPlay())
 	{
+		Super::NativeUpdateAnimation(DeltaSeconds);
 		BountyHunter = Cast<ABountyHunter>(TryGetPawnOwner());
-		bIsAiming = BountyHunter->bIsAiming;
-		bCanBasicAttack = BountyHunter->GetEquippedWeapon()->CanFire();
-		bIsBasicAttack = BountyHunter->bIsAttacking;
-		bCanSetTrap = BountyHunter->bPlacingTrap;
-		bIsDead = BountyHunter->Health <= 0.0f;
-		bIsHardCC = BountyHunter->bIsInHardCC;
+		if (BountyHunter != NULL)
+		{
+			bIsAiming = BountyHunter->bIsAiming;
+			bCanBasicAttack = BountyHunter->GetEquippedWeapon()->CanFire();
+			bIsBasicAttack = BountyHunter->bIsAttacking;
+			bCanSetTrap = BountyHunter->bPlacingTrap;
+			bIsDead = BountyHunter->Health <= 0.0f;
+			bIsHardCC = BountyHunter->bIsInHardCC;
+		}
 	}
 }
 

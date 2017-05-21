@@ -36,18 +36,30 @@ public:
 	virtual AWeapon* GetEquippedWeapon() override;
 	virtual bool bIsInRange() override;
 	virtual bool bIsInRange(float OveriddenDesiredRange) override;
+	virtual CharacterState::StatusEffect GetStatusEffect() override;
 	virtual bool GetbIsInHardCC() override;
 	virtual bool GetbIsInSoftCC() override;
 	virtual void Destroyed() override;
-	virtual bool bCanTriggerRecoilAnimation();
-	virtual void SetBountyHunterState(BountyHunterState NewState);
-	virtual void Die() override;
 
-protected:
-	//Inherited protected functions from AEnemy
+	// Implemented public functions
+	//virtual bool GetBTIsInRange();
+	virtual BountyHunterState GetBountyHunterState();
+
+protected: //Inherited protected functions from AEnemy
 	virtual bool bIsSoftCC() override;
 	virtual bool bIsHardCC() override;
+	virtual void Die() override;
 	virtual AWeapon* EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip) override;
+
+protected: //Implemented Functions
+	virtual void Attack();
+	virtual void FixWeaponRotation();
+	virtual bool bCanTriggerRecoilAnimation();
+	virtual void Flee(ACharacterController* PlayerToFleeFrom);
+	virtual void SetBearTrap(ATrapLocations* NewTrapLocation, const FHitResult & SweepResult);
+	UFUNCTION()
+	virtual void OnActorBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	virtual void SetBountyHunterState(BountyHunterState NewState);
 
 protected:
 	//The maximum number of traps he is allowed to put in the world, extra traps will delete the obsolete trap.
@@ -56,17 +68,21 @@ protected:
 	//Cushion distance from player, safe distance to attack.
 	UPROPERTY(EditDefaultsOnly)
 	float CushionSpace;
-	//Distance to patrol
+	//Distance to patrol.
 	float PatrolDistance;
-	//Distance to set traps
+	//Distance to set traps.
 	float SearchingLocations;
 	//Trap locations to move to.
 	ATrapLocations* FirstTrapLocation;
 	ATrapLocations* SecondTrapLocation;
 	ATrapLocations* ThirdTrapLocation;
 	//UPROPERTY(EditInstanceOnly, Category = Enemy) TArray<class ATargetPoint*> TrapLocations; //Blackboard keys does not accept arrays
+	
+	//Class for decals.
+	AActor* AimLineDecalActor;
+	TSubclassOf<AActor> AimLineDecalClass;
 
-	//Class for traps
+	//Class for traps.
 	TSubclassOf<class ABearTrap> BearTrapClass;
 	ABearTrap* BearTrapPlaced;
 	TArray<AActor*> TrapArray;
@@ -79,14 +95,6 @@ protected:
 	ACharacterController* PlayerToFleeFrom;
 	//Move to position when in Flee State
 	FVector PositionToMove;
-
-	//Implemented Functions
-	virtual void Attack();
-	virtual void FixWeaponRotation();
-	virtual void Flee(ACharacterController* PlayerToFleeFrom);
-	virtual void SetBearTrap(ATrapLocations* NewTrapLocation, const FHitResult & SweepResult);
-	UFUNCTION()
-	void OnActorBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	//Blackboard Key Booleans
 	bool bSafeAttackingDistance();
@@ -105,9 +113,10 @@ protected:
 
 	//Friendships
 	friend class ABearTrap;
+	friend class UBountyHunterAnimInstance;
 	friend class UBTTask_BountyHunterAim;
 	friend class UBTTask_BountyHunterFlee;
 	friend class UBTTask_BountyHunterAttack;
 	friend class UBTTask_BountyHunterPlaceTrap;
-	friend class UBountyHunterAnimInstance;
+	friend class UBTTask_BountyHunterReturnToIdle;
 };

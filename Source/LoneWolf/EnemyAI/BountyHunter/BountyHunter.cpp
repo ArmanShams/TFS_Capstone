@@ -86,7 +86,7 @@ void ABountyHunter::Tick(float DeltaTime)
 
 		if (BlackboardComponent->GetValueAsObject(TEXT("Target")) != NULL)
 		{
-			if (ACharacterController* RecastedTarget = Cast<ACharacterController>(BlackboardComponent->GetValueAsObject(TEXT("Target"))))
+			if (ACharacterController* RecastedTarget = Cast<ACharacterController>GetActor())
 			{
 				FVector CurrentLocation = GetActorLocation();
 				FVector PlayerLocation = RecastedTarget->GetActorLocation();
@@ -97,11 +97,11 @@ void ABountyHunter::Tick(float DeltaTime)
 				case BountyHunterState::IDLE:
 					break;
 				case BountyHunterState::AIMING:
-					bIsAiming = true;
+					//bIsAiming = true;
 					FixWeaponRotation();
 					break;
 				case BountyHunterState::ATTACKING:
-					bIsAttacking = true;
+					//bIsAttacking = true;
 					Attack();
 					break;
 				case BountyHunterState::FLEEING:
@@ -159,6 +159,11 @@ bool ABountyHunter::bIsInRange(float OveriddenDesiredRange)
 	return Super::bIsInRange(OveriddenDesiredRange);
 }
 
+CharacterState::StatusEffect ABountyHunter::GetStatusEffect()
+{
+	return Super::GetStatusEffect();
+}
+
 bool ABountyHunter::GetbIsInHardCC()
 {
 	return Super::GetbIsInHardCC();
@@ -195,10 +200,25 @@ void ABountyHunter::SetBountyHunterState(BountyHunterState NewState)
 	CurrentState = NewState;
 }
 
+BountyHunterState ABountyHunter::GetBountyHunterState()
+{
+	return CurrentState;
+}
+
 void ABountyHunter::Die()
 {
 	return Super::Die();
 }
+
+//bool ABountyHunter::GetBTIsInRange()
+//{
+//	if (HasActorBegunPlay() && CurrentState == BountyHunterState::ATTACKING)
+//	{
+//		UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent();
+//		return BlackboardComponent->GetValueAsBool(TEXT("IsInMeleeRange"));
+//	}
+//	return false;
+//}
 
 AWeapon* ABountyHunter::EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip)
 {
@@ -296,9 +316,10 @@ bool ABountyHunter::bIsFlee()
 	if (bIsInRange(CushionSpace))
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, FString::Printf(TEXT("Fleeing!")));
+		CurrentState = BountyHunterState::FLEEING;
 		return true;
 	}
-	return bIsFleeing = false;
+	return false;
 }
 
 void ABountyHunter::Attack()
@@ -325,14 +346,19 @@ void ABountyHunter::Flee(ACharacterController* PlayerToFleeFrom)
 	float DistanceToPlayer = FVector::Dist(CurrentLocation, PlayerLocation);
 	if (DistanceToPlayer <= (CushionSpace + 50.f))
 	{
-		SetBountyHunterState(BountyHunterState::FLEEING);
-		GetMovementComponent()->AddInputVector(DistanceToPlayer * Direction);
+		//SetBountyHunterState(BountyHunterState::FLEEING);
+		bIsAiming = false;
+		//if (bIsAtacking == false)
+		//{
+		//	GetMovementComponent()->AddInputVector(DistanceToPlayer * Direction);
+
+		//}
 		//GEngine->AddOnScreenDebugMessage(-1, 1.f , FColor::Red, FString::Printf(TEXT("BountyHunter in the beam")));
 	}
 	if (DistanceToPlayer > CushionSpace)
 	{
-		bIsFleeing = false;
-		SetBountyHunterState(BountyHunterState::AIMING);
+		bIsFleeing = false;	
+		//SetBountyHunterState(BountyHunterState::AIMING);
 	}
 }
 

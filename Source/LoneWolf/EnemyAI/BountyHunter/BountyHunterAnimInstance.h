@@ -11,6 +11,7 @@ class LONEWOLF_API UBountyHunterAnimInstance : public UAnimInstance
 	GENERATED_BODY()
 
 public:
+	virtual void NativeInitializaAnimation() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
 protected:
@@ -76,7 +77,13 @@ protected:
 	UFUNCTION()
 	void AnimNotify_FootstepEvent();
 
+	//UPROPERTY(BlueprintReadOnly)
+	//BountyHunterState CurrentBountyHunterState;
+	//CharacterState::StatusEffect StatusEffects;
+	
 	class ABountyHunter* BountyHunter;
 
+	friend class AEnemy;
 	friend class ABountyHunter;
+	friend class ABountyHunterAIController;
 };
