@@ -8,11 +8,6 @@
 #include "BountyHunterAnimInstance.h"
 #include "Engine.h"
 
-void UBountyHunterAnimInstance::NativeInitializaAnimation()
-{
-
-}
-
 void UBountyHunterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	if (GetWorld()->HasBegunPlay())

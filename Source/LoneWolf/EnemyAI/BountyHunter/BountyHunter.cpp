@@ -78,7 +78,6 @@ void ABountyHunter::Tick(float DeltaTime)
 		BlackboardComponent->SetValueAsObject(TEXT("FirstTargetLocation"), SecondTrapLocation);
 		BlackboardComponent->SetValueAsObject(TEXT("FirstTargetLocation"), ThirdTrapLocation);
 
-		
 		bIsFlee();
 		bCanAttack();
 		bIsPatrolling();
@@ -86,7 +85,7 @@ void ABountyHunter::Tick(float DeltaTime)
 
 		if (BlackboardComponent->GetValueAsObject(TEXT("Target")) != NULL)
 		{
-			if (ACharacterController* RecastedTarget = Cast<ACharacterController>GetActor())
+			if (ACharacterController* RecastedTarget = Cast<ACharacterController>(BlackboardComponent->GetValueAsObject(TEXT("Target"))))
 			{
 				FVector CurrentLocation = GetActorLocation();
 				FVector PlayerLocation = RecastedTarget->GetActorLocation();
@@ -118,7 +117,6 @@ void ABountyHunter::Tick(float DeltaTime)
 				default:
 					break;
 				}
-				
 			}
 		}
 	}
