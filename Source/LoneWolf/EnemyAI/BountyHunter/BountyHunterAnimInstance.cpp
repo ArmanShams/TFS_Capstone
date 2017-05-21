@@ -13,7 +13,6 @@ void UBountyHunterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	if (GetWorld()->HasBegunPlay())
 	{
 		BountyHunter = Cast<ABountyHunter>(TryGetPawnOwner());
-
 		bIsAiming = BountyHunter->bIsAiming;
 		bCanBasicAttack = BountyHunter->GetEquippedWeapon()->CanFire();
 		bIsBasicAttack = BountyHunter->bIsAttacking;
