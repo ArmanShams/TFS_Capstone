@@ -18,15 +18,21 @@ ABearTrap::ABearTrap()
 
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> BearTrapSkeletalMesh(TEXT("SkeletalMesh'/Game/Geometry/World/M_BearTrap.M_BearTrap'"));
 	MeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Skeletal Mesh Component"));
+	//MeshComponent->SetupAttachment(RootComponent);
 	MeshComponent->SetupAttachment(TrapCollider);
 	MeshComponent->SetSkeletalMesh(BearTrapSkeletalMesh.Object);
+	MeshComponent->SetSimulatePhysics(true);
+	MeshComponent->WakeRigidBody();
 
-	radius = 30.f;
+	radius = 100.f;
 	Damage = 5;
 	TrapCollider->SetCollisionProfileName(TEXT("Traps"));
 	TrapCollider->SetSphereRadius(radius);
+	//TrapCollider->SetupAttachment(MeshComponent, "armA");
 	TrapCollider->OnComponentBeginOverlap.AddDynamic(this, &ABearTrap::OnComponentBeginOverlap);
 	TrapCollider->OnComponentEndOverlap.AddDynamic(this, &ABearTrap::OnComponentEndOverlap);
+	TrapCollider->SetSimulatePhysics(true);
+	TrapCollider->WakeRigidBody();
 	bIsVisible = false;
 	BountyHunter = NULL;
 }

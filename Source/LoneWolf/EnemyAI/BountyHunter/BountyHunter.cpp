@@ -223,7 +223,7 @@ void ABountyHunter::SetBearTrap(ATrapLocations* NewTrapLocation, const FHitResul
 					//UE_LOG(LogTemp, Display, TEXT("Element popped from Trap Array"));
 				}
 				BearTrapPlaced = GetWorld()->SpawnActor<ABearTrap>(BearTrapClass);
-				BearTrapPlaced->SetActorRelativeLocation(GetMesh()->GetSocketLocation("RightToe_End"));
+				BearTrapPlaced->SetActorRelativeLocation(GetMesh()->GetSocketLocation("TrapBone"));
 				BearTrapPlaced->SetOwner(this);
 				BearTrapPlaced->SetLocationBeingOccupied(NewTrapLocation);
 				TrapArray.Add(BearTrapPlaced);

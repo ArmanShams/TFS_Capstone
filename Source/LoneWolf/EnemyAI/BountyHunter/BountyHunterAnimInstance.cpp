@@ -41,12 +41,6 @@ void UBountyHunterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			bCanSetTrap = BountyHunter->bPlacingTrap;
 			bIsDead = BountyHunter->Health <= 0.0f;
 			bIsHardCC = BountyHunter->bIsInHardCC;
-
-			if (bIsBasicAttack == true)
-			{
-				BountyHunter->CurrentlyEquippedWeapon->Fire();
-			}
-
 		}	
 	}
 }
