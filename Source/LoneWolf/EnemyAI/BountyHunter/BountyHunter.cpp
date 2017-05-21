@@ -25,9 +25,9 @@ ABountyHunter::ABountyHunter()
 	TurnRate = 0.25f;
 	MaxRange = 300.f;
 	AttackFrequency = 1.f;
-	AttackRange = 1250.f;
+	AttackRange = 650.f;
 	MaximumTrapsAllowed = 3;
-	CushionSpace = 500.f;
+	CushionSpace = 250.f;
 	PatrolDistance = 1000.f;
 	SearchingLocations = 1100.f;
 	bPlayRecoilAnimation = false;
@@ -64,22 +64,21 @@ void ABountyHunter::Tick(float DeltaTime)
 
 	if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
 	{
-		BlackboardComponent->SetValueAsBool(TEXT("IsHardCC"), bIsHardCC());
-		BlackboardComponent->SetValueAsBool(TEXT("IsSoftCC"), bIsSoftCC());
-		BlackboardComponent->SetValueAsBool(TEXT("bPatrolling"), bIsInRange(PatrolDistance));
-		BlackboardComponent->SetValueAsBool(TEXT("bIsFlee"), bIsFleeing);
-		BlackboardComponent->SetValueAsBool(TEXT("bCanAttackTarget"), bCanAttack());
-		BlackboardComponent->SetValueAsBool(TEXT("bIsAttacking"), bIsInRange(AttackRange));
-		BlackboardComponent->SetValueAsBool(TEXT("bSearchingLocations"), bIsInRange(SearchingLocations));
+		BlackboardComponent->SetValueAsBool(TEXT("IsHardCC"), bIsInHardCC);
+		BlackboardComponent->SetValueAsBool(TEXT("IsSoftCC"), bIsInSoftCC);
+		BlackboardComponent->SetValueAsBool(TEXT("CanAttack"), bCanAttack());
+		BlackboardComponent->SetValueAsBool(TEXT("IsAttack"), bIsAttacking);
+		BlackboardComponent->SetValueAsBool(TEXT("IsAiming"), bIsAiming);
+		BlackboardComponent->SetValueAsBool(TEXT("IsInPatrollingRange"), bIsInRange(PatrolDistance));
+		BlackboardComponent->SetValueAsBool(TEXT("IsInSearchingLocationRange"), bIsInRange(SearchingLocations));
 		BlackboardComponent->SetValueAsBool(TEXT("bSafeAttackingDistance"), bSafeAttackingDistance());
-
 		BlackboardComponent->SetValueAsEnum(TEXT("StatusEffects"), Effects);
 		BlackboardComponent->SetValueAsEnum(TEXT("CurrentState"), (uint8)CurrentState);
-
 		BlackboardComponent->SetValueAsObject(TEXT("FirstTargetLocation"), FirstTrapLocation);
 		BlackboardComponent->SetValueAsObject(TEXT("FirstTargetLocation"), SecondTrapLocation);
 		BlackboardComponent->SetValueAsObject(TEXT("FirstTargetLocation"), ThirdTrapLocation);
 
+		
 		bIsFlee();
 		bCanAttack();
 		bIsPatrolling();
@@ -92,15 +91,17 @@ void ABountyHunter::Tick(float DeltaTime)
 				FVector CurrentLocation = GetActorLocation();
 				FVector PlayerLocation = RecastedTarget->GetActorLocation();
 				FVector Direction = CurrentLocation - PlayerLocation;
-				float Distance = FVector::Dist(CurrentLocation, PlayerLocation);  //UE_LOG(LogTemp, Display, TEXT("Distance: %f"), Distance);
+				float Distance = FVector::Dist(CurrentLocation, PlayerLocation); //  UE_LOG(LogTemp, Display, TEXT("Distance: %f"), Distance);
 				switch (CurrentState)
 				{
 				case BountyHunterState::IDLE:
 					break;
 				case BountyHunterState::AIMING:
+					bIsAiming = true;
 					FixWeaponRotation();
 					break;
 				case BountyHunterState::ATTACKING:
+					bIsAttacking = true;
 					Attack();
 					break;
 				case BountyHunterState::FLEEING:
@@ -251,9 +252,10 @@ void ABountyHunter::OnActorBeginOverlap(UPrimitiveComponent * OverlappedComp, AA
 
 bool ABountyHunter::bSafeAttackingDistance()
 {
-	if (bCanAttack() && CurrentState == BountyHunterState::ATTACKING)
+	if (bCanAttack() && !bIsFlee())
 	{
-		bIsAttacking = true;
+		//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, FString::Printf(TEXT("bSafeAttackingDistance = true!")));
+		//UE_LOG(LogTemp, Display, TEXT("bCanAttack = true"));
 		return true;
 	}
 	return false;
@@ -261,8 +263,9 @@ bool ABountyHunter::bSafeAttackingDistance()
 
 bool ABountyHunter::bCanAttack()
 {
-	if (bIsInRange(AttackRange) && !bIsFlee()) 
+	if (bIsInRange(AttackRange)) 
 	{
+		//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::White, FString::Printf(TEXT("CanAttack = true!")));
 		return true;
 	}
 	return false;
@@ -272,6 +275,7 @@ bool ABountyHunter::bSearchingTrapLocations()
 {
 	if (bIsInRange(SearchingLocations))
 	{
+		//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, FString::Printf(TEXT("bSearchingTrapLocations = true!")));
 		return true;
 	}
 	return false;
@@ -281,6 +285,7 @@ bool ABountyHunter::bIsPatrolling()
 {
 	if (bIsInRange(PatrolDistance))
 	{
+		//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, FString::Printf(TEXT("bIsPatrolling = true!")));
 		return true;
 	}
 	return false;
@@ -290,7 +295,8 @@ bool ABountyHunter::bIsFlee()
 {
 	if (bIsInRange(CushionSpace))
 	{
-		return bIsFleeing = true;
+		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, FString::Printf(TEXT("Fleeing!")));
+		return true;
 	}
 	return bIsFleeing = false;
 }
@@ -302,6 +308,7 @@ void ABountyHunter::Attack()
 		if (CurrentlyEquippedWeapon->CanFire())
 		{
 			FixWeaponRotation();
+			CurrentlyEquippedWeapon->Fire();
 			bPlayRecoilAnimation = true;
 			bPlacingTrap = false;
 		}
@@ -345,7 +352,6 @@ void ABountyHunter::FixWeaponRotation()
 					{
 						FRotator YawRotation = (RecastTarget->GetActorLocation() - CurrentlyEquippedWeapon->GetActorLocation()).Rotation();
 						DesiredWeaponRotation.Yaw = YawRotation.Yaw;
-						bIsAttacking = true;
 					}
 					else
 					{
