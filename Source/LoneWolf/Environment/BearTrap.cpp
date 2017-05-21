@@ -8,7 +8,6 @@
 #include "Character/StatusEffects/StatusEffect_SoftCrowdControl.h"
 #include "Engine.h"
 
-
 ABearTrap::ABearTrap()
 {
 	PrimaryActorTick.bCanEverTick = true;

@@ -35,12 +35,22 @@ protected:
 	// If true, Bounty Hunter is in hard crowd control.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bIsHardCC;
+
 	// Rotator for the mesh.
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FRotator LookAtRotation;
+	//UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	//FRotator LookAtRotation;
 
 	//UPROPERTY(BlueprintReadOnly)
 	//BountyHunterState CurrentEnemyState;
+
+	UFUNCTION()
+	void AnimNotify_ReturnToIdle();
+
+	UFUNCTION()
+	void AnimNotify_StartAiming();
+
+	UFUNCTION()
+	void AnimNotify_EndAiming();
 
 	UFUNCTION()
 	void AnimNotify_StartShooting();
@@ -49,16 +59,22 @@ protected:
 	void AnimNotify_EndShooting();
 
 	UFUNCTION()
+	void AnimNotify_SpawnTrap();
+
+	UFUNCTION()
 	void AnimNotify_PlaceTrap();	
 
 	UFUNCTION()
-	void AnimNotify_Aim();
+	void AnimNotify_ReadyingAttack();
+	
+	UFUNCTION()
+	void AnimNotify_StartStunned();
 
 	UFUNCTION()
-	void AnimNotify_ReturnToIdle();
+	void AnimNotify_EndStunned();
 
 	UFUNCTION()
-	void AnimNotify_Stunned();
+	void AnimNotify_FootstepEvent();
 
 	class ABountyHunter* BountyHunter;
 

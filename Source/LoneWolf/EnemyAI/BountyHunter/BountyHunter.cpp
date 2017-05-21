@@ -75,6 +75,8 @@ void ABountyHunter::Tick(float DeltaTime)
 		BlackboardComponent->SetValueAsObject(TEXT("FirstTargetLocation"), FirstTrapLocation);
 		BlackboardComponent->SetValueAsObject(TEXT("FirstTargetLocation"), SecondTrapLocation);
 		BlackboardComponent->SetValueAsObject(TEXT("FirstTargetLocation"), ThirdTrapLocation);
+		BlackboardComponent->SetValueAsEnum(TEXT("StatusEffects"), Effects);
+		BlackboardComponent->SetValueAsEnum(TEXT("CurrentState"), (uint8)CurrentState);
 
 		bIsFlee();
 		bCanAttack();
@@ -119,6 +121,7 @@ void ABountyHunter::Tick(float DeltaTime)
 				default:
 					break;
 				}
+				
 			}
 		}
 	}
