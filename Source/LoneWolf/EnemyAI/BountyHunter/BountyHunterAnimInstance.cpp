@@ -64,15 +64,14 @@ void UBountyHunterAnimInstance::AnimNotify_EndShooting()
 
 void UBountyHunterAnimInstance::AnimNotify_SpawnTrap()
 {
-
+	BountyHunter->SetBountyHunterState(BountyHunterState::SETTINGTRAP);
 }
 
 void UBountyHunterAnimInstance::AnimNotify_PlaceTrap()
 {
 	if (GetWorld()->HasBegunPlay())
 	{
-		bCanSetTrap = true;
-		BountyHunter->SetBountyHunterState(BountyHunterState::SETTINGTRAP);
+		BountyHunter->bPlacingTrap = false;
 	}
 }
 
@@ -85,8 +84,8 @@ void UBountyHunterAnimInstance::AnimNotify_StartAiming()
 {
 	if (GetWorld()->HasBegunPlay())
 	{
-		bIsAiming = true;
 		BountyHunter->SetBountyHunterState(BountyHunterState::AIMING);
+		bIsAiming = true;
 	}
 }
 
@@ -95,6 +94,7 @@ void UBountyHunterAnimInstance::AnimNotify_EndAiming()
 	if (GetWorld()->HasBegunPlay())
 	{
 		bIsAiming = false;
+		BountyHunter->bIsAttacking = true;
 	}
 }
 
@@ -135,5 +135,4 @@ void UBountyHunterAnimInstance::AnimNotify_EndStunned()
 
 void UBountyHunterAnimInstance::AnimNotify_FootstepEvent()
 {
-
 }

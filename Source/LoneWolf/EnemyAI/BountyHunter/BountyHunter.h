@@ -110,5 +110,4 @@ protected:
 	friend class UBTTask_BountyHunterAttack;
 	friend class UBTTask_BountyHunterPlaceTrap;
 	friend class UBountyHunterAnimInstance;
-
 };
