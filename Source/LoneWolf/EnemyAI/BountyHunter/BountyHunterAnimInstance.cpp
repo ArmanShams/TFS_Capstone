@@ -81,7 +81,7 @@ void UBountyHunterAnimInstance::AnimNotify_EndAiming()
 	if (GetWorld()->HasBegunPlay())
 	{ UE_LOG(LogTemp, Display, TEXT("BountyHunterAnim//EndAiming"));
 		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, FString::Printf(TEXT("Aim End!")));
-		//BountyHunter->bIsAttacking = true;
+		BountyHunter->bIsAiming = false;
 		BountyHunter->SetBountyHunterState(BountyHunterState::ATTACKING);
 	}
 }

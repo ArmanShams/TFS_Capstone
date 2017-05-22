@@ -43,10 +43,10 @@ ABountyHunter::ABountyHunter()
 		BearTrapClass = (UClass*)TrapAsset.Class;
 	}
 
-	ConstructorHelpers::FClassFinder<AActor>AimLineDecalActor(TEXT("Blueprint'/Game/Blueprints/Enemies/MinerAI/MinerVisualTelegraph_ChargeBP.MinerVisualTelegraph_ChargeBP_C'"));
+	ConstructorHelpers::FClassFinder<AActor>AimLineDecalActor(TEXT("Blueprint'/Game/Blueprints/Enemies/BountyHunterAI/AimingDecal.AimingDecal_C'"));
 	if (AimLineDecalActor.Class)
 	{
-		AimLineDecalClass = (UClass*)AimLineDecalActor.Class; // Using current decal class from miner
+		AimLineDecalClass = (UClass*)AimLineDecalActor.Class;
 	}
 }
 
@@ -59,9 +59,6 @@ void ABountyHunter::BeginPlay()
 void ABountyHunter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	//ACharacter* Player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
-	//FVector PlayerLocation = Player->GetActorLocation();
 
 	if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
 	{
@@ -96,13 +93,14 @@ void ABountyHunter::Tick(float DeltaTime)
 					bIsAiming = false;
 					bPlacingTrap = false;
 					bIsBasicAttack = false;
-
 					break;
 				case BountyHunterState::AIMING:
+					bIsAiming = true;
 					Aim(RecastedTarget);
 					break;
 				case BountyHunterState::ATTACKING:
 					bCanAttack = true;
+					bIsBasicAttack = true;
 					bIsAiming = false;
 					Attack();
 					break;
@@ -117,10 +115,8 @@ void ABountyHunter::Tick(float DeltaTime)
 					}
 					break;
 				case BountyHunterState::SETTINGTRAP:
-					UE_LOG(LogTemp, Display, TEXT("Bounty Hunter is trying to set a trap"));
 					break;
 				case BountyHunterState::HARDCC:
-					UE_LOG(LogTemp, Display, TEXT("Bounty Hunter: 'Hek. InHardCC.'"));
 					break;
 				default:
 					break;
@@ -265,6 +261,7 @@ bool ABountyHunter::bSafeAttackingDistance()
 {
 	if (bIsInRange(AttackRange) && !bIsFlee())
 	{
+		bCanAttack = true;
 		//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, FString::Printf(TEXT("bSafeAttackingDistance = true!")));
 		//UE_LOG(LogTemp, Display, TEXT("bCanAttack = true"));
 		return true;
@@ -277,7 +274,7 @@ bool ABountyHunter::bIsFlee()
 	if (bIsInRange(CushionSpace))
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, FString::Printf(TEXT("Fleeing!")));
-		CurrentState = BountyHunterState::FLEEING;
+		//CurrentState = BountyHunterState::FLEEING;
 		return true;
 	}
 	return false;
@@ -311,6 +308,10 @@ void ABountyHunter::Flee(ACharacterController* PlayerToFleeFrom)
 	FRotator RotationToPlayer = PlayerToFleeFrom->GetActorRotation();
 	FVector Direction = CurrentLocation - PlayerLocation;
 	float DistanceToPlayer = FVector::Dist(CurrentLocation, PlayerLocation);
+
+	GetMovementComponent()->AddInputVector(DistanceToPlayer * Direction);
+	SetActorRotation(-Direction.Rotation());
+
 	if (DistanceToPlayer > CushionSpace)
 	{
 		bIsFleeing = false;
