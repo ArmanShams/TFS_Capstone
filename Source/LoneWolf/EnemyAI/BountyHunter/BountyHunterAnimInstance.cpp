@@ -28,7 +28,7 @@ void UBountyHunterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 }
 
 void UBountyHunterAnimInstance::AnimNotify_StartShooting()
-{ UE_LOG(LogTemp, Display, TEXT("BountyHunterAnim//StartShooting"));
+{ //UE_LOG(LogTemp, Display, TEXT("BountyHunterAnim//StartShooting"));
 	if (GetWorld()->HasBegunPlay())
 	{
 		if (bIsBasicAttack == true)
@@ -44,19 +44,19 @@ void UBountyHunterAnimInstance::AnimNotify_StartShooting()
 }
 
 void UBountyHunterAnimInstance::AnimNotify_EndShooting()
-{ UE_LOG(LogTemp, Display, TEXT("BountyHunterAnim//EndShooting"));
+{ //UE_LOG(LogTemp, Display, TEXT("BountyHunterAnim//EndShooting"));
 	
 	bIsAiming = false;
 	BountyHunter->SetBountyHunterState(BountyHunterState::IDLE);
 }
 
 void UBountyHunterAnimInstance::AnimNotify_SpawnTrap()
-{ UE_LOG(LogTemp, Display, TEXT("BountyHunterAnim//SpawnTrap"));
+{ //UE_LOG(LogTemp, Display, TEXT("BountyHunterAnim//SpawnTrap"));
 	BountyHunter->SetBountyHunterState(BountyHunterState::SETTINGTRAP);
 }
 
 void UBountyHunterAnimInstance::AnimNotify_PlaceTrap()
-{ UE_LOG(LogTemp, Display, TEXT("BountyHunterAnim//EndPlaceTrap"));
+{ //UE_LOG(LogTemp, Display, TEXT("BountyHunterAnim//EndPlaceTrap"));
 	if (GetWorld()->HasBegunPlay())
 	{
 		BountyHunter->bPlacingTrap = false;
@@ -64,22 +64,21 @@ void UBountyHunterAnimInstance::AnimNotify_PlaceTrap()
 }
 
 void UBountyHunterAnimInstance::AnimNotify_ReadyingAttack()
-{ UE_LOG(LogTemp, Display, TEXT("BountyHunterAnim//ReadyingAttack"));
+{ //UE_LOG(LogTemp, Display, TEXT("BountyHunterAnim//ReadyingAttack"));
 }
 
 void UBountyHunterAnimInstance::AnimNotify_StartAiming()
 {
 	if (GetWorld()->HasBegunPlay())
-	{ UE_LOG(LogTemp, Display, TEXT("BountyHunterAnim//StartAiming"));
-		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, FString::Printf(TEXT("Aim Start!")));
-
+	{ //UE_LOG(LogTemp, Display, TEXT("BountyHunterAnim//StartAiming"));
+	  //GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, FString::Printf(TEXT("Aim Start!")));
 	}
 }
 
 void UBountyHunterAnimInstance::AnimNotify_EndAiming()
 {
 	if (GetWorld()->HasBegunPlay())
-	{ UE_LOG(LogTemp, Display, TEXT("BountyHunterAnim//EndAiming"));
+	{ //UE_LOG(LogTemp, Display, TEXT("BountyHunterAnim//EndAiming"));
 		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, FString::Printf(TEXT("Aim End!")));
 		BountyHunter->bIsAiming = false;
 		BountyHunter->SetBountyHunterState(BountyHunterState::ATTACKING);
@@ -87,7 +86,7 @@ void UBountyHunterAnimInstance::AnimNotify_EndAiming()
 }
 
 void UBountyHunterAnimInstance::AnimNotify_ReturnToIdle()
-{ UE_LOG(LogTemp, Display, TEXT("BountyHunterAnim//ReturnToIdle"));
+{ //UE_LOG(LogTemp, Display, TEXT("BountyHunterAnim//ReturnToIdle"));
 	if (GetWorld()->HasBegunPlay())
 	{
 		if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(TryGetPawnOwner()->GetController())->GetBrainComponent()->GetBlackboardComponent())
@@ -98,7 +97,7 @@ void UBountyHunterAnimInstance::AnimNotify_ReturnToIdle()
 }
 
 void UBountyHunterAnimInstance::AnimNotify_StartStunned()
-{ UE_LOG(LogTemp, Display, TEXT("BountyHunterAnim//StartStunned"));
+{ //UE_LOG(LogTemp, Display, TEXT("BountyHunterAnim//StartStunned"));
 	if (GetWorld()->HasBegunPlay())
 	{
 		bIsHardCC = true;
@@ -110,7 +109,7 @@ void UBountyHunterAnimInstance::AnimNotify_StartStunned()
 }
 
 void UBountyHunterAnimInstance::AnimNotify_EndStunned()
-{ UE_LOG(LogTemp, Display, TEXT("BountyHunterAnim//EndStunne ,d"));
+{ //UE_LOG(LogTemp, Display, TEXT("BountyHunterAnim//EndStunne ,d"));
 	if (GetWorld()->HasBegunPlay())
 	{
 		bIsHardCC = false;

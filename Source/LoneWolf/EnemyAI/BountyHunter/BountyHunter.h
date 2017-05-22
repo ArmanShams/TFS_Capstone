@@ -65,10 +65,10 @@ protected:
 	//Cushion distance from player, safe distance to attack.
 	UPROPERTY(EditDefaultsOnly)
 		float CushionSpace;
-	//Trap locations to move to.
-	ATrapLocations* FirstTrapLocation;
-	ATrapLocations* SecondTrapLocation;
-	ATrapLocations* ThirdTrapLocation;
+	//Trap locations to move to. (Currently not supported)
+		//ATrapLocations* FirstTrapLocation;
+		//ATrapLocations* SecondTrapLocation;
+		//ATrapLocations* ThirdTrapLocation;
 	//Decal Actor to display telegraphs, and an array to store decal class created.
 	AActor* AimLineDecalActor;
 	TSubclassOf<AActor> AimLineDecalClass;

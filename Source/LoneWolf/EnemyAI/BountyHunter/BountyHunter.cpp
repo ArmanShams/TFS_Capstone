@@ -62,7 +62,7 @@ void ABountyHunter::Tick(float DeltaTime)
 
 	if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
 	{
-		//Animation 
+		//Animation																	Variables:
 		BlackboardComponent->SetValueAsBool(TEXT("IsHardCC"), bIsInHardCC);			// bIsHardCC
 		BlackboardComponent->SetValueAsBool(TEXT("IsSoftCC"), bIsInSoftCC);			// bIsSoftCC
 		BlackboardComponent->SetValueAsBool(TEXT("CanAttack"), bCanAttack);			// bCanBasicAttack
@@ -79,9 +79,9 @@ void ABountyHunter::Tick(float DeltaTime)
 		BlackboardComponent->SetValueAsEnum(TEXT("CurrentState"), (uint8)CurrentState);
 
 		//When patrolling, set target locations, if NULL, set searching for trap locations to false
-		BlackboardComponent->SetValueAsObject(TEXT("FirstTargetLocation"), FirstTrapLocation);
-		BlackboardComponent->SetValueAsObject(TEXT("SecondTargetLocation"), SecondTrapLocation);
-		BlackboardComponent->SetValueAsObject(TEXT("ThirdTargetLocation"), ThirdTrapLocation);
+		BlackboardComponent->SetValueAsObject(TEXT("FirstTargetLocation"), NULL);
+		BlackboardComponent->SetValueAsObject(TEXT("SecondTargetLocation"), NULL);
+		BlackboardComponent->SetValueAsObject(TEXT("ThirdTargetLocation"), NULL);
 
 		if (BlackboardComponent->GetValueAsObject(TEXT("Target")) != NULL)
 		{
