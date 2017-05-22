@@ -4,9 +4,8 @@
 #include "BehaviorTree//BehaviorTree.h"
 #include "EnemyAI/BountyHunter/BountyHunter.h"
 #include "Perception/AIPerceptionComponent.h"
-#include "GenericTeamAgentInterface.h"
 #include "BountyHunterAIController.h"
-
+#include "GenericTeamAgentInterface.h"
 
 ABountyHunterAIController::ABountyHunterAIController()
 {

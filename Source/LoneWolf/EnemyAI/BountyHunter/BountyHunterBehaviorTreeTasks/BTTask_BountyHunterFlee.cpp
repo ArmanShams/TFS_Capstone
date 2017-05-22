@@ -2,6 +2,8 @@
 
 #include "LoneWolf.h"
 #include "BTTask_BountyHunterFlee.h"
+#include "EnemyAI/BountyHunter/BountyHunter.h"
+#include "EnemyAI/BountyHunter/BountyHunterAIController.h"
 
 UBTTask_BountyHunterFlee::UBTTask_BountyHunterFlee()
 {
