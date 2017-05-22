@@ -13,9 +13,7 @@ enum class BountyHunterState : uint8
 	ATTACKING				UMETA(DisplayName = "Attacking"),
 	FLEEING					UMETA(DisplayName = "Fleeing"),
 	HARDCC					UMETA(DisplayName = "Stunned"),
-	PATROLLING				UMETA(DisplayName = "Patrolling"),
-	SETTINGTRAP				UMETA(DisplayName = "PlacingTrap"),
-	SEARCHFORTRAPLOCATIONS	UMETA(DisplayName = "SerachingForTrapLocations")
+	SETTINGTRAP				UMETA(DisplayName = "PlacingTrap")
 };
 
 UCLASS(Blueprintable)
@@ -42,7 +40,6 @@ public:
 	virtual void Destroyed() override;
 
 	// Implemented public functions
-	//virtual bool GetBTIsInRange();
 	virtual BountyHunterState GetBountyHunterState();
 
 protected: //Inherited protected functions from AEnemy
@@ -54,9 +51,9 @@ protected: //Inherited protected functions from AEnemy
 protected: //Implemented Functions
 	virtual void Attack();
 	virtual void FixWeaponRotation();
-	virtual bool bCanTriggerRecoilAnimation();
 	virtual void Flee(ACharacterController* PlayerToFleeFrom);
 	virtual void SetBearTrap(ATrapLocations* NewTrapLocation, const FHitResult & SweepResult);
+	
 	UFUNCTION()
 	virtual void OnActorBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	virtual void SetBountyHunterState(BountyHunterState NewState);
@@ -67,49 +64,40 @@ protected:
 	uint8 MaximumTrapsAllowed;
 	//Cushion distance from player, safe distance to attack.
 	UPROPERTY(EditDefaultsOnly)
-	float CushionSpace;
-	//Distance to patrol.
-	float PatrolDistance;
-	//Distance to set traps.
-	float SearchingLocations;
+		float CushionSpace;
 	//Trap locations to move to.
 	ATrapLocations* FirstTrapLocation;
 	ATrapLocations* SecondTrapLocation;
 	ATrapLocations* ThirdTrapLocation;
-	//UPROPERTY(EditInstanceOnly, Category = Enemy) TArray<class ATargetPoint*> TrapLocations; //Blackboard keys does not accept arrays
-	
-	//Class for decals.
+	//Decal Actor to display telegraphs, and an array to store decal class created.
 	AActor* AimLineDecalActor;
 	TSubclassOf<AActor> AimLineDecalClass;
-
-	//Class for traps.
+	//BearTrap Actor to place in the world, and an array to store bear trap class created.
 	TSubclassOf<class ABearTrap> BearTrapClass;
 	ABearTrap* BearTrapPlaced;
+	//Array to keep track of how many traps are in the world, and pop the obsolete trap.
 	TArray<AActor*> TrapArray;
-
 	//Bounty Hunter Enumerator current state to control animations and functions
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enum)
 	BountyHunterState CurrentState;
-
-	//Check on BlackBoard Component target, flee from player character when conditions are met
+	//Check on BlackBoard Component target, flee from player character when conditions are met.
 	ACharacterController* PlayerToFleeFrom;
-	//Move to position when in Flee State
-	FVector PositionToMove;
+	ACharacterController* PlayerToAimAt;
 
-	//Blackboard Key Booleans
+protected: //Blackboard Key Booleans
 	bool bSafeAttackingDistance();
-	bool bCanAttack();
-	bool bSearchingTrapLocations();
-	bool bIsPatrolling();
 	bool bIsFlee();
 	bool bIsStunned;
 	bool bIsFleeing;
 
+	void Aim(ACharacterController* PlayerToAimAt);
+
 	//Animation Booleans
+	bool bCanAttack;
+	bool bIsBasicAttack;
 	bool bIsAiming;
-	bool bIsAttacking;
 	bool bPlacingTrap;
-	bool bPlayRecoilAnimation;
+	//bool bPlayRecoilAnimation;
 
 	//Friendships
 	friend class ABearTrap;
