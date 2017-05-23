@@ -70,7 +70,7 @@ void UBountyHunterAnimInstance::AnimNotify_ReadyingAttack()
 void UBountyHunterAnimInstance::AnimNotify_StartAiming()
 {
 	if (GetWorld()->HasBegunPlay())
-	{ //UE_LOG(LogTemp, Display, TEXT("BountyHunterAnim//StartAiming"));
+	{ //UE_LOG(LogTemp, Display, TEXT("BountyHunterAnim//StartAiming")); 
 	  //GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, FString::Printf(TEXT("Aim Start!")));
 	}
 }
@@ -79,7 +79,6 @@ void UBountyHunterAnimInstance::AnimNotify_EndAiming()
 {
 	if (GetWorld()->HasBegunPlay())
 	{ //UE_LOG(LogTemp, Display, TEXT("BountyHunterAnim//EndAiming"));
-		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, FString::Printf(TEXT("Aim End!")));
 		BountyHunter->bIsAiming = false;
 		BountyHunter->SetBountyHunterState(BountyHunterState::ATTACKING);
 	}

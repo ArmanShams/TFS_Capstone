@@ -86,7 +86,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character")
 	// Assigned by member function bIsSoftCC()
 	bool bIsInSoftCC;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character")
 	float MoveSpeedBase;
 

@@ -467,6 +467,17 @@ void UCharacterHumanAnimInstance::AnimNotify_EndPrimaryFire()
 	}
 }
 
+void UCharacterHumanAnimInstance::AnimNotify_DespawnWeapon()
+{
+	if (GetWorld()->HasBegunPlay())
+	{
+		if (CharacterController != NULL)
+		{
+			CharacterController->DespawnCurrentWeapon();
+		}
+	}
+}
+
 void UCharacterHumanAnimInstance::AnimNotify_DisableInputAndMakeInvulnerable()
 {
 	if (GetWorld()->HasBegunPlay())

@@ -9,6 +9,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyAllTypes.h"
 #include "BrainComponent.h"
+#include "Perception/AIPerceptionComponent.h"
 #include "Character/PlayerCharacter/CharacterController.h"
 #include "Character/StatusEffects/StatusEffect_HardCrowdControl.h"
 
@@ -60,6 +61,7 @@ void ABountyHunter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+
 	if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
 	{
 		//Animation																	Variables:
@@ -82,6 +84,15 @@ void ABountyHunter::Tick(float DeltaTime)
 		BlackboardComponent->SetValueAsObject(TEXT("FirstTargetLocation"), NULL);
 		BlackboardComponent->SetValueAsObject(TEXT("SecondTargetLocation"), NULL);
 		BlackboardComponent->SetValueAsObject(TEXT("ThirdTargetLocation"), NULL);
+
+		if (!bIsInRange(AttackRange))
+		{
+			//if (UBehaviorTreeComponent& OwnerComp)
+			//{
+			//	UAIPerceptionComponent* PerceptionComponent = OwnerComp.GetAIOwner()->GetPerceptionComponent();
+			//	PerceptionComponent->GetHostileActors(0);
+			//}
+		}
 
 		if (BlackboardComponent->GetValueAsObject(TEXT("Target")) != NULL)
 		{
@@ -273,7 +284,7 @@ bool ABountyHunter::bIsFlee()
 {
 	if (bIsInRange(CushionSpace))
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, FString::Printf(TEXT("Fleeing!")));
+		//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, FString::Printf(TEXT("Fleeing!")));
 		//CurrentState = BountyHunterState::FLEEING;
 		return true;
 	}
@@ -307,10 +318,11 @@ void ABountyHunter::Flee(ACharacterController* PlayerToFleeFrom)
 	FVector PlayerLocation = PlayerToFleeFrom->GetActorLocation();
 	FRotator RotationToPlayer = PlayerToFleeFrom->GetActorRotation();
 	FVector Direction = CurrentLocation - PlayerLocation;
+	FRotator DirectionRotation = Direction.Rotation();
+	FRotator NewRotation = -DirectionRotation;
 	float DistanceToPlayer = FVector::Dist(CurrentLocation, PlayerLocation);
-
+	SetActorRotation(NewRotation);
 	GetMovementComponent()->AddInputVector(DistanceToPlayer * Direction);
-	SetActorRotation(-Direction.Rotation());
 
 	if (DistanceToPlayer > CushionSpace)
 	{
