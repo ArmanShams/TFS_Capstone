@@ -42,10 +42,10 @@ ASheriffAI::ASheriffAI()
 		KnifeWeapon = (UClass*)KnifeAsset.Class;
 	}
 
-	ConstructorHelpers::FClassFinder<AWeapon>RevolverAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/Sheriff/SheriffShotgunBP.SheriffShotgunBP_C'"));
-	if (RevolverAsset.Class)
+	ConstructorHelpers::FClassFinder<AWeapon>ShotgunAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/Sheriff/SheriffShotgunBP.SheriffShotgunBP_C'"));
+	if (ShotgunAsset.Class)
 	{
-		RevolverWeapon = (UClass*)RevolverAsset.Class;
+		ShotgunWeapon = (UClass*)ShotgunAsset.Class;
 	}
 
 	ConstructorHelpers::FClassFinder<AActor>LassoAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/LassoBP.LassoBP_C'"));
@@ -55,111 +55,68 @@ ASheriffAI::ASheriffAI()
 		LassoWeapon = (UClass*)LassoAsset.Class;
 	}
 
-	DefaultWeapon = KnifeWeapon;
+	DefaultWeapon = ShotgunWeapon;
 }
 
 void ASheriffAI::BeginPlay()
 {
-	Super::BeginPlay();
-	CurrentState = SheriffState::IDLE;
-	DefaultWeapon = KnifeWeapon;
-}
 
-SheriffState ASheriffAI::GetSheriffState()
-{
-	return CurrentState;
-}
-
-void ASheriffAI::SetSheriffState(SheriffState NewStateToEnter)
-{
-	CurrentState = NewStateToEnter;
 }
 
 void ASheriffAI::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-	
-	// Update the blackboard component keys
-	//if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
-	//{
-	//	BlackboardComponent->SetValueAsBool(TEXT("bIsSoftCC"), bIsInSoftCC);
-	//	BlackboardComponent->SetValueAsBool(TEXT("bIsInKnifeRange"), bIsInRange(KnifeAttackRange));
-	//	BlackboardComponent->SetValueAsBool(TEXT("bIsInRevolverRange"), bIsInRange(RevolverAttackRange));
-	//	BlackboardComponent->SetValueAsBool(TEXT("bIsInLassoRange"), bIsInRange(LassoAttackRange));
-	//	BlackboardComponent->SetValueAsEnum(TEXT("CurrentState"), (uint8)CurrentState);
-	//}
 
-	// Use functions for the appropriate state
-	switch (CurrentState)
+	if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
 	{
-	case SheriffState::IDLE:
-		break;
-	case SheriffState::MELEE:
-		UE_LOG(LogTemp, Display, TEXT("SHERIFFSTATE::MELEE"));
-		if (bIsInRange(KnifeAttackRange))
-		{
-			CurrentlyEquippedWeapon = GetEquippedWeapon();
-			if (CurrentlyEquippedWeapon->GetClass() != KnifeWeapon)
-			{
-				CurrentlyEquippedWeapon = EquipNewWeapon(KnifeWeapon);
-			}
-			//CurrentlyEquippedWeapon->Fire();
-		}
-		break;
-	case SheriffState::RANGED:
-		UE_LOG(LogTemp, Display, TEXT("SHERIFFSTATE::RANGED"));
-		if (bIsInRange(RevolverAttackRange))
-		{
-			CurrentlyEquippedWeapon = GetEquippedWeapon();
-			if (CurrentlyEquippedWeapon->GetClass() != KnifeWeapon)
-			{
-			EquipNewWeapon(RevolverWeapon);
-			}
-			//CurrentlyEquippedWeapon->Fire();
-		}
-		break;
-	case SheriffState::CASTING:
-		UE_LOG(LogTemp, Display, TEXT("SHERIFFSTATE::CASTING"));
-		if (bIsInRange(LassoAttackRange))
-		{
-			CurrentlyEquippedWeapon = GetEquippedWeapon();
-			if (CurrentlyEquippedWeapon->GetClass() != KnifeWeapon)
-			{ 
-				EquipNewWeapon(LassoWeapon);
-			}
-			//CurrentlyEquippedWeapon->Fire();
-		}
-		break;
-	case SheriffState::LASSO:
+		//Animation																	Variables:
+		BlackboardComponent->SetValueAsBool(TEXT("IsHardCC"), bIsInHardCC);			// bIsHardCC
+		BlackboardComponent->SetValueAsBool(TEXT("IsSoftCC"), bIsInSoftCC);			// bIsSoftCC
+		BlackboardComponent->SetValueAsBool(TEXT("CanAttack"), bCanAttack);			// bCanBasicAttack
+		BlackboardComponent->SetValueAsBool(TEXT("IsAttack"), bIsBasicAttack);		// bIsBasicAttack
+		BlackboardComponent->SetValueAsBool(TEXT("IsAiming"), bIsAiming);			// bIsAiming
+		BlackboardComponent->SetValueAsBool(TEXT("SwingingKnife"), bIsBasicAttack); // NOT IMPLEMENTED
 
-		//if (bIsInRange(LassoAttackRange))
-		//{
-		//}
-		break;
-	default:
-		break;
-	}
-	//if (bIsInRange())
-	//{
-	//	if (bIsInRange(LassoAttackRange))
-	//	{
-	//		Lasso();
-	//	}
-	//}
-	if (!bIsInRange())
-	{
-		LassoCableComponent->SetAttachEndTo(this, GetMesh()->GetSocketBoneName("RightHand"));
-	}
-}
+		//Checking the range
+		BlackboardComponent->SetValueAsBool(TEXT("IsInAttackRange"), bIsInRange(AttackRange));
+		BlackboardComponent->SetValueAsBool(TEXT("bSafeAttackingDistance"), bSafeAttackingDistance());
 
-void ASheriffAI::SetupPlayerInputComponent(class UInputComponent* InputComponent)
-{
-	Super::SetupPlayerInputComponent(InputComponent);
+		//Check for status
+		BlackboardComponent->SetValueAsEnum(TEXT("StatusEffects"), Effects);
+		BlackboardComponent->SetValueAsEnum(TEXT("CurrentState"), (uint8)CurrentState);
+
+		if (BlackboardComponent->GetValueAsObject(TEXT("Target")) != NULL)
+		{
+			switch (CurrentState)
+			{
+			case SheriffState::IDLE:
+				break;
+			case SheriffState::MELEE:
+				break;
+			case SheriffState::RANGED:
+				break;
+			case SheriffState::CASTING:
+				break;
+			case SheriffState::LASSO:
+				break;
+			case SheriffState::HARDCC:
+				break;
+			default:
+				UE_LOG(LogTemp, Display, TEXT("There's been an error in setting the state of the Sheriff"));
+				break;
+			}
+		}
+	}
 }
 
 float ASheriffAI::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
 {
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+}
+
+void ASheriffAI::SetupPlayerInputComponent(class UInputComponent* InInputComponent)
+{
+	Super::SetupPlayerInputComponent(InInputComponent);
 }
 
 void ASheriffAI::AddStatusEffect(TSubclassOf<class UStatusEffectBase> ClassToCreateFrom, bool bShouldPerformTickAction, float LifeTime, float TickRate, ALoneWolfCharacter* CharacterThatInflictedStatusEffect)
@@ -177,14 +134,39 @@ AWeapon* ASheriffAI::GetEquippedWeapon()
 	return Super::GetEquippedWeapon();
 }
 
+bool ASheriffAI::bIsInRange()
+{
+	return Super::bIsInRange();
+}
+
 bool ASheriffAI::bIsInRange(float OveriddenDesiredRange)
 {
 	return Super::bIsInRange(OveriddenDesiredRange);
 }
 
-bool ASheriffAI::bIsInRange()
+CharacterState::StatusEffect ASheriffAI::GetStatusEffect()
 {
-	return Super::bIsInRange();
+	return Super::GetStatusEffect();
+}
+
+bool ASheriffAI::GetbIsInHardCC()
+{
+	return Super::GetbIsInHardCC();
+}
+
+bool ASheriffAI::GetbIsInSoftCC()
+{
+	return Super::GetbIsInSoftCC();
+}
+
+void ASheriffAI::Destroyed()
+{
+	return Super::Destroyed();
+}
+
+SheriffState ASheriffAI::GetSheriffState()
+{
+	return CurrentState;
 }
 
 bool ASheriffAI::bIsSoftCC()
@@ -197,96 +179,156 @@ bool ASheriffAI::bIsHardCC()
 	return Super::bIsHardCC();
 }
 
-void ASheriffAI::Destroyed()
+void ASheriffAI::Die()
 {
-	Super::Destroyed();
-}
-
-void ASheriffAI::SwingKnife()
-{
-	SetSheriffState(SheriffState::MELEE);
-	UE_LOG(LogTemp, Display, TEXT("Sheriff is trying to swing his knife"));
-	if (DefaultWeapon = KnifeWeapon)
-	{
-		UE_LOG(LogTemp, Display, TEXT("Sheriff is swinging his knife"));
-		// CurrentlyEquippedWeapon->Fire();
-	}
-}
-
-void ASheriffAI::Shoot()
-{
-	SetSheriffState(SheriffState::RANGED);
-	UE_LOG(LogTemp, Display, TEXT("Sheriff is trying to shoot"));
-	if (DefaultWeapon = RevolverWeapon)
-	{
-		UE_LOG(LogTemp, Display, TEXT("Sheriff is shooting his shotgun"));
-		// CurrentlyEquippedWeapon->Fire();
-	}
-}
-
-void ASheriffAI::Casting()
-{
-	SetSheriffState(SheriffState::CASTING);
-	UE_LOG(LogTemp, Display, TEXT("Sheriff is trying to cast lasso"));
-	if (DefaultWeapon = LassoWeapon)
-	{
-		UE_LOG(LogTemp, Display, TEXT("Sheriff is readying the lasso ability"));
-	}
-}
-
-void ASheriffAI::Lasso()
-{
-	SetSheriffState(SheriffState::LASSO);
-	UE_LOG(LogTemp, Display, TEXT("Sheriff is trying to use lasso"));
-
-	CurrentlyEquippedWeapon = GetEquippedWeapon();
-	//if (CurrentlyEquippedWeapon->GetClass() != LassoWeapon)
-	//{
-	//	UE_LOG(LogTemp, Display, TEXT("Sheriff is using the lasso ability"));
-	//	EquipNewWeapon(LassoWeapon);
-	//}
-		
-	//if (DefaultWeapon = LassoWeapon)
-	//{
-	if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
-	{
-		if (BlackboardComponent->GetValueAsObject(TEXT("Target")) != NULL)
-		{
-			if (ACharacterController* PlayerReference = Cast<ACharacterController>(BlackboardComponent->GetValueAsObject(TEXT("Target"))))
-			{
-				// UE_LOG(LogTemp, Display, TEXT("Sheriff tried to lasso the player"));
-
-				CurrentLocation = GetActorLocation();
-				PlayerLocation = PlayerReference->GetActorLocation();
-				DistanceToPlayer = FVector::Dist(CurrentLocation, PlayerLocation);
-
-				//If the player gets pulled into the Sheriff's knife attack range, he will let go of the rope to swing his knife
-					CushionSpace = KnifeAttackRange;
-
-				if (DistanceToPlayer > CushionSpace)
-				{
-					LassoCableComponent->CableLength = LassoLength;
-					LassoCableComponent->SetAttachEndTo(PlayerReference, GetMesh()->GetSocketBoneName("pelvis"));
-					FVector PullDirecton = PullingVelocity * (PlayerReference->GetActorLocation() - GetActorLocation());
-					PlayerReference->GetMovementComponent()->AddInputVector(PullDirecton);
-
-					AddStatusEffect(UStatusEffect_SoftCrowdControl::StaticClass(), false, 2.f, 0.f, this);
-				}
-
-				if (DistanceToPlayer < CushionSpace)
-				{
-					LassoCableComponent->SetAttachEndTo(this, GetMesh()->GetSocketBoneName("hand_r"));
-				}
-			}
-		}
-	}
-
+	return Super::Die();
 }
 
 AWeapon* ASheriffAI::EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip)
 {
-	CurrentlyEquippedWeapon = Super::EquipNewWeapon(WeaponToEquip);
-	CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(90.0f, -90.f, 90.f));
-	CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("hand_r"));
-	return CurrentlyEquippedWeapon;
+	return Super::EquipNewWeapon(WeaponToEquip);
 }
+
+void ASheriffAI::Lasso()
+{
+	//CurrentlyEquippedWeapon = GetEquippedWeapon();
+	//if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
+	//{
+	//	if (BlackboardComponent->GetValueAsObject(TEXT("Target")) != NULL)
+	//	{
+	//		if (ACharacterController* PlayerReference = Cast<ACharacterController>(BlackboardComponent->GetValueAsObject(TEXT("Target"))))
+	//		{
+	//			CurrentLocation = GetActorLocation();
+	//			PlayerLocation = PlayerReference->GetActorLocation();
+	//			DistanceToPlayer = FVector::Dist(CurrentLocation, PlayerLocation);
+
+	//			//If the player gets pulled into the Sheriff's knife attack range, he will let go of the rope to swing his knife
+	//			CushionSpace = KnifeAttackRange;
+
+	//			if (DistanceToPlayer > CushionSpace)
+	//			{
+	//				LassoCableComponent->CableLength = LassoLength;
+	//				LassoCableComponent->SetAttachEndTo(PlayerReference, GetMesh()->GetSocketBoneName("pelvis"));
+	//				FVector PullDirecton = PullingVelocity * (PlayerReference->GetActorLocation() - GetActorLocation());
+	//				PlayerReference->GetMovementComponent()->AddInputVector(PullDirecton);
+
+	//				AddStatusEffect(UStatusEffect_SoftCrowdControl::StaticClass(), false, 2.f, 0.f, this);
+	//			}
+
+	//			if (DistanceToPlayer < CushionSpace)
+	//			{
+	//				LassoCableComponent->SetAttachEndTo(this, GetMesh()->GetSocketBoneName("hand_r"));
+	//			}
+	//		}
+	//	}
+	//}
+}
+
+void ASheriffAI::Shoot()
+{
+	CurrentlyEquippedWeapon->Fire();
+}
+
+void ASheriffAI::Casting()
+{
+
+}
+
+void ASheriffAI::SwingKnife()
+{
+}
+
+void ASheriffAI::SetSheriffState(SheriffState NewStateToEnter)
+{
+	CurrentState = NewStateToEnter;
+}
+
+bool ASheriffAI::bSafeAttackingDistance()
+{
+	if (bIsInRange(AttackRange) && !bIsFlee())
+	{
+		UE_LOG(LogTemp, Display, TEXT("WE ARE IN THE BEAM"));
+		return bIsFleeing = true;
+	}
+	return bIsFleeing = false;
+}
+
+bool ASheriffAI::bIsFlee()
+{
+	if (bIsInRange(CushionSpace))
+	{
+		UE_LOG(LogTemp, Display, TEXT("WE ARE FLEE"));
+		return true;
+	}
+	return false;
+}
+
+void ASheriffAI::Aim(ACharacterController* PlayerToAimAt)
+{
+	//FixedWeapo+Rotation();
+	FVector Direction = PlayerToAimAt->GetActorLocation() - GetActorLocation();
+	FRotator NewRollRotation = FRotationMatrix::MakeFromX(Direction).Rotator();
+	SetActorRotation(NewRollRotation);
+}
+
+//void ABountyHunter::Attack()
+//{
+//	if (CurrentlyEquippedWeapon != NULL)
+//	{
+//		if (CurrentlyEquippedWeapon->CanFire())
+//		{
+//			FixWeaponRotation();
+//		}
+//	}
+//}
+
+//void ASheriffAI::FixWeaponRotation()
+//{
+//	if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
+//	{
+//		if (BlackboardComponent->GetValueAsObject(TEXT("Target")) != NULL)
+//		{
+//			if (ACharacterController* RecastTarget = Cast<ACharacterController>(BlackboardComponent->GetValueAsObject(TEXT("Target"))))
+//			{
+//				if (CurrentlyEquippedWeapon != NULL)
+//				{
+//					FRotator DesiredWeaponRotation = GetActorRotation();
+//					FVector DirectionToTarget = RecastTarget->GetActorLocation() - GetActorLocation();
+//					if (DirectionToTarget.Size() > 300.f)
+//					{
+//						FRotator YawRotation = (RecastTarget->GetActorLocation() - CurrentlyEquippedWeapon->GetActorLocation()).Rotation();
+//						DesiredWeaponRotation.Yaw = YawRotation.Yaw;
+//					}
+//					else
+//					{
+//						FRotator YawRotation = (GetActorLocation() + (GetMesh()->GetRightVector() * 256.f) - CurrentlyEquippedWeapon->GetActorLocation()).Rotation();
+//
+//						DesiredWeaponRotation.Yaw = YawRotation.Yaw;
+//					}
+//					FRotator RotationInDirection = FRotationMatrix::MakeFromX(DirectionToTarget).Rotator();
+//					DesiredWeaponRotation.Pitch = RotationInDirection.Pitch;
+//
+//					CurrentlyEquippedWeapon->SetActorRotation(FMath::RInterpTo(CurrentlyEquippedWeapon->GetActorRotation(), DesiredWeaponRotation, GetWorld()->GetDeltaSeconds(), 200.f));
+//				}
+//			}
+//		}
+//	}
+//}
+
+//void ASherifAI::Flee(ACharacterController* PlayerToFleeFrom)
+//{
+//	FVector CurrentLocation = GetActorLocation();
+//	FVector PlayerLocation = PlayerToFleeFrom->GetActorLocation();
+//	FRotator RotationToPlayer = PlayerToFleeFrom->GetActorRotation();
+//	FVector Direction = CurrentLocation - PlayerLocation;
+//	FRotator DirectionRotation = Direction.Rotation();
+//	FRotator NewRotation = -DirectionRotation;
+//	float DistanceToPlayer = FVector::Dist(CurrentLocation, PlayerLocation);
+//	SetActorRotation(NewRotation);
+//	GetMovementComponent()->AddInputVector(DistanceToPlayer * Direction);
+//
+//	if (DistanceToPlayer > CushionSpace)
+//	{
+//		bIsFleeing = false;
+//	}
+//}
