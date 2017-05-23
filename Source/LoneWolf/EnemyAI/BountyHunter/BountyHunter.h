@@ -13,9 +13,7 @@ enum class BountyHunterState : uint8
 	ATTACKING				UMETA(DisplayName = "Attacking"),
 	FLEEING					UMETA(DisplayName = "Fleeing"),
 	HARDCC					UMETA(DisplayName = "Stunned"),
-	PATROLLING				UMETA(DisplayName = "Patrolling"),
-	SETTINGTRAP				UMETA(DisplayName = "PlacingTrap"),
-	SEARCHFORTRAPLOCATIONS	UMETA(DisplayName = "SerachingForTrapLocations")
+	SETTINGTRAP				UMETA(DisplayName = "PlacingTrap")
 };
 
 UCLASS(Blueprintable)
@@ -36,18 +34,29 @@ public:
 	virtual AWeapon* GetEquippedWeapon() override;
 	virtual bool bIsInRange() override;
 	virtual bool bIsInRange(float OveriddenDesiredRange) override;
+	virtual CharacterState::StatusEffect GetStatusEffect() override;
 	virtual bool GetbIsInHardCC() override;
 	virtual bool GetbIsInSoftCC() override;
 	virtual void Destroyed() override;
-	virtual bool bCanTriggerRecoilAnimation();
-	virtual void SetBountyHunterState(BountyHunterState NewState);
-	virtual void Die() override;
 
-protected:
-	//Inherited protected functions from AEnemy
+	// Implemented public functions
+	virtual BountyHunterState GetBountyHunterState();
+
+protected: //Inherited protected functions from AEnemy
 	virtual bool bIsSoftCC() override;
 	virtual bool bIsHardCC() override;
+	virtual void Die() override;
 	virtual AWeapon* EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip) override;
+
+protected: //Implemented Functions
+	virtual void Attack();
+	virtual void FixWeaponRotation();
+	virtual void Flee(ACharacterController* PlayerToFleeFrom);
+	virtual void SetBearTrap(ATrapLocations* NewTrapLocation, const FHitResult & SweepResult);
+	
+	UFUNCTION()
+	virtual void OnActorBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	virtual void SetBountyHunterState(BountyHunterState NewState);
 
 protected:
 	//The maximum number of traps he is allowed to put in the world, extra traps will delete the obsolete trap.
@@ -55,60 +64,47 @@ protected:
 	uint8 MaximumTrapsAllowed;
 	//Cushion distance from player, safe distance to attack.
 	UPROPERTY(EditDefaultsOnly)
-	float CushionSpace;
-	//Distance to patrol
-	float PatrolDistance;
-	//Distance to set traps
-	float SearchingLocations;
-	//Trap locations to move to.
-	ATrapLocations* FirstTrapLocation;
-	ATrapLocations* SecondTrapLocation;
-	ATrapLocations* ThirdTrapLocation;
-	//UPROPERTY(EditInstanceOnly, Category = Enemy) TArray<class ATargetPoint*> TrapLocations; //Blackboard keys does not accept arrays
-
-	//Class for traps
+		float CushionSpace;
+	//Trap locations to move to. (Currently not supported)
+		//ATrapLocations* FirstTrapLocation;
+		//ATrapLocations* SecondTrapLocation;
+		//ATrapLocations* ThirdTrapLocation;
+	//Decal Actor to display telegraphs, and an array to store decal class created.
+	AActor* AimLineDecalActor;
+	TSubclassOf<AActor> AimLineDecalClass;
+	//BearTrap Actor to place in the world, and an array to store bear trap class created.
 	TSubclassOf<class ABearTrap> BearTrapClass;
 	ABearTrap* BearTrapPlaced;
+	//Array to keep track of how many traps are in the world, and pop the obsolete trap.
 	TArray<AActor*> TrapArray;
-
 	//Bounty Hunter Enumerator current state to control animations and functions
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enum)
 	BountyHunterState CurrentState;
-
-	//Check on BlackBoard Component target, flee from player character when conditions are met
+	//Check on BlackBoard Component target, flee from player character when conditions are met.
 	ACharacterController* PlayerToFleeFrom;
-	//Move to position when in Flee State
-	FVector PositionToMove;
+	ACharacterController* PlayerToAimAt;
 
-	//Implemented Functions
-	virtual void Attack();
-	virtual void FixWeaponRotation();
-	virtual void Flee(ACharacterController* PlayerToFleeFrom);
-	virtual void SetBearTrap(ATrapLocations* NewTrapLocation, const FHitResult & SweepResult);
-	UFUNCTION()
-	void OnActorBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
-	//Blackboard Key Booleans
+protected: //Blackboard Key Booleans
 	bool bSafeAttackingDistance();
-	bool bCanAttack();
-	bool bSearchingTrapLocations();
-	bool bIsPatrolling();
 	bool bIsFlee();
 	bool bIsStunned;
 	bool bIsFleeing;
 
+	void Aim(ACharacterController* PlayerToAimAt);
+
 	//Animation Booleans
+	bool bCanAttack;
+	bool bIsBasicAttack;
 	bool bIsAiming;
-	bool bIsAttacking;
 	bool bPlacingTrap;
-	bool bPlayRecoilAnimation;
+	//bool bPlayRecoilAnimation;
 
 	//Friendships
 	friend class ABearTrap;
+	friend class UBountyHunterAnimInstance;
 	friend class UBTTask_BountyHunterAim;
 	friend class UBTTask_BountyHunterFlee;
 	friend class UBTTask_BountyHunterAttack;
 	friend class UBTTask_BountyHunterPlaceTrap;
-	friend class UBountyHunterAnimInstance;
-
+	friend class UBTTask_BountyHunterReturnToIdle;
 };

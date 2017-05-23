@@ -45,11 +45,11 @@ void ABartenderAI::Tick(float DeltaSeconds)
 
 	if (bIsAttacking)
 	{
-		UE_LOG(LogTemp, Display, TEXT("JAM"));
+		//UE_LOG(LogTemp, Display, TEXT("JAM"));
 	}
 	else
 	{
-		UE_LOG(LogTemp, Display, TEXT("NOJAM"));
+		//UE_LOG(LogTemp, Display, TEXT("NOJAM"));
 	}
 
 

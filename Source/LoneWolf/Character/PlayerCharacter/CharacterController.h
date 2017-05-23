@@ -72,7 +72,7 @@ public:
 
 
 	// SOON TO BE REMOVED
-	void EquipRevolver();
+	//void EquipRevolver();
 
 
 	//UFUNCTION()
@@ -96,6 +96,7 @@ protected:
 	virtual void Die() override;
 	virtual void TransformIntoWolf();
 	virtual void TransformIntoHuman();
+	virtual void DespawnCurrentWeapon();
 	virtual void RevokeControlAndBecomeInvulnerable();
 	virtual void RestoreControlAndRevokeInvulnerable();
 	virtual void OrientMeshToMovementDirection();

@@ -18,4 +18,6 @@ public:
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	class UBehaviorTree* BountyHunterBTAsset;
+
+	friend class ABountyHunter;
 };
