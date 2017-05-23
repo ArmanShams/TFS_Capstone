@@ -59,6 +59,9 @@ protected:
 	void AnimNotify_EndPrimaryFire();
 
 	UFUNCTION()
+	void AnimNotify_DespawnWeapon();
+
+	UFUNCTION()
 	void AnimNotify_DisableInputAndMakeInvulnerable();
 
 	UFUNCTION()

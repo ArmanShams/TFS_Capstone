@@ -270,11 +270,15 @@ void ACharacterController::Tick(float DeltaSeconds)
 		if (Rage <= 0.1f)
 		{
 			CurrentForm = TransformationState::HUMAN;
-			//CurrentForm = TransformationState::WOLF;
 			UE_LOG(LogTemp, Display, TEXT("Player 'Transformed' to human"));
-
 			if (HumanAnimationClass && HumanMesh)
 			{
+				if (CurrentlyEquippedWeapon != NULL)
+				{
+					CurrentlyEquippedWeapon->SetLifeSpan(0.2f);
+					CurrentlyEquippedWeapon = NULL;
+				}
+				
 				GetMesh()->SetAnimInstanceClass(HumanAnimationClass);
 				GetMesh()->SetSkeletalMesh(HumanMesh);
 
@@ -282,13 +286,11 @@ void ACharacterController::Tick(float DeltaSeconds)
 				{
 					EnableInput(RecastController);
 				}
-
-				CurrentlyEquippedWeapon->Destroy();
-				CurrentlyEquippedWeapon = NULL;
-				//GetMesh()->SetSkeletalMesh(NewMesh);
-				EquipNewWeapon(DefaultWeapon);
+				if (CurrentlyEquippedWeapon == NULL)
+				{
+					EquipNewWeapon(DefaultWeapon);
+				}
 			}
-			//EquipRevolver();
 			Rage = 0.0f;
 		}
 		break;
@@ -653,16 +655,6 @@ EightDirectional ACharacterController::GetRelativeMovement()
 	return MoveDirection;
 }
 
-void ACharacterController::EquipRevolver()
-{
-	/*
-	CurrentlyEquippedWeapon = GetWorld()->SpawnActor<AWeapon>(DefaultWeapon);
-	CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(90.f, 180.f, 0.f));
-	CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("hand_r"));
-	CurrentlyEquippedWeapon->SetOwner(this);
-	*/
-}
-
 void ACharacterController::OnShootPressed()
 {
 	if (CurrentlyEquippedWeapon != NULL)
@@ -742,7 +734,7 @@ void ACharacterController::OnAltShootReleased()
 
 void ACharacterController::OnDebugRagePressed()
 {
-	if (Rage <= MAXRAGE - 0.5f)
+	if (Rage <= MAXRAGE - 10.5f)
 	{
 		Rage = MAXRAGE;
 		UE_LOG(LogTemp, Display, TEXT("Rage has been set to maximum %f"), Rage);
@@ -834,30 +826,16 @@ void ACharacterController::Die()
 
 void ACharacterController::TransformIntoWolf()
 {
-	if (WolfAnimationClass && WolfMesh)
+	if (ensureMsg(WolfAnimationClass != NULL, TEXT("Wolf animation class is NULL!")) && ensureMsg(WolfMesh != NULL, TEXT("Wolfmesh is NULL!")))
 	{
-		if (AWeapon_PlayerRevolver* RecastWeapon = Cast<AWeapon_PlayerRevolver>(CurrentlyEquippedWeapon))
-		{
-			if (RecastWeapon->IsFanFiring())
-			{
-				RecastWeapon->StopFanFire();
-			}
-		}
-
-		CurrentlyEquippedWeapon->SetLifeSpan(0.2f);
-		CurrentlyEquippedWeapon = NULL;
-		bShouldEnterReload = false;
-		bAnimPrimaryFire = false;
-		bAnimSecondaryFire = false;
-
 		GetMesh()->SetAnimInstanceClass(WolfAnimationClass);
 		GetMesh()->SetSkeletalMesh(WolfMesh);
 		
-
 		CurrentlyEquippedWeapon = GetWorld()->SpawnActor<AWeapon>(WolfWeapon);
 		//CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(90.f, 180.f, 0.f));
 		CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("rightclaw"));
 		CurrentlyEquippedWeapon->SetOwner(this);
+		GetWorld()->ForceGarbageCollection();
 	}
 }
 
@@ -866,24 +844,47 @@ void ACharacterController::TransformIntoHuman()
 
 }
 
+void ACharacterController::DespawnCurrentWeapon()
+{
+	if (CurrentlyEquippedWeapon != NULL)
+	{
+		if (AWeapon_Ranged* RecastAsRanged = Cast<AWeapon_Ranged>(CurrentlyEquippedWeapon))
+		{
+			if (AWeapon_PlayerRevolver* RecastAsRevolver = Cast<AWeapon_PlayerRevolver>(RecastAsRanged))
+			{
+				if (RecastAsRevolver->IsFanFiring())
+				{
+					RecastAsRevolver->StopFanFire();
+				}
+			}
+			CurrentlyEquippedWeapon->SetLifeSpan(0.2f);
+			CurrentlyEquippedWeapon = NULL;
+			bShouldEnterReload = false;
+			bAnimPrimaryFire = false;
+			bAnimSecondaryFire = false;
+		}
+	}
+}
+
 void ACharacterController::RevokeControlAndBecomeInvulnerable()
 {
 	if (APlayerController* RecastController = Cast<APlayerController>(GetController()))
 	{
-		if (RecastController->InputEnabled())
+		//if (RecastController->IsO)
 		{
 			UE_LOG(LogTemp, Display, TEXT("We are entering the beam"));
 			DisableInput(RecastController);
 			Effects = CharacterState::INVULNERABLE;
 		}
 	}
+	
 }
 
 void ACharacterController::RestoreControlAndRevokeInvulnerable()
 {
 	if (APlayerController* RecastController = Cast<APlayerController>(GetController()))
 	{
-		//if (!RecastController->InputEnabled())
+		//if (RecastController->InputEnabled())
 		{
 			UE_LOG(LogTemp, Display, TEXT("We are exiting the beam"));
 			EnableInput(RecastController);

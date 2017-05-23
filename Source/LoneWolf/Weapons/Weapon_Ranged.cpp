@@ -9,6 +9,9 @@
 AWeapon_Ranged::AWeapon_Ranged()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
+	MeshComponent->SetupAttachment(RootComponent);
+
 	PrimaryActorTick.bCanEverTick = true;
 	ConstructorHelpers::FClassFinder<AProjectile> ProjectileAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/ProjectileBP.ProjectileBP_C'"));
 	if (ProjectileAsset.Class)
