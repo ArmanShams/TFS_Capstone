@@ -76,23 +76,27 @@ float AEnemy::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEv
 	UE_LOG(LogTemp, Display, TEXT("Enemy health modified, health was %f, now: %f"), Health, NewHealth);
 
 	Health = NewHealth;
-
-	if (ACharacterController* player = Cast<ACharacterController>(DamageCauser))
+	if (DamageCauser->IsValidLowLevel())
 	{
-		//UE_LOG(LogTemp, Display, TEXT("We are in the beam."));
-		float RageGeneratedFromDamage = DamageAmount * 1.8f;
+		if (ACharacterController* Player = Cast<ACharacterController>(DamageCauser))
+		{
+			if (Player->IsValidLowLevel())
+			{	//UE_LOG(LogTemp, Display, TEXT("We are in the beam."));
+				float RageGeneratedFromDamage = DamageAmount * 1.8f;
 
-		player->AddRage(RageGeneratedFromDamage);
-		if (AAIController* Controller = Cast<AAIController>(GetController()))
-		{
-			Controller->GetBrainComponent()->GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), Cast<AActor>(player));
-		}
-		if (NewHealth <= 0.f)
-		{
-			player->AddRage(RageGeneratedFromDamage * 2.0f);
+				Player->AddRage(RageGeneratedFromDamage);
+				if (AAIController* Controller = Cast<AAIController>(GetController()))
+				{
+					Controller->GetBrainComponent()->GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), Cast<AActor>(Player));
+				}
+				if (NewHealth <= 0.f)
+				{
+					Player->AddRage(RageGeneratedFromDamage * 2.0f);
+				}
+			}
+		
 		}
 	}
-
 	if (NewHealth <= 0.f)
 	{
 		Die();

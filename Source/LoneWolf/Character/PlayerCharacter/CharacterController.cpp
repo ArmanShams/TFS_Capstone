@@ -84,8 +84,6 @@ ACharacterController::ACharacterController()
 	Effects = CharacterState::NONE;
 	CurrentMeleeAttackType = UAttackTypes::NONE;
 	CurrentForm = TransformationState::HUMAN;
-
-	
 }
 
 void ACharacterController::BeginPlay()
@@ -269,7 +267,12 @@ void ACharacterController::Tick(float DeltaSeconds)
 
 		if (Rage <= 0.1f)
 		{
+			HumanMesh = LoadObject<USkeletalMesh>(NULL, TEXT("SkeletalMesh'/Game/Geometry/Characters/VincentArgo/SK_Vincent.SK_Vincent'"), NULL, LOAD_None, NULL);
+			FString AnimClassStringHuman = "Class'/Game/Animation/Vincent/Character_Controller_AnimBP.Character_Controller_AnimBP_C'";
+			HumanAnimationClass = LoadObject<UClass>(NULL, *AnimClassStringHuman);
+
 			CurrentForm = TransformationState::HUMAN;
+
 			UE_LOG(LogTemp, Display, TEXT("Player 'Transformed' to human"));
 			if (HumanAnimationClass && HumanMesh)
 			{
@@ -277,10 +280,14 @@ void ACharacterController::Tick(float DeltaSeconds)
 				{
 					CurrentlyEquippedWeapon->SetLifeSpan(0.2f);
 					CurrentlyEquippedWeapon = NULL;
+					
 				}
-				
+				CurrentMeleeAttackType = UAttackTypes::NONE;
+				bIsMeleeAttacking = false;
+
 				GetMesh()->SetAnimInstanceClass(HumanAnimationClass);
 				GetMesh()->SetSkeletalMesh(HumanMesh);
+				GetWorld()->ForceGarbageCollection();
 
 				if (APlayerController* RecastController = Cast<APlayerController>(GetController()))
 				{
@@ -288,7 +295,7 @@ void ACharacterController::Tick(float DeltaSeconds)
 				}
 				if (CurrentlyEquippedWeapon == NULL)
 				{
-					EquipNewWeapon(DefaultWeapon);
+					CurrentlyEquippedWeapon = EquipNewWeapon(DefaultWeapon);
 				}
 			}
 			Rage = 0.0f;
@@ -617,13 +624,14 @@ void ACharacterController::Roll()
 
 void ACharacterController::OnReloadPressed()
 {
-	switch (CurrentForm)
+	if (CurrentlyEquippedWeapon != NULL)
 	{
-	case TransformationState::DEAD:
-		break;
-	case TransformationState::HUMAN:
-		if (CurrentlyEquippedWeapon != NULL)
+		switch (CurrentForm)
 		{
+		case TransformationState::DEAD:
+			break;
+		case TransformationState::HUMAN:
+
 			if (AWeapon_Ranged* RecastWeapon = Cast<AWeapon_Ranged>(CurrentlyEquippedWeapon))
 			{
 				if (AWeapon_PlayerRevolver* RecastAsRevolver = Cast<AWeapon_PlayerRevolver>(RecastWeapon))
@@ -635,13 +643,13 @@ void ACharacterController::OnReloadPressed()
 					bShouldEnterReload = true;
 				}
 			}
-		}
 		break;
 	case TransformationState::WOLF:
 		break;
 	default:
 		break;
 	}
+}
 	
 }
 
@@ -826,16 +834,36 @@ void ACharacterController::Die()
 
 void ACharacterController::TransformIntoWolf()
 {
-	if (ensureMsg(WolfAnimationClass != NULL, TEXT("Wolf animation class is NULL!")) && ensureMsg(WolfMesh != NULL, TEXT("Wolfmesh is NULL!")))
+	if (WolfAnimationClass != NULL && WolfMesh != NULL)
 	{
-		GetMesh()->SetAnimInstanceClass(WolfAnimationClass);
-		GetMesh()->SetSkeletalMesh(WolfMesh);
-		
+		if (bIsRolling)
+		{
+			bIsRolling = false;
+		}
+		if (GetMesh()->AnimClass != WolfAnimationClass)
+		{
+			WolfMesh = LoadObject<USkeletalMesh>(NULL, TEXT("SkeletalMesh'/Game/Geometry/Characters/Werewolf/SK_Werewolf.SK_Werewolf'"), NULL, LOAD_None, NULL);
+			FString AnimClassStringWolf = "AnimBlueprint'/Game/Animation/Wolf/CharacterControllerWolf_AnimBP.CharacterControllerWolf_AnimBP_C'";
+			WolfAnimationClass = LoadObject<UClass>(NULL, *AnimClassStringWolf);
+			GetMesh()->SetAnimInstanceClass(WolfAnimationClass);
+			if (GetMesh()->SkeletalMesh != WolfMesh)
+			{
+				GetMesh()->SetSkeletalMesh(WolfMesh);
+			}
+		}
+
+		if (CurrentlyEquippedWeapon != NULL)
+		{
+			DespawnCurrentWeapon();
+			CurrentlyEquippedWeapon = NULL;
+		}
+
 		CurrentlyEquippedWeapon = GetWorld()->SpawnActor<AWeapon>(WolfWeapon);
 		//CurrentlyEquippedWeapon->SetActorRelativeRotation(FRotator(90.f, 180.f, 0.f));
 		CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("rightclaw"));
 		CurrentlyEquippedWeapon->SetOwner(this);
 		GetWorld()->ForceGarbageCollection();
+		UE_LOG(LogTemp, Display, TEXT("Transformation method resolved without causing a crash"));
 	}
 }
 
@@ -870,11 +898,21 @@ void ACharacterController::RevokeControlAndBecomeInvulnerable()
 {
 	if (APlayerController* RecastController = Cast<APlayerController>(GetController()))
 	{
-		//if (RecastController->IsO)
+		if (RecastController->IsValidLowLevel())
 		{
+			if (bIsRolling)
+			{
+				bIsRolling = false;
+			}
+
 			UE_LOG(LogTemp, Display, TEXT("We are entering the beam"));
-			DisableInput(RecastController);
-			Effects = CharacterState::INVULNERABLE;
+
+			if (true)
+			{
+				DisableInput(RecastController);
+				Effects = CharacterState::INVULNERABLE;
+				UE_LOG(LogTemp, Display, TEXT("We are HAVE DISABLED the beam"));
+			}
 		}
 	}
 	
