@@ -26,6 +26,9 @@ public:
 	UFUNCTION(BlueprintCallable, category = "UI")
 	FText GetAmmoValue();
 
+	UFUNCTION(BlueprintCallable, category = "UI")
+	FVector2D GetMousePosition();
+
 	// The speed at which the progress bars on screen smoothly 'slide'
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player UI")
 	float InterpolationSpeed;

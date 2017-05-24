@@ -77,4 +77,23 @@ FText UUIWidget::GetAmmoValue()
 	return FText();
 }
 
+FVector2D UUIWidget::GetMousePosition()
+{
+	if (Player != NULL)
+	{
+		if (GetWorld()->HasBegunPlay())
+		{
+			FVector2D MousePosition;
+			if (APlayerController* RecastController = Cast<APlayerController>(Player->GetController()))
+			{
+				if (GetWorld()->GetGameViewport() && RecastController->GetMousePosition(MousePosition.X, MousePosition.Y))
+				{
+					return MousePosition;
+				}
+			}
+		}
+	}
+	return FVector2D::ZeroVector;
+}
+
 #undef LOCTEXT_NAMESPACE 
