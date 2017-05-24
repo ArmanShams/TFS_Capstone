@@ -507,6 +507,10 @@ void UCharacterHumanAnimInstance::AnimNotify_ReplaceMesh()
 		if (CharacterController != NULL)
 		{
 			CharacterController->TransformIntoWolf();
+
+			CharacterController->RestoreControlAndRevokeInvulnerable();
+
+			CharacterController = NULL;
 		}
 	}
 }
