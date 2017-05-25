@@ -60,15 +60,15 @@ protected: //Implemented Functions
 
 protected:
 	//The maximum number of traps he is allowed to put in the world, extra traps will delete the obsolete trap.
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category = Enemy)
 	uint8 MaximumTrapsAllowed;
 	//Cushion distance from player, safe distance to attack.
-	UPROPERTY(EditDefaultsOnly)
-		float CushionSpace;
+	UPROPERTY(EditDefaultsOnly, Category = Enemy)
+	float CushionSpace;
 	//Trap locations to move to. (Currently not supported)
-		//ATrapLocations* FirstTrapLocation;
-		//ATrapLocations* SecondTrapLocation;
-		//ATrapLocations* ThirdTrapLocation;
+	//ATrapLocations* FirstTrapLocation;
+	//ATrapLocations* SecondTrapLocation;
+	//ATrapLocations* ThirdTrapLocation;
 	//Decal Actor to display telegraphs, and an array to store decal class created.
 	AActor* AimLineDecalActor;
 	TSubclassOf<AActor> AimLineDecalClass;
@@ -78,26 +78,34 @@ protected:
 	//Array to keep track of how many traps are in the world, and pop the obsolete trap.
 	TArray<AActor*> TrapArray;
 	//Bounty Hunter Enumerator current state to control animations and functions
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enum)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enemy)
 	BountyHunterState CurrentState;
 	//Check on BlackBoard Component target, flee from player character when conditions are met.
-	ACharacterController* PlayerToFleeFrom;
-	ACharacterController* PlayerToAimAt;
+	ACharacterController* PlayerRecasted;
 
 protected: //Blackboard Key Booleans
-	bool bSafeAttackingDistance();
-	bool bIsFlee();
 	bool bIsStunned;
 	bool bIsFleeing;
 
-	void Aim(ACharacterController* PlayerToAimAt);
+	void Aim(ACharacterController* PlayerRecasted);
 
 	//Animation Booleans
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enemy)
 	bool bCanAttack;
-	bool bIsBasicAttack;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enemy)
+	bool bIsAttacking;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enemy)
 	bool bIsAiming;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enemy)
 	bool bPlacingTrap;
 	//bool bPlayRecoilAnimation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enemy)
+	bool bAttack;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enemy)
+	bool bFlee;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enemy)
+	bool bPatrol;
 
 	//Friendships
 	friend class ABearTrap;

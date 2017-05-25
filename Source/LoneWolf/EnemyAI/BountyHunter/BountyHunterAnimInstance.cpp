@@ -20,7 +20,7 @@ void UBountyHunterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 			bIsHardCC = BountyHunter->bIsInHardCC;
 			bCanBasicAttack = BountyHunter->GetEquippedWeapon()->CanFire();
-			bIsBasicAttack = BountyHunter->bIsBasicAttack;
+			bIsBasicAttack = BountyHunter->bIsAttacking;
 			bIsAiming = BountyHunter->bIsAiming;
 			bCanSetTrap = BountyHunter->bPlacingTrap;
 		}
@@ -44,48 +44,34 @@ void UBountyHunterAnimInstance::AnimNotify_StartShooting()
 }
 
 void UBountyHunterAnimInstance::AnimNotify_EndShooting()
-{ //UE_LOG(LogTemp, Display, TEXT("BountyHunterAnim//EndShooting"));
-	
+{ 
 	bIsAiming = false;
-	BountyHunter->SetBountyHunterState(BountyHunterState::IDLE);
+	BountyHunter->bIsAttacking = false;
 }
 
 void UBountyHunterAnimInstance::AnimNotify_SpawnTrap()
-{ //UE_LOG(LogTemp, Display, TEXT("BountyHunterAnim//SpawnTrap"));
+{
 	BountyHunter->SetBountyHunterState(BountyHunterState::SETTINGTRAP);
 }
 
 void UBountyHunterAnimInstance::AnimNotify_PlaceTrap()
-{ //UE_LOG(LogTemp, Display, TEXT("BountyHunterAnim//EndPlaceTrap"));
+{
 	if (GetWorld()->HasBegunPlay())
 	{
 		BountyHunter->bPlacingTrap = false;
 	}
 }
 
-void UBountyHunterAnimInstance::AnimNotify_ReadyingAttack()
-{ //UE_LOG(LogTemp, Display, TEXT("BountyHunterAnim//ReadyingAttack"));
-}
-
 void UBountyHunterAnimInstance::AnimNotify_StartAiming()
 {
 	if (GetWorld()->HasBegunPlay())
-	{ //UE_LOG(LogTemp, Display, TEXT("BountyHunterAnim//StartAiming")); 
-	  //GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, FString::Printf(TEXT("Aim Start!")));
-	}
-}
-
-void UBountyHunterAnimInstance::AnimNotify_EndAiming()
-{
-	if (GetWorld()->HasBegunPlay())
-	{ //UE_LOG(LogTemp, Display, TEXT("BountyHunterAnim//EndAiming"));
-		BountyHunter->bIsAiming = false;
-		BountyHunter->SetBountyHunterState(BountyHunterState::ATTACKING);
+	{
+	  BountyHunter->SetBountyHunterState(BountyHunterState::AIMING);
 	}
 }
 
 void UBountyHunterAnimInstance::AnimNotify_ReturnToIdle()
-{ //UE_LOG(LogTemp, Display, TEXT("BountyHunterAnim//ReturnToIdle"));
+{
 	if (GetWorld()->HasBegunPlay())
 	{
 		if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(TryGetPawnOwner()->GetController())->GetBrainComponent()->GetBlackboardComponent())
@@ -96,7 +82,7 @@ void UBountyHunterAnimInstance::AnimNotify_ReturnToIdle()
 }
 
 void UBountyHunterAnimInstance::AnimNotify_StartStunned()
-{ //UE_LOG(LogTemp, Display, TEXT("BountyHunterAnim//StartStunned"));
+{
 	if (GetWorld()->HasBegunPlay())
 	{
 		bIsHardCC = true;
@@ -108,7 +94,7 @@ void UBountyHunterAnimInstance::AnimNotify_StartStunned()
 }
 
 void UBountyHunterAnimInstance::AnimNotify_EndStunned()
-{ //UE_LOG(LogTemp, Display, TEXT("BountyHunterAnim//EndStunne ,d"));
+{
 	if (GetWorld()->HasBegunPlay())
 	{
 		bIsHardCC = false;

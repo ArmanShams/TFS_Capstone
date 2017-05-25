@@ -31,6 +31,8 @@ protected:
 	// If true, Bounty Hunter can set a trap at it's location.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bCanSetTrap;
+	// If true, Bounty Hunter is fleeing
+	bool bIsFleeing;
 
 	// If true, Bounty Hunter is in hard crowd control.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -50,9 +52,6 @@ protected:
 	void AnimNotify_StartAiming();
 
 	UFUNCTION()
-	void AnimNotify_EndAiming();
-
-	UFUNCTION()
 	void AnimNotify_StartShooting();
 
 	UFUNCTION()
@@ -62,10 +61,7 @@ protected:
 	void AnimNotify_SpawnTrap();
 
 	UFUNCTION()
-	void AnimNotify_PlaceTrap();	
-
-	UFUNCTION()
-	void AnimNotify_ReadyingAttack();
+	void AnimNotify_PlaceTrap();
 	
 	UFUNCTION()
 	void AnimNotify_StartStunned();
