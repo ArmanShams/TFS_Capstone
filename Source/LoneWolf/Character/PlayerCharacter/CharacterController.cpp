@@ -404,10 +404,15 @@ bool ACharacterController::bIsSoftCC()
 	return Super::bIsSoftCC();
 }
 
+float ACharacterController::GetHealthPercent()
+{
+	return Super::GetHealthPercent();
+}
+
 AWeapon* ACharacterController::EquipNewWeapon(TSubclassOf<AWeapon> WeaponToEquip)
 {
 	CurrentlyEquippedWeapon = Super::EquipNewWeapon(WeaponToEquip);
-	CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepWorldTransform, FName("hand_r"));
+	CurrentlyEquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("hand_r"));
 	CurrentlyEquippedWeapon->SetActorLocation(GetMesh()->GetSocketLocation(FName("hand_r")));
 	CurrentlyEquippedWeapon->SetActorRotation(FRotator::ZeroRotator);
 	return CurrentlyEquippedWeapon;
@@ -517,7 +522,7 @@ void ACharacterController::OnMouseMove(float scale)
 					{
 						if (Cast<AWeapon_Ranged>(CurrentlyEquippedWeapon))
 						{
-							FRotator DesiredWeaponRotation = GetActorRotation();
+							FRotator DesiredWeaponRotation = CurrentlyEquippedWeapon->GetActorRotation();
 							FRotator OldRotation = CurrentlyEquippedWeapon->GetActorRotation();
 
 

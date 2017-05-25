@@ -195,6 +195,11 @@ bool AEnemy::bIsInRange(float OveriddenDesiredRange)
 	return false;
 }
 
+float AEnemy::GetHealthPercent()
+{
+	return Super::GetHealthPercent();
+}
+
 bool AEnemy::bIsSoftCC()
 {
 	return Super::bIsSoftCC();

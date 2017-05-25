@@ -40,7 +40,8 @@ public:
 	virtual AWeapon* GetEquippedWeapon() override;
 	virtual bool bIsInRange();
 	virtual bool bIsInRange(float OveriddenDesiredRange);
-	
+	UFUNCTION(BlueprintCallable, category = "Character")
+	virtual float GetHealthPercent() override;
 	virtual void Destroyed() override;
 
 
@@ -61,10 +62,8 @@ protected:
 	//virtual void EquipWeapon(TSubclassOf<AWeapon> WeaponToEquip);
 	virtual void SetStatusEffect(CharacterState::StatusEffect NewStatusEffect);
 
-
-
-	UPROPERTY(EditDefaultsOnly)
-	float Health;
+	//UPROPERTY(EditDefaultsOnly)
+	//float Health;
 
 	UPROPERTY(EditDefaultsOnly)
 	float MoveSpeed;

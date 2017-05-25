@@ -64,6 +64,8 @@ public:
 		Returns a pointer to currently member EquippedWeapon if it isn't null
 	*/
 	virtual class AWeapon* GetEquippedWeapon();
+	UFUNCTION(BlueprintCallable, category = "Character")
+	virtual float GetHealthPercent();
 	virtual void Destroyed() override;
 
 protected:
@@ -90,6 +92,12 @@ protected:
 	float MoveSpeedBase;
 
 	float MoveSpeedActual;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character")
+	float Health;
+	
+	const float MAXHEALTH = 100.f;
+	//float 
 
 	class AWeapon* CurrentlyEquippedWeapon;
 

@@ -15,33 +15,37 @@ void UUIWidget::NativeConstruct()
 	if (Cast<ACharacterController>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)))
 	{
 		Player = Cast<ACharacterController>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-	}
-	if (Player != NULL)
-	{
-		PlayerWeapon = Cast<AWeapon_Ranged>(Player->CurrentlyEquippedWeapon);
-		Health = Player->Health;
+		if (Player != NULL)
+		{
+			PlayerWeapon = Cast<AWeapon_Ranged>(Player->CurrentlyEquippedWeapon);
+			Health = Player->Health;
+			//Player->TakeDamage.AddDynamic(this, &ThisClass::PlayerWasHit);
+		}
 	}
 	if (InterpolationSpeed == 0.f)
 	{
 		InterpolationSpeed = 2.0f;
 	}
+
 }
 
 void UUIWidget::NativeTick(const FGeometry& MyGeometry, float DeltaSeconds)
 {
 	Super::NativeTick(MyGeometry, DeltaSeconds);
-
-	if (AWeapon_Ranged* RecastPlayerWeapon = Cast<AWeapon_Ranged>(Player->CurrentlyEquippedWeapon))
+	if (Player != NULL)
 	{
-		PlayerWeapon = Cast<AWeapon_Ranged>(Player->CurrentlyEquippedWeapon);
+		if (AWeapon_Ranged* RecastPlayerWeapon = Cast<AWeapon_Ranged>(Player->CurrentlyEquippedWeapon))
+		{
+			PlayerWeapon = Cast<AWeapon_Ranged>(Player->CurrentlyEquippedWeapon);
+		}
+		else
+		{
+			PlayerWeapon = NULL;
+		}
+		Health = FMath::FInterpTo(Health, Player->Health, DeltaSeconds, InterpolationSpeed);
+		CurrentForm = Player->CurrentForm;
+		Rage = FMath::FInterpTo(Rage, Player->Rage, DeltaSeconds, InterpolationSpeed);
 	}
-	else
-	{
-		PlayerWeapon = NULL;
-	}
-	Health = FMath::FInterpTo(Health, Player->Health, DeltaSeconds, InterpolationSpeed);
-
-	Rage = FMath::FInterpTo(Rage, Player->Rage, DeltaSeconds, InterpolationSpeed);
 }
 
 float UUIWidget::GetHealthPercent()
