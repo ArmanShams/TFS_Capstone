@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Animation/AnimInstance.h"
+#include "EnemyAI/BountyHunter/BountyHunter.h"
 #include "BountyHunterAnimInstance.generated.h"
 
 UCLASS()
@@ -49,7 +50,7 @@ protected:
 	void AnimNotify_ReturnToIdle();
 
 	UFUNCTION()
-	void AnimNotify_StartAiming();
+	void AnimNotify_Aiming();
 
 	UFUNCTION()
 	void AnimNotify_StartShooting();
@@ -72,8 +73,8 @@ protected:
 	UFUNCTION()
 	void AnimNotify_FootstepEvent();
 
-	//UPROPERTY(BlueprintReadOnly)
-	//BountyHunterState CurrentBountyHunterState;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "enum")
+	BountyHunterState CurrentBountyHunterState;
 	//CharacterState::StatusEffect StatusEffects;
 	
 	class ABountyHunter* BountyHunter;

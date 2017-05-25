@@ -1,7 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "LoneWolf.h"
-#include "EnemyAI/BountyHunter/BountyHunter.h"
 #include "EnemyAI/BountyHunter/BountyHunterAIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyAllTypes.h"
@@ -19,6 +18,7 @@ void UBountyHunterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			bIsDead = BountyHunter->Health <= 0.0f;
 
 			bIsHardCC = BountyHunter->bIsInHardCC;
+			CurrentBountyHunterState = BountyHunter->GetBountyHunterState();
 			bCanBasicAttack = BountyHunter->GetEquippedWeapon()->CanFire();
 			bIsBasicAttack = BountyHunter->bIsAttacking;
 			bIsAiming = BountyHunter->bIsAiming;
@@ -27,26 +27,37 @@ void UBountyHunterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	}
 }
 
-void UBountyHunterAnimInstance::AnimNotify_StartShooting()
-{ //UE_LOG(LogTemp, Display, TEXT("BountyHunterAnim//StartShooting"));
+void UBountyHunterAnimInstance::AnimNotify_ReturnToIdle()
+{
+	BountyHunter->SetBountyHunterState(BountyHunterState::IDLE);	
+}
+
+void UBountyHunterAnimInstance::AnimNotify_Aiming()
+{
 	if (GetWorld()->HasBegunPlay())
 	{
-		if (bIsBasicAttack == true)
-		{
-			if (!bCanBasicAttack)
-			{
-				AWeapon_Ranged* RecastWeapon = Cast<AWeapon_Ranged>(BountyHunter->GetEquippedWeapon());
-				RecastWeapon->Reload();
-			}
-			BountyHunter->CurrentlyEquippedWeapon->Fire();
-		}
+		BountyHunter->bIsAiming = true;
+	}
+}
+
+void UBountyHunterAnimInstance::AnimNotify_StartShooting()
+{
+	if (GetWorld()->HasBegunPlay())
+	{
+		BountyHunter->Attack();
+		BountyHunter->CurrentlyEquippedWeapon->Fire();
+		//BountyHunter->bIsAttacking = true;
+		bIsBasicAttack = true;
 	}
 }
 
 void UBountyHunterAnimInstance::AnimNotify_EndShooting()
-{ 
-	bIsAiming = false;
-	BountyHunter->bIsAttacking = false;
+{
+	if (GetWorld()->HasBegunPlay()) 
+	{
+		BountyHunter->bIsAttacking = false; 
+		bIsBasicAttack = false;
+	}
 }
 
 void UBountyHunterAnimInstance::AnimNotify_SpawnTrap()
@@ -59,25 +70,6 @@ void UBountyHunterAnimInstance::AnimNotify_PlaceTrap()
 	if (GetWorld()->HasBegunPlay())
 	{
 		BountyHunter->bPlacingTrap = false;
-	}
-}
-
-void UBountyHunterAnimInstance::AnimNotify_StartAiming()
-{
-	if (GetWorld()->HasBegunPlay())
-	{
-	  BountyHunter->SetBountyHunterState(BountyHunterState::AIMING);
-	}
-}
-
-void UBountyHunterAnimInstance::AnimNotify_ReturnToIdle()
-{
-	if (GetWorld()->HasBegunPlay())
-	{
-		if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(TryGetPawnOwner()->GetController())->GetBrainComponent()->GetBlackboardComponent())
-		{
-			BlackboardComponent->SetValueAsBool(TEXT("bIsIdle"), true);
-		}
 	}
 }
 
@@ -107,4 +99,5 @@ void UBountyHunterAnimInstance::AnimNotify_EndStunned()
 
 void UBountyHunterAnimInstance::AnimNotify_FootstepEvent()
 {
+
 }

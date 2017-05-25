@@ -21,5 +21,10 @@ EBTNodeResult::Type UBTTask_BountyHunterPlaceTrap::ExecuteTask(UBehaviorTreeComp
 
 EBTNodeResult::Type UBTTask_BountyHunterPlaceTrap::AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
+	UBehaviorTreeComponent* BehaviorTree = &OwnerComp;
+	if (ABountyHunterAIController* Controller = Cast<ABountyHunterAIController>(BehaviorTree->GetAIOwner()))
+	{
+		Cast<ABountyHunter>(Controller->GetPawn())->SetBountyHunterState(BountyHunterState::IDLE);
+	}
 	return Super::AbortTask(OwnerComp, NodeMemory);
 }

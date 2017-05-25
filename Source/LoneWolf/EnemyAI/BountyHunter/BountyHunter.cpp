@@ -103,20 +103,27 @@ void ABountyHunter::Tick(float DeltaTime)
 				switch (CurrentState)
 				{
 				case BountyHunterState::IDLE:
+					bIsAttacking = false;
 					bIsAiming = false;
 					bPlacingTrap = false;
-					bIsAttacking = false;
 					break;
 				case BountyHunterState::AIMING:
 					bIsAiming = true;
+					bCanAttack = true;
 					Aim(RecastedTarget);
 					break;
 				case BountyHunterState::ATTACKING:
-					bCanAttack = true;
-					bIsAiming = false;
-					Aim(RecastedTarget);
-					Attack();
-					bIsAttacking = true;
+					if (bIsAiming == true)
+					{
+						Aim(RecastedTarget);
+						bIsAiming = false;
+						bIsAttacking = true;
+					}
+					else
+					{
+						bIsAiming = false;
+						SetBountyHunterState(BountyHunterState::IDLE);
+					}
 					break;
 				case BountyHunterState::FLEEING:
 					if (bIsAiming == false && !bIsInHardCC)
@@ -128,8 +135,17 @@ void ABountyHunter::Tick(float DeltaTime)
 							Flee(RecastedTarget);
 						}
 					}
+					else
+					{
+						bIsAttacking = false;
+						SetBountyHunterState(BountyHunterState::IDLE);
+					}
 					break;
 				case BountyHunterState::SETTINGTRAP:
+					if (bAttack == true)
+					{
+						SetBountyHunterState(BountyHunterState::IDLE);
+					}
 					break;
 				case BountyHunterState::HARDCC:
 					break;
@@ -177,8 +193,8 @@ bool ABountyHunter::bIsInRange(float OveriddenDesiredRange)
 	float DesiredRange = OveriddenDesiredRange;
 	FVector CurrentLocation = GetActorLocation();
 	ACharacter* PlayerCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
-	FVector PlayerLocation = PlayerCharacter->GetActorLocation();
-
+	if (PlayerCharacter != NULL) 
+	{ FVector PlayerLocation = PlayerCharacter->GetActorLocation(); 
 	const float CurrentDistance = FVector::Dist(PlayerLocation, CurrentLocation);
 
 	if (CurrentDistance > CushionSpace && CurrentDistance <= AttackRange)
@@ -187,6 +203,7 @@ bool ABountyHunter::bIsInRange(float OveriddenDesiredRange)
 		bAttack = true;
 		bFlee = false;
 		bPlacingTrap = false;
+		bCanAttack = true;
 	}
 
 	if (CurrentDistance < CushionSpace)
@@ -194,10 +211,12 @@ bool ABountyHunter::bIsInRange(float OveriddenDesiredRange)
 		DrawDebugLine(GetWorld(), CurrentLocation, PlayerLocation, FColor::Red, false, -1, 0, 12.333);
 		bAttack = false;
 		bFlee = true;
+		bCanAttack = false;
+
 
 		//bPatrol = false;
-		bCanAttack = false;
-		bIsFleeing = true;
+		//bCanAttack = false;
+		//bIsFleeing = true;
 
 	}
 
@@ -206,11 +225,12 @@ bool ABountyHunter::bIsInRange(float OveriddenDesiredRange)
 		//bPatrol = true;
 		bFlee = false;
 		bAttack = false;
-
-		//UE_LOG(LogTemp, Display, TEXT("Distance: %f"), CurrentDistance);
 		bCanAttack = false;
-		bIsFleeing = false;
+		//UE_LOG(LogTemp, Display, TEXT("Distance: %f"), CurrentDistance);
 	}
+	}
+
+	
 	return false;
 }
 
@@ -303,22 +323,29 @@ void ABountyHunter::SetBearTrap(ATrapLocations* NewTrapLocation, const FHitResul
 
 void ABountyHunter::OnActorBeginOverlap(UPrimitiveComponent * OverlappedComp, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
 {
-	if (ATrapLocations* RecastedOverlappingActor = Cast<ATrapLocations>(OtherActor))
+	if (CurrentState == BountyHunterState::SETTINGTRAP)
 	{
-		if (RecastedOverlappingActor->bIsOccupied == false)
+		if (ATrapLocations* RecastedOverlappingActor = Cast<ATrapLocations>(OtherActor))
 		{
-			bPlacingTrap = true; // Animation Variable: bCanSetTrap = true;
-			SetBearTrap(RecastedOverlappingActor, SweepResult);
+			if (RecastedOverlappingActor->bIsOccupied == false)
+			{
+				bPlacingTrap = true; // Animation Variable: bCanSetTrap = true;
+				SetBearTrap(RecastedOverlappingActor, SweepResult);
+			}
+			if (RecastedOverlappingActor->bIsOccupied == true)
+			{
+				UE_LOG(LogTemp, Display, TEXT("The Trap Location is already occupied, the bounty hunter will not try to place a trap here"));
+				SetBountyHunterState(BountyHunterState::IDLE);
+			}
 		}
-		if (RecastedOverlappingActor->bIsOccupied == true)
-		{
-			SetBountyHunterState(BountyHunterState::IDLE);
-		}
+
+		UE_LOG(LogTemp, Display, TEXT("The other actor isn't a trap location..."));
 	}
 }
 
 void ABountyHunter::Aim(ACharacterController* PlayerRecasted)
 {
+	bIsAiming = true;
 	FixWeaponRotation();
 	FVector Direction = PlayerRecasted->GetActorLocation() - GetActorLocation();
 	//FRotator NewYawRotation = (PlayerToAimAt->GetActorLocation() - GetActorLocation()).Rotation();
@@ -329,36 +356,35 @@ void ABountyHunter::Aim(ACharacterController* PlayerRecasted)
 
 void ABountyHunter::Attack()
 {
-	if (CurrentlyEquippedWeapon != NULL)
+	if (CurrentState == BountyHunterState::ATTACKING)
 	{
-		if (CurrentlyEquippedWeapon->CanFire())
+		if (CurrentlyEquippedWeapon != NULL)
 		{
-			FixWeaponRotation();
-			//CurrentlyEquippedWeapon->Fire();
+			if (CurrentlyEquippedWeapon->CanFire() && bIsAttacking == true)
+			{
+				bIsAiming = false;
+			}
 		}
-
 	}
 }
 
 void ABountyHunter::Flee(ACharacterController* PlayerRecasted)
 {
-	//SetBountyHunterState(BountyHunterState::IDLE);
-	FVector CurrentLocation = GetActorLocation();
-	FVector PlayerLocation = PlayerRecasted->GetActorLocation();
-	FRotator RotationToPlayer = PlayerRecasted->GetActorRotation();
-	FVector Direction = CurrentLocation - PlayerLocation;
-
-	float DistanceToPlayer = FVector::Dist(CurrentLocation, PlayerLocation);
-		
 	if (CurrentState == BountyHunterState::FLEEING)
 	{
+		//SetBountyHunterState(BountyHunterState::IDLE);
+		FVector CurrentLocation = GetActorLocation();
+		FVector PlayerLocation = PlayerRecasted->GetActorLocation();
+		FRotator RotationToPlayer = PlayerRecasted->GetActorRotation();
+		FVector Direction = CurrentLocation - PlayerLocation;
+		float DistanceToPlayer = FVector::Dist(CurrentLocation, PlayerLocation);
 		SetActorRotation(Direction.Rotation());
 		GetMovementComponent()->AddInputVector(DistanceToPlayer * Direction);
-	}
-
-	if (DistanceToPlayer > CushionSpace)
-	{
-		bIsFleeing = false;
+		if (DistanceToPlayer > CushionSpace)
+		{
+			bIsFleeing = false;
+			SetBountyHunterState(BountyHunterState::IDLE);
+		}
 	}
 }
 
