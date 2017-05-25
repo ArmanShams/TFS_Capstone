@@ -525,3 +525,9 @@ void UCharacterHumanAnimInstance::RecenterMeshOnCursor()
 		}
 	}
 }
+
+void UCharacterHumanAnimInstance::ForceCompletionOfReload()
+{
+	AnimNotify_ReloadEnd();
+	AnimNotify_Reload();
+}
