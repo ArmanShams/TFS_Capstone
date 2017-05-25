@@ -528,6 +528,15 @@ void UCharacterHumanAnimInstance::RecenterMeshOnCursor()
 
 void UCharacterHumanAnimInstance::ForceCompletionOfReload()
 {
-	AnimNotify_ReloadEnd();
-	AnimNotify_Reload();
+	if (GetWorld()->HasBegunPlay())
+	{
+		if (CharacterController != NULL)
+		{
+			bReloading = false;
+			bPrimaryFire = false;
+			CharacterController->bAnimPrimaryFire = bPrimaryFire;
+			CharacterController->bShouldEnterReload = bReloading;
+			CharacterController->Reload();
+		}
+	}
 }
