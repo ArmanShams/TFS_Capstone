@@ -17,7 +17,7 @@ void UBountyHunterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		{
 			bIsDead = BountyHunter->Health <= 0.0f;
 			bIsHardCC = BountyHunter->bIsInHardCC;
-			bIsSettingTrap = BountyHunter->bIsSetTrap;
+			bIsSettingTrap = BountyHunter->bIsPlacingTrap;
 			CurrentBountyHunterState = BountyHunter->GetBountyHunterState();
 		}
 	}
@@ -29,6 +29,7 @@ void UBountyHunterAnimInstance::AnimNotify_ReturnToIdle()
 	{
 		if (BountyHunter != NULL)
 		{
+			BountyHunter->bIsPlacingTrap = false;
 			BountyHunter->SetBountyHunterState(BountyHunterState::IDLE);
 		}
 	}
@@ -70,66 +71,6 @@ void UBountyHunterAnimInstance::AnimNotify_EndShooting()
 		if (BountyHunter != NULL)
 		{
 			BountyHunter->bShouldAdjustGun = false;
-		}
-	}
-}
-
-void UBountyHunterAnimInstance::AnimNotify_SpawnTrap()
-{
-	if (GetWorld()->HasBegunPlay())
-	{
-		if (BountyHunter != NULL)
-		{
-		}
-	}
-}
-
-void UBountyHunterAnimInstance::AnimNotify_PlaceTrap()
-{
-	if (GetWorld()->HasBegunPlay())
-	{
-		if (BountyHunter != NULL)
-		{
-		}
-	}
-}
-
-void UBountyHunterAnimInstance::AnimNotify_StartStunned()
-{
-	if (GetWorld()->HasBegunPlay())
-	{
-		if (BountyHunter != NULL)
-		{
-			bIsHardCC = true;
-			if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(TryGetPawnOwner()->GetController())->GetBrainComponent()->GetBlackboardComponent())
-			{
-				BlackboardComponent->SetValueAsBool(TEXT("bIsHardCC"), true);
-			}
-		}
-	}
-}
-
-void UBountyHunterAnimInstance::AnimNotify_EndStunned()
-{
-	if (GetWorld()->HasBegunPlay())
-	{
-		if (BountyHunter != NULL)
-		{
-			bIsHardCC = false;
-			if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(TryGetPawnOwner()->GetController())->GetBrainComponent()->GetBlackboardComponent())
-			{
-				BlackboardComponent->SetValueAsBool(TEXT("bIsHardCC"), false);
-			}
-		}
-	}
-}
-
-void UBountyHunterAnimInstance::AnimNotify_FootstepEvent()
-{
-	if (GetWorld()->HasBegunPlay())
-	{
-		if (BountyHunter != NULL)
-		{
 		}
 	}
 }

@@ -46,21 +46,6 @@ protected:
 	UFUNCTION()
 	void AnimNotify_EndShooting();
 
-	UFUNCTION()
-	void AnimNotify_SpawnTrap();
-
-	UFUNCTION()
-	void AnimNotify_PlaceTrap();
-	
-	UFUNCTION()
-	void AnimNotify_StartStunned();
-
-	UFUNCTION()
-	void AnimNotify_EndStunned();
-
-	UFUNCTION()
-	void AnimNotify_FootstepEvent();
-
 	class ABountyHunter* BountyHunter;
 
 	friend class AEnemy;

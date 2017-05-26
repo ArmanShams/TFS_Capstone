@@ -19,7 +19,7 @@ ABountyHunter::ABountyHunter()
 	PrimaryActorTick.bCanEverTick = true;
 	RootComponent = GetCapsuleComponent();
 	GetMesh()->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
-	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ABountyHunter::OnActorBeginOverlap);
+	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ABountyHunter::OnTrapOverlap);
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 	Health = MAXHEALTH;
@@ -252,8 +252,10 @@ AWeapon* ABountyHunter::EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip)
 
 void ABountyHunter::SetBearTrap(ATrapLocations* NewTrapLocation, const FHitResult& SweepResult)
 {
+	UE_LOG(LogTemp, Display, TEXT("SHITOVERLAPPED"));
 	if (!NewTrapLocation->bIsOccupied)
-	{ UE_LOG(LogTemp, Display, TEXT("The trap location is now occupied"));
+	{
+		UE_LOG(LogTemp, Display, TEXT("The trap location is now occupied"));
 		if (BearTrapClass != NULL)
 		{ //UE_LOG(LogTemp, Display, TEXT("Bounty Hunter set a bear trap, trap added to array list"));
 			if (TrapArray.Num() >= MaximumTrapsAllowed)
@@ -261,27 +263,31 @@ void ABountyHunter::SetBearTrap(ATrapLocations* NewTrapLocation, const FHitResul
 				AActor* TrapToDelete = TrapArray.Pop();
 				TrapToDelete->SetLifeSpan(0.1f);
 			}
+			NewTrapLocation->bIsOccupied = true;
 			BearTrapPlaced = GetWorld()->SpawnActor<ABearTrap>(BearTrapClass);
 			BearTrapPlaced->SetActorRelativeLocation(GetMesh()->GetSocketLocation("TrapBone"));
 			BearTrapPlaced->SetOwner(this);
-			NewTrapLocation->bIsOccupied = true;
 			BearTrapPlaced->SetLocationBeingOccupied(NewTrapLocation);
 			TrapArray.Add(BearTrapPlaced);
 		}
 	}
 }
 
-void ABountyHunter::OnActorBeginOverlap(UPrimitiveComponent * OverlappedComp, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
+void ABountyHunter::OnTrapOverlap(UPrimitiveComponent * OverlappedComp, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
 {
-	if (ATrapLocations* RecastedOverlappingActor = Cast<ATrapLocations>(OtherActor))
+	if (CurrentState == BountyHunterState::SETTINGTRAP)
 	{
-		if (RecastedOverlappingActor->bIsOccupied == false)
+		if (ATrapLocations* RecastedOverlappingActor = Cast<ATrapLocations>(OtherActor))
 		{
-			SetBearTrap(RecastedOverlappingActor, SweepResult);
-		}
-		if (RecastedOverlappingActor->bIsOccupied == true)
-		{
-			SetBountyHunterState(BountyHunterState::IDLE);
+			if (RecastedOverlappingActor->bIsOccupied == false)
+			{
+				bIsPlacingTrap = true;
+				SetBearTrap(RecastedOverlappingActor, SweepResult);
+			}
+			if (RecastedOverlappingActor->bIsOccupied == true)
+			{
+				SetBountyHunterState(BountyHunterState::IDLE);
+			}
 		}
 	}
 }
