@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Animation/AnimInstance.h"
+#include "EnemyAI/BountyHunter/BountyHunter.h"
 #include "BountyHunterAnimInstance.generated.h"
 
 UCLASS()
@@ -14,43 +15,30 @@ public:
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
 protected:
-	// Speed of the Bounty Hunter.
+	//Current state that the Bounty Hunter is in.
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "enum")
+	BountyHunterState CurrentBountyHunterState;
+
+	//Speed of the Bounty Hunter.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float speed;
-	// If true, Bounty Hunter is dead. If false, is alive.
+
+	//If true, Bounty Hunter is dead. If false, is alive.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bIsDead;
-	// If true, Bounty Hunter is aiming.
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	bool bIsAiming;
-	// If true, player is in basic attack range for the Bounty Hunter to shoot.
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	bool bCanBasicAttack;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	bool bIsBasicAttack;
-	// If true, Bounty Hunter can set a trap at it's location.
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	bool bCanSetTrap;
 
-	// If true, Bounty Hunter is in hard crowd control.
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool bIsSettingTrap;
+				
+	//If true, Bounty Hunter is in hard crowd control.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bIsHardCC;
-
-	// Rotator for the mesh.
-	//UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	//FRotator LookAtRotation;
-
-	//UPROPERTY(BlueprintReadOnly)
-	//BountyHunterState CurrentEnemyState;
 
 	UFUNCTION()
 	void AnimNotify_ReturnToIdle();
 
 	UFUNCTION()
-	void AnimNotify_StartAiming();
-
-	UFUNCTION()
-	void AnimNotify_EndAiming();
+	void AnimNotify_Aiming();
 
 	UFUNCTION()
 	void AnimNotify_StartShooting();
@@ -59,27 +47,8 @@ protected:
 	void AnimNotify_EndShooting();
 
 	UFUNCTION()
-	void AnimNotify_SpawnTrap();
+	void AnimNotify_PlaceTrap();
 
-	UFUNCTION()
-	void AnimNotify_PlaceTrap();	
-
-	UFUNCTION()
-	void AnimNotify_ReadyingAttack();
-	
-	UFUNCTION()
-	void AnimNotify_StartStunned();
-
-	UFUNCTION()
-	void AnimNotify_EndStunned();
-
-	UFUNCTION()
-	void AnimNotify_FootstepEvent();
-
-	//UPROPERTY(BlueprintReadOnly)
-	//BountyHunterState CurrentBountyHunterState;
-	//CharacterState::StatusEffect StatusEffects;
-	
 	class ABountyHunter* BountyHunter;
 
 	friend class AEnemy;
