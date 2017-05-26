@@ -14,26 +14,26 @@ public:
 
 	AAreaOfEffect(const FObjectInitializer& ObjectInitializer);
 
-	UPROPERTY(EditDefaultsOnly)
-	float lifeTimeInSeconds;
+	UPROPERTY(EditDefaultsOnly, Category = "AreaOfEffect")
+	float LifeTimeInSeconds;
 
-	UPROPERTY(EditDefaultsOnly)
-	float ticksPerSecond;
+	UPROPERTY(EditDefaultsOnly, Category = "AreaOfEffect")
+	float TicksPerSecond;
 	
-	UPROPERTY(EditDefaultsOnly)
-	float damagePerTick;
+	UPROPERTY(EditDefaultsOnly, Category = "AreaOfEffect")
+	float DamagePerTick;
 	
-	UPROPERTY(EditDefaultsOnly)
-	float radius;
+	UPROPERTY(EditDefaultsOnly, Category = "AreaOfEffect")
+	float Radius;
 
-	uint8 totalTicks;
+	uint8 TotalTicks;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Collision)
-	USphereComponent* sphereCollider;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision")
+	USphereComponent* SphereCollider;
 
 private:
-	float timeSinceLastTick;
-	float timeOfCreation;
+	float TimeSinceLastTick;
+	float TimeOfCreation;
 
 public:
 	// Called when the game starts or when spawned

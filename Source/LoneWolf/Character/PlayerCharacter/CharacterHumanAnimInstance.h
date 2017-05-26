@@ -73,6 +73,9 @@ protected:
 	UFUNCTION(BlueprintCallable, category = "Mesh")
 	void RecenterMeshOnCursor();
 
+	UFUNCTION(BlueprintCallable, category = "Player")
+	void ForceCompletionOfReload();
+
 	class ACharacterController* CharacterController;
 
 	friend class ACharacterController;

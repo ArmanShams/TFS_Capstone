@@ -40,14 +40,17 @@ public:
 	virtual AWeapon* GetEquippedWeapon() override;
 	virtual bool bIsInRange();
 	virtual bool bIsInRange(float OveriddenDesiredRange);
-	
+	UFUNCTION(BlueprintCallable, category = "Character")
+	virtual float GetHealthPercent() override;
 	virtual void Destroyed() override;
-
 
 	virtual CharacterState::StatusEffect GetStatusEffect();
 
 	UPROPERTY(EditInstanceOnly)
 	TArray<class ATargetPoint*> PatrolPoints;
+
+	UPROPERTY(EditInstanceOnly, category = "Enemy")
+	bool bPatrolsLinearly;
 
 protected:
 	// Returns true if the actor's Status Effects is a 'softCC'. Defined in Design Document
@@ -61,10 +64,8 @@ protected:
 	//virtual void EquipWeapon(TSubclassOf<AWeapon> WeaponToEquip);
 	virtual void SetStatusEffect(CharacterState::StatusEffect NewStatusEffect);
 
-
-
-	UPROPERTY(EditDefaultsOnly)
-	float Health;
+	//UPROPERTY(EditDefaultsOnly)
+	//float Health;
 
 	UPROPERTY(EditDefaultsOnly)
 	float MoveSpeed;

@@ -15,6 +15,8 @@ protected:
 
 	virtual void TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 
+	bool bPawnPatrolsLinearly;
+	int32 PatrolPointIterator = 0;
 	int32 RangePoint;
 
 };

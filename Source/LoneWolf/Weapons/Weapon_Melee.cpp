@@ -17,16 +17,20 @@ void AWeapon_Melee::BeginPlay()
 {
 	Super::BeginPlay();
 
+	MeshComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	CapsuleComponent->SetRelativeLocation(FVector::ZeroVector);
 	CapsuleComponent->AttachToComponent(MeshComponent, FAttachmentTransformRules::KeepRelativeTransform);
-	MeshComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
-	CapsuleComponent->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnMeleeWeaponOverlapBegin);
 
 	TimeSinceLastFire = 0.f;
 	RateOfFire = 1.3f;
 	CollisionProfileName = CapsuleComponent->GetCollisionProfileName();
 	CapsuleComponent->SetCollisionProfileName(TEXT("NoCollision"));
 	bCollisionEnabled = false;
+
+	if (!CapsuleComponent->OnComponentBeginOverlap.IsBound())
+	{
+		CapsuleComponent->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnMeleeWeaponOverlapBegin);
+	}
 }
 
 void AWeapon_Melee::Tick(float DeltaSeconds)

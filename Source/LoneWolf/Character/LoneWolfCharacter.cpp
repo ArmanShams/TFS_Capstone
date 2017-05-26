@@ -110,6 +110,11 @@ AWeapon* ALoneWolfCharacter::GetEquippedWeapon()
 	return NULL;
 }
 
+float ALoneWolfCharacter::GetHealthPercent()
+{
+	return Health / MAXHEALTH;
+}
+
 bool ALoneWolfCharacter::bIsHardCC()
 {
 	if (GetComponentByClass(UStatusEffect_HardCrowdControl::StaticClass()))

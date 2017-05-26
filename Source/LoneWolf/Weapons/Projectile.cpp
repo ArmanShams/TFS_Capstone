@@ -73,10 +73,13 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, U
 	// OtherComp->AddImpulseAtLocation(GetVelocity() * BulletImpulse, GetActorLocation());
 	if (APawn* RecastedOwner = Cast<APawn>(Owner))
 	{
-		UE_LOG(LogTemp, Display, TEXT("PROJECTILE HIT A THING %s   %s"), *OtherActor->GetName(), *OtherComp->GetName());
-		if (ACharacter* RecastedOtherCharacter = Cast<ACharacter>(OtherActor))
+		if (RecastedOwner->IsValidLowLevel() && RecastedOwner->GetController())
 		{
-			UGameplayStatics::ApplyDamage(OtherActor, Damage, RecastedOwner->GetController(), Owner, TSubclassOf<UDamageType>());
+			UE_LOG(LogTemp, Display, TEXT("PROJECTILE HIT A THING %s   %s"), *OtherActor->GetName(), *OtherComp->GetName());
+			if (ACharacter* RecastedOtherCharacter = Cast<ACharacter>(OtherActor))
+			{
+				UGameplayStatics::ApplyDamage(OtherActor, Damage, RecastedOwner->GetController(), RecastedOwner, TSubclassOf<UDamageType>());
+			}
 		}
 	}
 	this->Destroy();

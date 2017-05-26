@@ -88,7 +88,8 @@ public:
 protected:
 	virtual bool bIsHardCC() override;
 	virtual bool bIsSoftCC() override;
-
+	UFUNCTION(BlueprintCallable, category = "Character")
+	virtual float GetHealthPercent() override;
 	bool IsRolling();
 	bool IsMeleeAttacking();
 	bool bEnterReloadAnimation();
@@ -115,8 +116,8 @@ protected:
 	float CameraArmDistance;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character")
 	float TurnRate;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character")
-	float Health;
+	//UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character")
+	//float Health;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character")
 	float RollSpeed;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character")

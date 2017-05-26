@@ -507,6 +507,10 @@ void UCharacterHumanAnimInstance::AnimNotify_ReplaceMesh()
 		if (CharacterController != NULL)
 		{
 			CharacterController->TransformIntoWolf();
+
+			CharacterController->RestoreControlAndRevokeInvulnerable();
+
+			CharacterController = NULL;
 		}
 	}
 }
@@ -518,6 +522,21 @@ void UCharacterHumanAnimInstance::RecenterMeshOnCursor()
 		if (CharacterController != NULL)
 		{
 			CharacterController->bRecenterMesh = true;
+		}
+	}
+}
+
+void UCharacterHumanAnimInstance::ForceCompletionOfReload()
+{
+	if (GetWorld()->HasBegunPlay())
+	{
+		if (CharacterController != NULL)
+		{
+			bReloading = false;
+			bPrimaryFire = false;
+			CharacterController->bAnimPrimaryFire = bPrimaryFire;
+			CharacterController->bShouldEnterReload = bReloading;
+			CharacterController->Reload();
 		}
 	}
 }
