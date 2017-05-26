@@ -16,46 +16,74 @@ void UBTService_FindTarget::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* N
 {
 	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
 
-	UAIPerceptionComponent* PerceptionComponent = OwnerComp.GetAIOwner()->GetPerceptionComponent();
-
-	TArray<ATargetPoint*> PatrolPoints = Cast<AEnemy>(OwnerComp.GetAIOwner()->GetPawn())->PatrolPoints;
-	TArray<AActor*> HostileActors;
-	PerceptionComponent->GetPerceivedHostileActors(HostileActors);
-	if (HostileActors.Num() > 0)
+	if (UAIPerceptionComponent* PerceptionComponent = OwnerComp.GetAIOwner()->GetPerceptionComponent())
 	{
-		// Cancels current movement task if the AI is patrolling.
-		if (Cast<ATargetPoint>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(TEXT("Target"))))
+		if (AEnemy* RecastOwnerPawn = Cast<AEnemy>(OwnerComp.GetAIOwner()->GetPawn()))
 		{
-			//UE_LOG(LogTemp, Display, TEXT("We are in the beam"));
+			//bPatrolsLinearly;
+			//UAIPerceptionComponent* PerceptionComponent = OwnerComp.GetAIOwner()->GetPerceptionComponent();
+			//TArray<ATargetPoint*> PatrolPoints = Cast<AEnemy>(OwnerComp.GetAIOwner()->GetPawn())->PatrolPoints;
+			bPawnPatrolsLinearly = RecastOwnerPawn->bPatrolsLinearly;
+			TArray<ATargetPoint*> PatrolPoints = RecastOwnerPawn->PatrolPoints;
+			TArray<AActor*> HostileActors;
+			PerceptionComponent->GetPerceivedHostileActors(HostileActors);
+
+			if (HostileActors.Num() > 0)
+			{
+				// Cancels current movement task if the AI is patrolling.
+				if (Cast<ATargetPoint>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(TEXT("Target"))))
+				{
+					//UE_LOG(LogTemp, Display, TEXT("We are in the beam"));
+					OwnerComp.GetAIOwner()->StopMovement();
+				}
+				AActor* HostileActor = NULL;
+				for (int i = 0; i < HostileActors.Num(); i++)
+				{
+					if (Cast<ACharacterController>(HostileActors[i]))
+					{
+						HostileActor = HostileActors[i];
+					}
+				}
+
+				if (HostileActor != NULL)
+				{
+					OwnerComp.GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), Cast<AActor>(HostileActor));
+				}
+				return;
+			}
+
+			else if (PatrolPoints.Num() > 0) 
+			{
+				if (bPawnPatrolsLinearly)
+				{
+					AActor* PatrolPoint = PatrolPoints[PatrolPointIterator];
+					OwnerComp.GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), PatrolPoint);
+					PatrolPointIterator++;
+					if (PatrolPointIterator == PatrolPoints.Num())
+					{
+						PatrolPointIterator = 0;
+					}
+					return;
+				}
+				else
+				{
+					RangePoint = FMath::RandRange(0, PatrolPoints.Num() - 1);
+					AActor* PatrolPoint = PatrolPoints[RangePoint];
+					OwnerComp.GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), PatrolPoint);
+					return;
+				}
+				
+			}
+
+			OwnerComp.GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), NULL);
 			OwnerComp.GetAIOwner()->StopMovement();
 		}
-		AActor* HostileActor = NULL;
-		for (int i = 0; i < HostileActors.Num(); i++)
-		{
-			if (Cast<ACharacterController>(HostileActors[i]))
-			{
-				HostileActor = HostileActors[i];
-			}
-		}
-
-		if (HostileActor != NULL)
-		{
-			OwnerComp.GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), Cast<AActor>(HostileActor));
-		}
-		return;
+		
+	
 	}
-
-	else if (PatrolPoints.Num() > 0)
-	{
-
-		RangePoint = FMath::RandRange(0, PatrolPoints.Num() - 1);
-		AActor* PatrolPoint = PatrolPoints[RangePoint];
-		OwnerComp.GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), PatrolPoint);
-		return;
-	}
-
-	OwnerComp.GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), NULL);
-	OwnerComp.GetAIOwner()->StopMovement();
+	
+	return;
+	
 }
 
 
