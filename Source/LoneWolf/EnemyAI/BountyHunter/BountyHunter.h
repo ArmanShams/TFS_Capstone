@@ -13,7 +13,7 @@ enum class BountyHunterState : uint8
 	ATTACKING				UMETA(DisplayName = "Attacking"),
 	FLEEING					UMETA(DisplayName = "Fleeing"),
 	HARDCC					UMETA(DisplayName = "Stunned"),
-	SETTINGTRAP				UMETA(DisplayName = "PlacingTrap")
+	SETTINGTRAP				UMETA(DisplayName = "SettingTrap")
 };
 
 UCLASS(Blueprintable)
@@ -89,23 +89,18 @@ protected: //Blackboard Key Booleans
 
 	void Aim(class ACharacterController* PlayerRecasted);
 
-	//Animation Booleans
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
-	bool bCanAttack;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
-	bool bIsAttacking;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
-	bool bIsAiming;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
-	bool bPlacingTrap;
-	//bool bPlayRecoilAnimation;
-
+	//Booleans to check for range
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
 	bool bAttack;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
 	bool bFlee;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
 	bool bPatrol;
+
+	//Booleans for animation
+	bool bShouldAdjustGun;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
+	bool bIsSetTrap;
 
 	//Friendships
 	friend class ABearTrap;
