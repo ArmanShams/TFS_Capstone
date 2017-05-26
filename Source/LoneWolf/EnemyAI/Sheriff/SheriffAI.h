@@ -10,11 +10,9 @@ UENUM(BlueprintType)
 enum class SheriffState : uint8
 {
 	IDLE			UMETA(DisplayName = "Idle"),
-	MELEE			UMETA(DisplayName = "Melee"),
-	RANGED			UMETA(DisplayName = "Ranged"),
+	ATTACKING		UMETA(DisplayName = "Ranged"),
 	CASTING			UMETA(DisplayName = "Casting"),
-	LASSO			UMETA(DisplayName = "Lasso"),
-	HARDCC			UMETA(DisplayName = "HardCC")
+	LASSO			UMETA(DisplayName = "Lasso")
 };
 
 UCLASS()
@@ -112,22 +110,10 @@ protected: //Weapons
 		class UCableComponent* LassoCableComponent;
 
 protected: //Blackboard Key Booleans
-	bool bSafeAttackingDistance();
-	bool bIsFlee();
 	bool bIsStunned;
 	bool bIsFleeing;
 
 	void Aim(ACharacterController* PlayerToAimAt);
-
-	//Animation Booleans
-	bool bCanAttack;
-	bool bIsBasicAttack;
-	bool bIsAiming;
-	bool bIsPlacingTrap;
-
-	//Not Yet Implemented Functions
-	bool bIsCasting();
-
 
 protected: //Friendships
 	friend class USheriffAnimInstance;

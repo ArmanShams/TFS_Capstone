@@ -5,23 +5,16 @@
 
 void USheriffAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
-	if (SheriffAI)
-	{
-		bKnifeSwing = SheriffAI->bIsInRange();
-	}
-}
-
-void USheriffAnimInstance::AnimNotify_KnifeSwing()
-{
-	if (SheriffAI)
-	{
-		KnifeRange = SheriffAI->RevolverAttackRange;
-		bShootRevolver = SheriffAI->bIsInRange(KnifeRange);
-	}
+	
 }
 
 void USheriffAnimInstance::AnimNotify_ShootRevolver()
 {
+	if (GetWorld()->HasBegunPlay())
+	{
+
+	}
+
 	if (SheriffAI)
 	{
 		RevolverRange = SheriffAI->RevolverAttackRange;

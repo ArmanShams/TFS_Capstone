@@ -73,9 +73,6 @@ void ASheriffAI::Tick(float DeltaSeconds)
 		BlackboardComponent->SetValueAsBool(TEXT("IsHardCC"), bIsInHardCC);			// bIsHardCC
 		BlackboardComponent->SetValueAsBool(TEXT("IsSoftCC"), bIsInSoftCC);			// bIsSoftCC
 		BlackboardComponent->SetValueAsBool(TEXT("CanAttack"), bCanAttack);			// bCanBasicAttack
-		BlackboardComponent->SetValueAsBool(TEXT("IsAttack"), bIsBasicAttack);		// bIsBasicAttack
-		BlackboardComponent->SetValueAsBool(TEXT("IsAiming"), bIsAiming);			// bIsAiming
-		BlackboardComponent->SetValueAsBool(TEXT("SwingingKnife"), bIsBasicAttack); // NOT IMPLEMENTED
 
 		//Checking the range
 		BlackboardComponent->SetValueAsBool(TEXT("IsInAttackRange"), bIsInRange(AttackRange));
@@ -91,15 +88,11 @@ void ASheriffAI::Tick(float DeltaSeconds)
 			{
 			case SheriffState::IDLE:
 				break;
-			case SheriffState::MELEE:
-				break;
-			case SheriffState::RANGED:
+			case SheriffState::ATTACKING:
 				break;
 			case SheriffState::CASTING:
 				break;
 			case SheriffState::LASSO:
-				break;
-			case SheriffState::HARDCC:
 				break;
 			default:
 				UE_LOG(LogTemp, Display, TEXT("There's been an error in setting the state of the Sheriff"));
@@ -243,26 +236,6 @@ void ASheriffAI::SetSheriffState(SheriffState NewStateToEnter)
 	CurrentState = NewStateToEnter;
 }
 
-bool ASheriffAI::bSafeAttackingDistance()
-{
-	if (bIsInRange(AttackRange) && !bIsFlee())
-	{
-		UE_LOG(LogTemp, Display, TEXT("WE ARE IN THE BEAM"));
-		return bIsFleeing = true;
-	}
-	return bIsFleeing = false;
-}
-
-bool ASheriffAI::bIsFlee()
-{
-	if (bIsInRange(CushionSpace))
-	{
-		UE_LOG(LogTemp, Display, TEXT("WE ARE FLEE"));
-		return true;
-	}
-	return false;
-}
-
 void ASheriffAI::Aim(ACharacterController* PlayerToAimAt)
 {
 	//FixedWeapo+Rotation();
@@ -270,65 +243,3 @@ void ASheriffAI::Aim(ACharacterController* PlayerToAimAt)
 	FRotator NewRollRotation = FRotationMatrix::MakeFromX(Direction).Rotator();
 	SetActorRotation(NewRollRotation);
 }
-
-//void ABountyHunter::Attack()
-//{
-//	if (CurrentlyEquippedWeapon != NULL)
-//	{
-//		if (CurrentlyEquippedWeapon->CanFire())
-//		{
-//			FixWeaponRotation();
-//		}
-//	}
-//}
-
-//void ASheriffAI::FixWeaponRotation()
-//{
-//	if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
-//	{
-//		if (BlackboardComponent->GetValueAsObject(TEXT("Target")) != NULL)
-//		{
-//			if (ACharacterController* RecastTarget = Cast<ACharacterController>(BlackboardComponent->GetValueAsObject(TEXT("Target"))))
-//			{
-//				if (CurrentlyEquippedWeapon != NULL)
-//				{
-//					FRotator DesiredWeaponRotation = GetActorRotation();
-//					FVector DirectionToTarget = RecastTarget->GetActorLocation() - GetActorLocation();
-//					if (DirectionToTarget.Size() > 300.f)
-//					{
-//						FRotator YawRotation = (RecastTarget->GetActorLocation() - CurrentlyEquippedWeapon->GetActorLocation()).Rotation();
-//						DesiredWeaponRotation.Yaw = YawRotation.Yaw;
-//					}
-//					else
-//					{
-//						FRotator YawRotation = (GetActorLocation() + (GetMesh()->GetRightVector() * 256.f) - CurrentlyEquippedWeapon->GetActorLocation()).Rotation();
-//
-//						DesiredWeaponRotation.Yaw = YawRotation.Yaw;
-//					}
-//					FRotator RotationInDirection = FRotationMatrix::MakeFromX(DirectionToTarget).Rotator();
-//					DesiredWeaponRotation.Pitch = RotationInDirection.Pitch;
-//
-//					CurrentlyEquippedWeapon->SetActorRotation(FMath::RInterpTo(CurrentlyEquippedWeapon->GetActorRotation(), DesiredWeaponRotation, GetWorld()->GetDeltaSeconds(), 200.f));
-//				}
-//			}
-//		}
-//	}
-//}
-
-//void ASherifAI::Flee(ACharacterController* PlayerToFleeFrom)
-//{
-//	FVector CurrentLocation = GetActorLocation();
-//	FVector PlayerLocation = PlayerToFleeFrom->GetActorLocation();
-//	FRotator RotationToPlayer = PlayerToFleeFrom->GetActorRotation();
-//	FVector Direction = CurrentLocation - PlayerLocation;
-//	FRotator DirectionRotation = Direction.Rotation();
-//	FRotator NewRotation = -DirectionRotation;
-//	float DistanceToPlayer = FVector::Dist(CurrentLocation, PlayerLocation);
-//	SetActorRotation(NewRotation);
-//	GetMovementComponent()->AddInputVector(DistanceToPlayer * Direction);
-//
-//	if (DistanceToPlayer > CushionSpace)
-//	{
-//		bIsFleeing = false;
-//	}
-//}

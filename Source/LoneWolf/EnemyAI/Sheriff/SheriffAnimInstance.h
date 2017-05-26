@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Animation/AnimInstance.h"
+#include "EnemyAI/Sheriff/SheriffAI.h"
 #include "SheriffAnimInstance.generated.h"
 
 UCLASS()
@@ -31,9 +32,6 @@ protected:
 		bool bCanLassoAttack;
 
 protected:
-	UFUNCTION()
-		void AnimNotify_KnifeSwing();
-
 	UFUNCTION()
 		void AnimNotify_ShootRevolver();
 
