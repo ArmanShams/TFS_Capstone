@@ -30,6 +30,8 @@ void UBountyHunterAnimInstance::AnimNotify_ReturnToIdle()
 		if (BountyHunter != NULL)
 		{
 			BountyHunter->bIsPlacingTrap = false;
+			bIsSettingTrap = false;
+			UE_LOG(LogTemp, Display, TEXT(""));
 			BountyHunter->SetBountyHunterState(BountyHunterState::IDLE);
 		}
 	}
@@ -71,6 +73,17 @@ void UBountyHunterAnimInstance::AnimNotify_EndShooting()
 		if (BountyHunter != NULL)
 		{
 			BountyHunter->bShouldAdjustGun = false;
+		}
+	}
+}
+
+void UBountyHunterAnimInstance::AnimNotify_PlaceTrap()
+{
+	if (GetWorld()->HasBegunPlay())
+	{
+		if (BountyHunter != NULL)
+		{
+			BountyHunter->bIsPlacingTrap = false;
 		}
 	}
 }

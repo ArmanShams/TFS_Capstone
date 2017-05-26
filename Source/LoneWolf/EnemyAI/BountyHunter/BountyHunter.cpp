@@ -19,7 +19,6 @@ ABountyHunter::ABountyHunter()
 	PrimaryActorTick.bCanEverTick = true;
 	RootComponent = GetCapsuleComponent();
 	GetMesh()->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
-	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ABountyHunter::OnTrapOverlap);
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 	Health = MAXHEALTH;
@@ -55,6 +54,8 @@ ABountyHunter::ABountyHunter()
 void ABountyHunter::BeginPlay()
 {
 	Super::BeginPlay();
+	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ABountyHunter::OnComponentOverlap);
+
 	EquipNewWeapon(DefaultWeapon);
 }
 
@@ -66,7 +67,10 @@ void ABountyHunter::Tick(float DeltaTime)
 	{
 		SetBountyHunterState(BountyHunterState::IDLE);
 	}
+	if (Health >= 0.1f)
+	{
 
+	}
 	if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
 	{
 		//Animation																	Variables:
@@ -98,7 +102,8 @@ void ABountyHunter::Tick(float DeltaTime)
 				case BountyHunterState::IDLE:
 					break;
 				case BountyHunterState::AIMING:
-					
+					FixWeaponRotation();
+					DrawDebugLine(GetWorld(), GetActorLocation(), RecastedTarget->GetActorLocation(), FColor::Red, false, 0.05f, 1.f, 5.f);
 					break;
 				case BountyHunterState::ATTACKING:
 					Attack();
@@ -108,9 +113,12 @@ void ABountyHunter::Tick(float DeltaTime)
 					break;
 				case BountyHunterState::HARDCC:
 					break;
+				case BountyHunterState::SETTINGTRAP:
+					break;
 				default:
 					break;
 				}
+
 				if (bShouldAdjustGun)
 				{
 					Aim(RecastedTarget);
@@ -162,16 +170,14 @@ bool ABountyHunter::bIsInRange(float OveriddenDesiredRange)
 		const float CurrentDistance = FVector::Dist(PlayerLocation, CurrentLocation);
 
 		if (CurrentDistance > CushionSpace && CurrentDistance <= AttackRange)
-		{
-			DrawDebugLine(GetWorld(), CurrentLocation, PlayerLocation, FColor::White, false, -1, 0, 12.333);
+		{ //DrawDebugLine(GetWorld(), CurrentLocation, PlayerLocation, FColor::White, false, -1, 0, 12.333);
 			bAttack = true;
 			bFlee = false;
 			bPatrol = false;
 		}
 
 		if (CurrentDistance < CushionSpace)
-		{
-			DrawDebugLine(GetWorld(), CurrentLocation, PlayerLocation, FColor::Red, false, -1, 0, 12.333);
+		{ //DrawDebugLine(GetWorld(), CurrentLocation, PlayerLocation, FColor::Red, false, -1, 0, 12.333);
 			bAttack = false;
 			bFlee = true;
 			bPatrol = false;
@@ -252,14 +258,13 @@ AWeapon* ABountyHunter::EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip)
 
 void ABountyHunter::SetBearTrap(ATrapLocations* NewTrapLocation, const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp, Display, TEXT("SHITOVERLAPPED"));
 	if (!NewTrapLocation->bIsOccupied)
 	{
 		UE_LOG(LogTemp, Display, TEXT("The trap location is now occupied"));
 		if (BearTrapClass != NULL)
-		{ //UE_LOG(LogTemp, Display, TEXT("Bounty Hunter set a bear trap, trap added to array list"));
+		{ UE_LOG(LogTemp, Display, TEXT("Bounty Hunter set a bear trap, trap added to array list"));
 			if (TrapArray.Num() >= MaximumTrapsAllowed)
-			{ //UE_LOG(LogTemp, Display, TEXT("Element popped from Trap Array"));
+			{ UE_LOG(LogTemp, Display, TEXT("Element popped from Trap Array"));
 				AActor* TrapToDelete = TrapArray.Pop();
 				TrapToDelete->SetLifeSpan(0.1f);
 			}
@@ -269,14 +274,17 @@ void ABountyHunter::SetBearTrap(ATrapLocations* NewTrapLocation, const FHitResul
 			BearTrapPlaced->SetOwner(this);
 			BearTrapPlaced->SetLocationBeingOccupied(NewTrapLocation);
 			TrapArray.Add(BearTrapPlaced);
+
 		}
 	}
 }
 
-void ABountyHunter::OnTrapOverlap(UPrimitiveComponent * OverlappedComp, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
+void ABountyHunter::OnComponentOverlap(UPrimitiveComponent * OverlappedComp, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
 {
+	UE_LOG(LogTemp, Display, TEXT("You did an overlap"));
 	if (CurrentState == BountyHunterState::SETTINGTRAP)
 	{
+		UE_LOG(LogTemp, Display, TEXT("Current state is valid"));
 		if (ATrapLocations* RecastedOverlappingActor = Cast<ATrapLocations>(OtherActor))
 		{
 			if (RecastedOverlappingActor->bIsOccupied == false)

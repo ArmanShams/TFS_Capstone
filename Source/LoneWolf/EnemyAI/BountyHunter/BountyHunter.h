@@ -55,7 +55,7 @@ protected: //Implemented Functions
 	virtual void SetBearTrap(class ATrapLocations* NewTrapLocation, const FHitResult & SweepResult);
 	
 	UFUNCTION()
-	virtual void OnTrapOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	virtual void OnComponentOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	virtual void SetBountyHunterState(BountyHunterState NewState);
 
 protected:
@@ -65,10 +65,6 @@ protected:
 	//Cushion distance from player, safe distance to attack.
 	UPROPERTY(EditDefaultsOnly, Category = "Enemy")
 	float CushionSpace;
-	//Trap locations to move to. (Currently not supported)
-	//ATrapLocations* FirstTrapLocation;
-	//ATrapLocations* SecondTrapLocation;
-	//ATrapLocations* ThirdTrapLocation;
 	//Decal Actor to display telegraphs, and an array to store decal class created.
 	AActor* AimLineDecalActor;
 	TSubclassOf<AActor> AimLineDecalClass;
