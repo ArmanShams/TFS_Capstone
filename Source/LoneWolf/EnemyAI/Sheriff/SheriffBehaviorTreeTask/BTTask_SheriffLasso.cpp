@@ -14,7 +14,8 @@ EBTNodeResult::Type UBTTask_SheriffLasso::ExecuteTask(UBehaviorTreeComponent& Ow
 	UBehaviorTreeComponent* BehaviorTree = &OwnerComp;
 	if (ASheriffAIController* Controller = Cast<ASheriffAIController>(BehaviorTree->GetAIOwner()))
 	{
-		Cast<ASheriffAI>(Controller->GetPawn())->Lasso();
+		//Cast<ASheriffAI>(Controller->GetPawn())->Lasso();
+		Cast<ASheriffAI>(Controller->GetPawn())->SetSheriffState(SheriffState::CASTING);
 	}
 	return Super::ExecuteTask(OwnerComp, NodeMemory);
 }

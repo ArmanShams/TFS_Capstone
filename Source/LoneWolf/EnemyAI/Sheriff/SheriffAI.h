@@ -12,7 +12,8 @@ enum class SheriffState : uint8
 	IDLE			UMETA(DisplayName = "Idle"),
 	ATTACKING		UMETA(DisplayName = "Ranged"),
 	CASTING			UMETA(DisplayName = "Casting"),
-	LASSO			UMETA(DisplayName = "Lasso")
+	LASSO			UMETA(DisplayName = "Lasso"),
+	RELOADING		UMETA(DisplayName = "Reloading")
 };
 
 UCLASS()
@@ -50,48 +51,12 @@ protected: //Implemented Functions
 	void Lasso();
 	void Shoot();
 	void Casting();
-	void SwingKnife();
 
 	SheriffState CurrentState;
 	virtual void SetSheriffState(SheriffState NewStateToEnter);
 
 	// Sphere Collider to apply the soft CC
 	USphereComponent* LassoSphereCollider;
-
-protected: // Variables to keep track
-		   //Space to be kept from the Player when Lassoing
-	UPROPERTY(EditDefaultsOnly)
-		float CushionSpace;
-	//Force of lasso
-	UPROPERTY(EditDefaultsOnly)
-		float PullingForce;
-	//Vector of the velocity the player is pulled
-	UPROPERTY(EditDefaultsOnly)
-		FVector PullingVelocity;
-	//Location of the actor
-	UPROPERTY(EditDefaultsOnly)
-		FVector CurrentLocation;
-	//Location of the lasso target
-	UPROPERTY(EditDefaultsOnly)
-		FVector PlayerLocation;
-	//The altered location of the lasso target
-	UPROPERTY(EditDefaultsOnly)
-		FVector NewLocation;
-	//Distance from the lasso target and the Sheriff
-	UPROPERTY(EditDefaultsOnly)
-		float DistanceToPlayer;
-	//How long the lasso is
-	UPROPERTY(EditDefaultsOnly)
-		float LassoLength;
-	//Max attack range for swinging knife
-	UPROPERTY(EditDefaultsOnly)
-		float KnifeAttackRange;
-	//Max attack range for shooting revolver
-	UPROPERTY(EditDefaultsOnly)
-		float RevolverAttackRange;
-	//Max casting range to use lasso
-	UPROPERTY(EditDefaultsOnly)
-		float LassoAttackRange;
 
 protected: //Decal Actors
 	AActor* LassoLineDecalActor;

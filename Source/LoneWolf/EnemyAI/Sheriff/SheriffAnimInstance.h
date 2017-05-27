@@ -15,30 +15,31 @@ public:
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-		float speed;
+	float speed;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-		float KnifeRange;
+	bool bIsDead;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-		float RevolverRange;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-		float LassoRange;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-		bool isDead;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-		bool bKnifeSwing;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-		bool bShootRevolver;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-		bool bCanLassoAttack;
+	bool bIsHardCC;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "enum")
+	SheriffState CurrentSheriffSate;
 
 protected:
 	UFUNCTION()
-		void AnimNotify_ShootRevolver();
+	void AnimNotify_Lasso();
 
 	UFUNCTION()
-		void AnimNotify_LassoAttack();
+	void AnimNotify_EndPull();
 
-	class ASheriffAI* SheriffAI;
+	UFUNCTION()
+	void AnimNotify_FirstShot();
+
+	UFUNCTION()
+	void AnimNotify_SecondShot();
+
+	UFUNCTION()
+	void AnimNotify_EndReload();
+
+	class ASheriffAI* Sheriff;
 
 	friend class ASheriffAI;
 };
