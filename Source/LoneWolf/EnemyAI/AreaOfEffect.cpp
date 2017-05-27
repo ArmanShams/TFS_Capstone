@@ -2,6 +2,7 @@
 
 #include "LoneWolf.h"
 #include "AreaOfEffect.h"
+#include "Character/LoneWolfCharacter.h"
 #include "Character/PlayerCharacter/CharacterController.h"
 
 // Sets default values
@@ -10,20 +11,20 @@ AAreaOfEffect::AAreaOfEffect(const FObjectInitializer& ObjectInitializer)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	timeSinceLastTick = 0.f;
+	TimeSinceLastTick = 0.f;
 
-	damagePerTick = 5.f;
+	DamagePerTick = 5.f;
 
-	ticksPerSecond = 2.f;
-	lifeTimeInSeconds = 3.f;
+	TicksPerSecond = 2.f;
+	LifeTimeInSeconds = 3.f;
 
-	radius = 30.f;
+	Radius = 30.f;
 
-	totalTicks = 0;
+	TotalTicks = 0;
 
-	sphereCollider = CreateDefaultSubobject<USphereComponent>(TEXT("Collider"));
-	sphereCollider->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
-	sphereCollider->SetSphereRadius(radius);
+	SphereCollider = CreateDefaultSubobject<USphereComponent>(TEXT("Collider"));
+	SphereCollider->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	SphereCollider->SetSphereRadius(Radius);
 
 	//sphereCollider->OnComponentBeginOverlap.AddDynamic(this, &AAreaOfEffect::OnBeginOverllap);
 }
@@ -33,7 +34,7 @@ void AAreaOfEffect::BeginPlay()
 {
 	Super::BeginPlay();
 
-	timeOfCreation = UGameplayStatics::GetRealTimeSeconds(GetWorld());
+	TimeOfCreation = UGameplayStatics::GetRealTimeSeconds(GetWorld());
 }
 
 
@@ -41,17 +42,19 @@ void AAreaOfEffect::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
 
-	timeSinceLastTick += DeltaTime;
-	if ((timeOfCreation + lifeTimeInSeconds) + timeSinceLastTick >= UGameplayStatics::GetRealTimeSeconds(GetWorld()))
+	TimeSinceLastTick += DeltaTime;
+	if ((TimeOfCreation + LifeTimeInSeconds) + TimeSinceLastTick >= UGameplayStatics::GetRealTimeSeconds(GetWorld()))
 	{
-		if (timeSinceLastTick >= 1 / ticksPerSecond)
+		if (TimeSinceLastTick >= 1 / TicksPerSecond)
 		{
-			if (sphereCollider->IsOverlappingActor(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)))
+			TArray<AActor*> OverlappedActors;
+			SphereCollider->GetOverlappingActors(OverlappedActors, ALoneWolfCharacter::StaticClass());
+			if (OverlappedActors.Num() > 0)
 			{
-				/*ACharacterController* player = Cast<ACharacterController>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-				player->ModifyHealth(-damagePerTick);*/
-
-				//UE_LOG(LogTemp, Warning, TEXT("Overlapping another actor"));
+				for (size_t i = 0; i < OverlappedActors.Num(); i++)
+				{
+					UGameplayStatics::ApplyDamage(OverlappedActors[i], DamagePerTick, NULL, this, TSubclassOf<UDamageType>());
+				}
 			}
 			//float realtimeSeconds = UGameplayStatics::GetRealTimeSeconds(GetWorld());
 			//UE_LOG(LogTemp, Warning, TEXT("Time since last tick: %f"), timeSinceLastTick);
@@ -59,15 +62,15 @@ void AAreaOfEffect::Tick( float DeltaTime )
 			UE_LOG(LogTemp, Warning, TEXT("AreaOfEffect ticked!"));
 
 			//STUFF HAPPENS HERE.
-			totalTicks++;
+			TotalTicks++;
 
-			timeSinceLastTick = 0.f;
+			TimeSinceLastTick = 0.f;
 
 		}
 	}
 	else 
 	{
-		UE_LOG(LogTemp, Warning, TEXT("AreaOfEffect should now be destroyed! Total ticks: %d"), totalTicks);
+		UE_LOG(LogTemp, Warning, TEXT("AreaOfEffect should now be destroyed! Total ticks: %d"), TotalTicks);
 		Destroy();
 	}
 }
