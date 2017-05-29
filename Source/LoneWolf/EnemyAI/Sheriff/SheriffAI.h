@@ -56,7 +56,7 @@ protected: //Implemented Functions
 	void Casting();
 
 protected: //Enumerator states
-	UPROPERTY(EditDefaultsOnly, Category = "Enemy")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
 	SheriffState CurrentState;
 	virtual void SetSheriffState(SheriffState NewStateToEnter);
 

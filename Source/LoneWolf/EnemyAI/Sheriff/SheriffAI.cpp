@@ -45,7 +45,6 @@ ASheriffAI::ASheriffAI()
 		UE_LOG(LogTemp, Display, TEXT("We have found the lasso!"));
 		LassoWeapon = (UClass*)LassoAsset.Class;
 	}
-
 }
 
 void ASheriffAI::BeginPlay()
@@ -96,6 +95,36 @@ void ASheriffAI::Tick(float DeltaSeconds)
 			default:
 				UE_LOG(LogTemp, Display, TEXT("There's been an error in setting the state of the Sheriff"));
 				break;
+			}
+		}
+
+		if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
+		{
+			if (BlackboardComponent->GetValueAsObject(TEXT("Target")) != NULL)
+			{
+				if (ACharacterController* RecastTarget = Cast<ACharacterController>(BlackboardComponent->GetValueAsObject(TEXT("Target"))))
+				{
+					if (CurrentlyEquippedWeapon != NULL)
+					{
+						FRotator DesiredWeaponRotation = GetActorRotation();
+						FVector DirectionToTarget = RecastTarget->GetActorLocation() - GetActorLocation();
+						if (DirectionToTarget.Size() > 300.f)
+						{
+							FRotator YawRotation = (RecastTarget->GetActorLocation() - CurrentlyEquippedWeapon->GetActorLocation()).Rotation();
+							DesiredWeaponRotation.Yaw = YawRotation.Yaw;
+						}
+						else
+						{
+							FRotator YawRotation = (GetActorLocation() + (GetMesh()->GetRightVector() * 256.f) - CurrentlyEquippedWeapon->GetActorLocation()).Rotation();
+
+							DesiredWeaponRotation.Yaw = YawRotation.Yaw;
+						}
+						FRotator RotationInDirection = FRotationMatrix::MakeFromX(DirectionToTarget).Rotator();
+						DesiredWeaponRotation.Pitch = RotationInDirection.Pitch;
+
+						CurrentlyEquippedWeapon->SetActorRotation(FMath::RInterpTo(CurrentlyEquippedWeapon->GetActorRotation(), DesiredWeaponRotation, GetWorld()->GetDeltaSeconds(), 200.f));
+					}
+				}
 			}
 		}
 	}
@@ -161,6 +190,7 @@ bool ASheriffAI::bIsInRange(float OveriddenDesiredRange)
 
 		if (CurrentDistance > AttackRange)
 		{
+			DrawDebugLine(GetWorld(), CurrentLocation, PlayerLocation, FColor::Blue, false, -1, 0, 12.333);
 			bInLassoRange = true;
 			bInFleeRange = false;
 			bInAttackRange = false;
@@ -244,12 +274,12 @@ void ASheriffAI::Shoot()
 
 void ASheriffAI::Casting()
 {
-	UE_LOG(LogTemp, Display, TEXT("Attempting to cast lasso in C++ class"));
+	UE_LOG(LogTemp, Display, TEXT("Attempting to cast lasso"));
 }
 
 void ASheriffAI::Lasso()
 {
-	UE_LOG(LogTemp, Display, TEXT("Completed Lasso task in C++ class"));
+	UE_LOG(LogTemp, Display, TEXT("Completed Lasso task"));
 	//CurrentlyEquippedWeapon = GetEquippedWeapon();
 	//if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
 	//{
@@ -285,5 +315,6 @@ void ASheriffAI::Lasso()
 
 void ASheriffAI::EndLasso()
 {
-	UE_LOG(LogTemp, Display, TEXT("Ended Lasso task in C++ class"));
+	UE_LOG(LogTemp, Display, TEXT("Ended Lasso task"));
+	SetSheriffState(SheriffState::IDLE);
 }
