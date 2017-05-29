@@ -25,22 +25,18 @@ ASheriffAI::ASheriffAI()
 	TurnRate = 0.25f;
 	MaxRange = 100.0f;
 	AttackFrequency = 5.f;
+	CushionSpace = 250.f;
 	AttackRange = 500.0f;
 
 	FName LassoSocket = TEXT("hand_r");
 	LassoCableComponent = CreateDefaultSubobject<UCableComponent>(TEXT("Cable Component"));
 	LassoCableComponent->AttachTo(GetMesh(), LassoSocket);
-
-	ConstructorHelpers::FClassFinder<AWeapon>KnifeAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/KnifeBP_Arman.KnifeBP_Arman_C'"));
-	if (KnifeAsset.Class)
-	{
-		KnifeWeapon = (UClass*)KnifeAsset.Class;
-	}
+	//LassoCableComponent->AttachEndTo();
 
 	ConstructorHelpers::FClassFinder<AWeapon>ShotgunAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/Sheriff/SheriffShotgunBP.SheriffShotgunBP_C'"));
 	if (ShotgunAsset.Class)
 	{
-		ShotgunWeapon = (UClass*)ShotgunAsset.Class;
+		DefaultWeapon = (UClass*)ShotgunAsset.Class;
 	}
 
 	ConstructorHelpers::FClassFinder<AActor>LassoAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/LassoBP.LassoBP_C'"));
@@ -49,21 +45,32 @@ ASheriffAI::ASheriffAI()
 		UE_LOG(LogTemp, Display, TEXT("We have found the lasso!"));
 		LassoWeapon = (UClass*)LassoAsset.Class;
 	}
-	DefaultWeapon = ShotgunWeapon;
+
 }
 
 void ASheriffAI::BeginPlay()
 {
+	Super::BeginPlay();
+	EquipNewWeapon(DefaultWeapon);
 }
 
 void ASheriffAI::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+	
+
 	if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
 	{
+		bIsInRange(AttackRange);
+
 		//Animation																	Variables:
 		BlackboardComponent->SetValueAsBool(TEXT("IsHardCC"), bIsInHardCC);			// bIsHardCC
 		BlackboardComponent->SetValueAsBool(TEXT("IsSoftCC"), bIsInSoftCC);			// bIsSoftCC
+
+		//Checking for the range
+		BlackboardComponent->SetValueAsBool(TEXT("bIsInFleeRange"), bInFleeRange);
+		BlackboardComponent->SetValueAsBool(TEXT("bIsInLassoRange"), bInLassoRange);
+		BlackboardComponent->SetValueAsBool(TEXT("bIsInAttackRange"), bInAttackRange);
 
 		//Check for status
 		BlackboardComponent->SetValueAsEnum(TEXT("StatusEffects"), Effects);
@@ -83,6 +90,8 @@ void ASheriffAI::Tick(float DeltaSeconds)
 				break;
 			case SheriffState::LASSO:
 				Lasso();
+				break;
+			case SheriffState::FLEEING:
 				break;
 			default:
 				UE_LOG(LogTemp, Display, TEXT("There's been an error in setting the state of the Sheriff"));
@@ -124,7 +133,45 @@ bool ASheriffAI::bIsInRange()
 
 bool ASheriffAI::bIsInRange(float OveriddenDesiredRange)
 {
-	return Super::bIsInRange(OveriddenDesiredRange);
+	//return Super::bIsInRange(OveriddenDesiredRange);
+
+	ACharacter* PlayerCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+	if (PlayerCharacter != NULL)
+	{
+		float DesiredRange = OveriddenDesiredRange;
+		FVector CurrentLocation = GetActorLocation();
+		FVector PlayerLocation = PlayerCharacter->GetActorLocation();
+		const float CurrentDistance = FVector::Dist(PlayerLocation, CurrentLocation);
+
+		if (CurrentDistance > CushionSpace && CurrentDistance <= AttackRange)
+		{
+			DrawDebugLine(GetWorld(), CurrentLocation, PlayerLocation, FColor::White, false, -1, 0, 12.333);
+			bInAttackRange = true;
+			bInFleeRange = false;
+			bInLassoRange = false;
+		}
+
+		if (CurrentDistance < CushionSpace)
+		{
+			DrawDebugLine(GetWorld(), CurrentLocation, PlayerLocation, FColor::Red, false, -1, 0, 12.333);
+			bInAttackRange = false;
+			bInFleeRange = true;
+			bInLassoRange = false;
+		}
+
+		if (CurrentDistance > AttackRange)
+		{
+			bInLassoRange = true;
+			bInFleeRange = false;
+			bInAttackRange = false;
+		}
+	}
+
+	if (PlayerCharacter == NULL)
+	{
+		UE_LOG(LogTemp, Display, TEXT("WE ARE NOT IN THE BEAM"));
+	}
+	return false;
 }
 
 CharacterState::StatusEffect ASheriffAI::GetStatusEffect()
@@ -172,6 +219,11 @@ AWeapon* ASheriffAI::EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip)
 	return Super::EquipNewWeapon(WeaponToEquip);
 }
 
+void ASheriffAI::Flee()
+{
+
+}
+
 void ASheriffAI::SetSheriffState(SheriffState NewStateToEnter)
 {
 	CurrentState = NewStateToEnter;
@@ -179,7 +231,7 @@ void ASheriffAI::SetSheriffState(SheriffState NewStateToEnter)
 
 void ASheriffAI::Aim(ACharacterController* PlayerToAimAt)
 {
-	//FixedWeapo+Rotation();
+	//FixedWeaponRotation();
 	FVector Direction = PlayerToAimAt->GetActorLocation() - GetActorLocation();
 	FRotator NewRollRotation = FRotationMatrix::MakeFromX(Direction).Rotator();
 	SetActorRotation(NewRollRotation);
@@ -187,7 +239,7 @@ void ASheriffAI::Aim(ACharacterController* PlayerToAimAt)
 
 void ASheriffAI::Shoot()
 {
-	CurrentlyEquippedWeapon->Fire();
+	//UE_LOG(LogTemp, Display, TEXT("Attemping to shoot"));
 }
 
 void ASheriffAI::Casting()
@@ -229,4 +281,9 @@ void ASheriffAI::Lasso()
 	//		}
 	//	}
 	//}
+}
+
+void ASheriffAI::EndLasso()
+{
+	UE_LOG(LogTemp, Display, TEXT("Ended Lasso task in C++ class"));
 }

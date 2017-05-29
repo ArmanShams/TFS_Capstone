@@ -14,8 +14,8 @@ public:
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	float speed;
+		//UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+		//float speed;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bIsDead;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)

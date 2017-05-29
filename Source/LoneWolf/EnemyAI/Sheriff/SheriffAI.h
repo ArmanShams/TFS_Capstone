@@ -13,7 +13,8 @@ enum class SheriffState : uint8
 	ATTACKING		UMETA(DisplayName = "Ranged"),
 	CASTING			UMETA(DisplayName = "Casting"),
 	LASSO			UMETA(DisplayName = "Lasso"),
-	RELOADING		UMETA(DisplayName = "Reloading")
+	RELOADING		UMETA(DisplayName = "Reloading"),
+	FLEEING			UMETA(DisplayName = "Fleeing")
 };
 
 UCLASS()
@@ -48,10 +49,14 @@ protected: //Inherited protected functions from AEnemy
 	virtual AWeapon* EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip) override;
 
 protected: //Implemented Functions
-	void Lasso();
+	void Flee();
 	void Shoot();
+	void Lasso();
+	void EndLasso();
 	void Casting();
 
+protected: //Enumerator states
+	UPROPERTY(EditDefaultsOnly, Category = "Enemy")
 	SheriffState CurrentState;
 	virtual void SetSheriffState(SheriffState NewStateToEnter);
 
@@ -65,26 +70,30 @@ protected: //Decal Actors
 protected: //Weapons
 	AActor* LassoActor;
 	TSubclassOf<AActor> LassoActorClass;
-	TSubclassOf<AWeapon> KnifeWeapon;
-	TSubclassOf<AWeapon> ShotgunWeapon;
 	TSubclassOf<AWeapon> LassoWeapon;
 
 	FComponentReference CastedPlayerReference;
 
 	UPROPERTY(EditAnywhere)
-		class UCableComponent* LassoCableComponent;
+	class UCableComponent* LassoCableComponent;
 
 protected: //Blackboard Key Booleans
 	bool bIsStunned;
 	bool bIsFleeing;
+
+	bool bInFleeRange;
+	bool bInLassoRange;
+	bool bInAttackRange;
+
+	float CushionSpace;
 
 	void Aim(ACharacterController* PlayerToAimAt);
 
 protected: //Friendships
 	friend class USheriffAnimInstance;
 	friend class UBTTask_SheriffIdle;
+	friend class UBTTask_SheriffFlee;
 	friend class UBTTask_SheriffLasso;
+	friend class UBTTask_SheriffAttack;
 	friend class UBTTask_SheriffCasting;
-	friend class UBTTask_SheriffKnifeAttack;
-	friend class UBTTask_SheriffShotgunAttack;
 };

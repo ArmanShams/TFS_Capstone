@@ -28,6 +28,7 @@ void USheriffAnimInstance::AnimNotify_Lasso()
 		if (Sheriff != NULL)
 		{
 			//Lasso casted and hit enemy
+			Sheriff->Lasso();
 		}
 	}
 }
@@ -39,6 +40,7 @@ void USheriffAnimInstance::AnimNotify_EndPull()
 		if (Sheriff != NULL)
 		{
 			//Sheriff tugging on enemy
+			Sheriff->EndLasso();
 		}
 	}
 }
@@ -50,6 +52,7 @@ void USheriffAnimInstance::AnimNotify_FirstShot()
 		if (Sheriff != NULL)
 		{
 			//First Shot in the attacking state
+			Sheriff->CurrentlyEquippedWeapon->Fire();
 		}
 	}
 }
@@ -61,6 +64,7 @@ void USheriffAnimInstance::AnimNotify_SecondShot()
 		if (Sheriff != NULL)
 		{
 			//Second Shot in the attacking state
+			Sheriff->CurrentlyEquippedWeapon->Fire();
 		}
 	}
 }
@@ -72,6 +76,7 @@ void USheriffAnimInstance::AnimNotify_EndReload()
 		if (Sheriff != NULL)
 		{
 			//Reloading shotgun
+			//CanAttack = true;
 		}
 	}
 }
