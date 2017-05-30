@@ -8,6 +8,8 @@
 
 #include "Engine.h"
 
+#include "Character/StatusEffects/StatusEffects.h"
+
 
 #define ECC_Player ECC_GameTraceChannel1;
 
@@ -21,6 +23,7 @@
 #include "LoneWolf.generated.h"
 
 #pragma once
+
 UENUM(BlueprintType)
 namespace UAttackTypes
 {
