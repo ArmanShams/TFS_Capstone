@@ -37,6 +37,7 @@ void UUIWidget::NativeTick(const FGeometry& MyGeometry, float DeltaSeconds)
 		if (AWeapon_Ranged* RecastPlayerWeapon = Cast<AWeapon_Ranged>(Player->CurrentlyEquippedWeapon))
 		{
 			PlayerWeapon = Cast<AWeapon_Ranged>(Player->CurrentlyEquippedWeapon);
+			
 		}
 		else
 		{
@@ -45,6 +46,10 @@ void UUIWidget::NativeTick(const FGeometry& MyGeometry, float DeltaSeconds)
 		Health = FMath::FInterpTo(Health, Player->Health, DeltaSeconds, InterpolationSpeed);
 		CurrentForm = Player->CurrentForm;
 		Rage = FMath::FInterpTo(Rage, Player->Rage, DeltaSeconds, InterpolationSpeed);
+	}
+	if (PlayerWeapon != NULL)
+	{
+		AmmoCount = PlayerWeapon->CurrentAmmo;
 	}
 }
 

@@ -19,10 +19,9 @@ void UCharacterHumanAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			//if (CharacterController->CurrentForm == TransformationState::HUMAN)
 			{
 				bRolling = CharacterController->bIsRolling;
-				if (!bPrimaryFire)
-				{
-					bPrimaryFire = CharacterController->bAnimPrimaryFire;
-				}
+				
+				bPrimaryFire = CharacterController->bAnimPrimaryFire;
+				
 				ForwardMovementMultiplier = 0;
 				bSecondaryFiring = CharacterController->bAnimSecondaryFire;
 				bIsDead = CharacterController->Health <= 0.f;
@@ -407,11 +406,6 @@ void UCharacterHumanAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 				AnimMovementSpeed = CharacterController->AnimMovementSpeed;
 				AnimMovementDirection = CharacterController->AnimMovementDirection;
-
-				if (bPrimaryFire)
-				{
-					CharacterController->bAnimPrimaryFire = bPrimaryFire;
-				}
 			}
 		}
 	}
@@ -436,8 +430,10 @@ void UCharacterHumanAnimInstance::AnimNotify_ReloadEnd()
 		{
 			bReloading = false;
 			bPrimaryFire = false;
-			CharacterController->bAnimPrimaryFire = bPrimaryFire;
-			CharacterController->bShouldEnterReload = bReloading;
+			bSecondaryFiring = false;
+			CharacterController->SetAnimPrimaryFire(false);
+			CharacterController->SetAnimSecondaryFire(false);
+			CharacterController->SetShouldReload(false);
 		}
 	}
 }
@@ -462,7 +458,9 @@ void UCharacterHumanAnimInstance::AnimNotify_EndPrimaryFire()
 		if (CharacterController != NULL)
 		{
 			bPrimaryFire = false;
-			CharacterController->bAnimPrimaryFire = bPrimaryFire;
+			bSecondaryFiring = false;
+			CharacterController->SetAnimPrimaryFire(false);
+			CharacterController->SetAnimSecondaryFire(false);
 		}
 	}
 }
@@ -534,8 +532,10 @@ void UCharacterHumanAnimInstance::ForceCompletionOfReload()
 		{
 			bReloading = false;
 			bPrimaryFire = false;
-			CharacterController->bAnimPrimaryFire = bPrimaryFire;
-			CharacterController->bShouldEnterReload = bReloading;
+			bSecondaryFiring = false;
+			CharacterController->SetAnimPrimaryFire(false);
+			CharacterController->SetAnimSecondaryFire(false);
+			CharacterController->SetShouldReload(false);
 			CharacterController->Reload();
 		}
 	}

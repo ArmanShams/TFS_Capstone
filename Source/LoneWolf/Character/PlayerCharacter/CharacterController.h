@@ -78,6 +78,9 @@ public:
 	//UFUNCTION()
 	//void OnComponentBeginOverlap(AActor* other);
 
+	void SetAnimPrimaryFire(bool NewValue);
+	void SetAnimSecondaryFire(bool NewValue);
+	void SetShouldReload(bool NewValue);
 	UFUNCTION()
 	void OnCollision(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 	UFUNCTION()
@@ -147,7 +150,6 @@ protected:
 	TSubclassOf<class AWeapon> DefaultWeapon;
 	TSubclassOf<class AWeapon> WolfWeapon;
 	
-
 	// HUD Widget references
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
 	TSubclassOf<class UUserWidget> wInGameHud;

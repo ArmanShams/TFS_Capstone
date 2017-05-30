@@ -27,6 +27,8 @@ public:
 	virtual UProjectileMovementComponent* GetProjectileMovementComponent() override;
 
 protected:
+	TSubclassOf<class AActor> FireBPClass;
+	AActor* FireBP;
 
 	//class AActor* Owner;
 

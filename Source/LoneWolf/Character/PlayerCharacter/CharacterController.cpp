@@ -540,6 +540,7 @@ void ACharacterController::OnMouseMove(float scale)
 								{
 									DesiredWeaponRotation.Pitch = 0.f;
 								}
+								
 								if (DirectionHorizontal.Size() > 200.f)
 								{
 									FRotator YawRotation = (OutHitResultResult.Location - CurrentlyEquippedWeapon->GetActorLocation()).Rotation();
@@ -549,6 +550,8 @@ void ACharacterController::OnMouseMove(float scale)
 								{
 									DesiredWeaponRotation.Yaw = OldRotation.Yaw;
 								}
+								
+								
 								//FVector DirectionHorizontal = FVector(OutHitResultResult.Location.X - GetActorLocation().X, OutHitResultResult.Location.Y - GetActorLocation().Y, OutHitResultResult.Location.Z - GetActorLocation().Z);
 							}
 							else
@@ -563,6 +566,7 @@ void ACharacterController::OnMouseMove(float scale)
 								}
 								
 							}
+							DesiredWeaponRotation.Roll = 0.f;
 							CurrentlyEquippedWeapon->SetActorRotation(FMath::RInterpTo(CurrentlyEquippedWeapon->GetActorRotation(), DesiredWeaponRotation, GetWorld()->GetDeltaSeconds(), TurnRate * TurnRate));
 						}
 					}
@@ -668,23 +672,42 @@ EightDirectional ACharacterController::GetRelativeMovement()
 	return MoveDirection;
 }
 
+void ACharacterController::SetAnimPrimaryFire(bool NewValue)
+{
+	bAnimPrimaryFire = NewValue;
+}
+
+void ACharacterController::SetAnimSecondaryFire(bool NewValue)
+{
+	bAnimSecondaryFire = NewValue;
+}
+
+void ACharacterController::SetShouldReload(bool NewValue)
+{
+	bShouldEnterReload = NewValue;
+}
+
 void ACharacterController::OnShootPressed()
 {
 	if (CurrentlyEquippedWeapon != NULL)
 	{
-		if (!bIsInHardCC && !bIsRolling)
+		if (!bIsInHardCC && !bIsRolling && !bAnimSecondaryFire)
 		{
 			switch (CurrentForm)
 			{
 			case TransformationState::DEAD:
 				break;
 			case TransformationState::HUMAN:
-				if (!bShouldEnterReload)
+				if (!bShouldEnterReload && CurrentlyEquippedWeapon->CanFire())
 				{
 					if (!bAnimPrimaryFire)
 					{
 						bAnimPrimaryFire = true;
 						CurrentlyEquippedWeapon->Fire();
+					}
+					if (bAnimSecondaryFire)
+					{
+						bAnimSecondaryFire = false;
 					}
 				}
 				break;
@@ -721,6 +744,7 @@ void ACharacterController::OnAltShootPressed()
 			case TransformationState::HUMAN:
 				if (!bShouldEnterReload)
 				{
+					bAnimPrimaryFire = false;
 					bAnimSecondaryFire = true;
 					CurrentlyEquippedWeapon->AltFire();
 				}

@@ -60,11 +60,10 @@ bool AWeapon_PlayerRevolver::Fire()
 
 bool AWeapon_PlayerRevolver::AltFire()
 {
-	if (Super::AltFire())
+	TimeSinceLastFire = RateOfFire;
+	//if (Super::AltFire())
 	{
 		UE_LOG(LogTemp, Display, TEXT("ALTFIRING BUT ONLY AT AN APPROPRIATE SPEED"));
-		TimeSinceLastFire = RateOfFire;
-
 		bFanFiring = true;
 		return true;
 	}

@@ -34,9 +34,10 @@ public:
 	
 
 	virtual void ThrowMolotov();
+	virtual void RollKeg();
 	virtual bool GetIsAttacking();
 	virtual void SetIsAttacking(bool NewValue);
-	
+
 protected:
 	virtual AWeapon* EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip) override;
 
@@ -57,4 +58,5 @@ protected:
 
 	friend class UBartenderAIAnimInstance;
 	friend class UBTTask_BountyHunterAttack;
+	friend class UBTTask_BartenderRollKeg;
 };

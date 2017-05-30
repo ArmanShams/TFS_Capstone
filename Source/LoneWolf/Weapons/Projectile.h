@@ -27,10 +27,10 @@ protected:
 
 
 	// Sphere collision component
-	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
+	UPROPERTY(VisibleDefaultsOnly, Category = "Projectile")
 	class USphereComponent* CollisionComponent;
 
-	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
+	UPROPERTY(VisibleDefaultsOnly, Category = "Projectile")
 	class UStaticMeshComponent* MeshComponent;
 
 	// Projectile movement component
@@ -40,16 +40,16 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Collision)
 	float SphereRadius = 5.0f;
 
-	UPROPERTY(EditAnywhere, Category = Projectile)
+	UPROPERTY(EditAnywhere, Category = "Projectile")
 	float InitSpeed = 100.0f;
 
-	UPROPERTY(EditAnywhere, Category = Projectile)
+	UPROPERTY(EditAnywhere, Category = "Projectile")
 	float MaxSpeed = 100.0f;
 
-	UPROPERTY(EditAnywhere, Category = Projectile)
+	UPROPERTY(EditAnywhere, Category = "Projectile")
 	float LifeTime = 3.0f;
 
-	UPROPERTY(EditAnywhere, Category = Projectile)
+	UPROPERTY(EditAnywhere, Category = "Projectile")
 	float BulletImpulse = 100.0f;
 
 	float Damage;
