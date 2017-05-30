@@ -185,7 +185,7 @@ bool AEnemy::bIsInRange(float OveriddenDesiredRange)
  
 					//UE_LOG(LogTemp, Warning, TEXT("MyLocation is %s"), *MyLocation.ToString());
 					//UE_LOG(LogTemp, Warning, TEXT("CurrentDistance is %f"), CurrentDistance);
-					return CurrentDistance < DesiredRange;
+					return CurrentDistance <= DesiredRange;
 
 				}
 			}
