@@ -10,7 +10,7 @@ UENUM(BlueprintType)
 enum class SheriffState : uint8
 {
 	IDLE			UMETA(DisplayName = "Idle"),
-	ATTACKING		UMETA(DisplayName = "Ranged"),
+	ATTACKING		UMETA(DisplayName = "Attacking"),
 	CASTING			UMETA(DisplayName = "Casting"),
 	LASSO			UMETA(DisplayName = "Lasso"),
 	RELOADING		UMETA(DisplayName = "Reloading"),
@@ -85,6 +85,7 @@ protected: //Blackboard Key Booleans
 	bool bInLassoRange;
 	bool bInAttackRange;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
 	float CushionSpace;
 
 	void Aim(ACharacterController* PlayerToAimAt);

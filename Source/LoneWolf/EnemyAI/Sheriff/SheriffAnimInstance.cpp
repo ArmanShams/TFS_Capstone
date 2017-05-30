@@ -80,3 +80,13 @@ void USheriffAnimInstance::AnimNotify_EndReload()
 		}
 	}
 }
+
+void USheriffAnimInstance::AnimNotify_EndThrow()
+{
+	Sheriff->SetSheriffState(SheriffState::LASSO);
+}
+
+void USheriffAnimInstance::AnimNotify_ReturnToIdle()
+{
+	Sheriff->SetSheriffState(SheriffState::IDLE);
+}

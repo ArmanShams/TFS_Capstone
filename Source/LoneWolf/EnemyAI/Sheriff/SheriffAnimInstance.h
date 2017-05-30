@@ -39,6 +39,12 @@ protected:
 	UFUNCTION()
 	void AnimNotify_EndReload();
 
+	UFUNCTION()
+	void AnimNotify_EndThrow();
+
+	UFUNCTION()
+	void AnimNotify_ReturnToIdle();
+
 	class ASheriffAI* Sheriff;
 
 	friend class ASheriffAI;
