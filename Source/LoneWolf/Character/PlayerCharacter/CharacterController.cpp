@@ -431,7 +431,7 @@ void ACharacterController::OnMoveForward(float scale)
 		{
 			if (LookDirection != MoveDirection)
 			{
-				OrientMeshToMovementDirection();
+				//OrientMeshToMovementDirection();
 			}
 			VerticalMove = 1;	
 		}
@@ -439,7 +439,7 @@ void ACharacterController::OnMoveForward(float scale)
 		{
 			if (LookDirection != MoveDirection)
 			{
-				OrientMeshToMovementDirection();
+				//OrientMeshToMovementDirection();
 			}
 			VerticalMove = -1;
 		}
@@ -459,7 +459,7 @@ void ACharacterController::OnMoveRight(float scale)
 		{
 			if (LookDirection != MoveDirection)
 			{
-				OrientMeshToMovementDirection();
+				//OrientMeshToMovementDirection();
 			}
 			HorizontalMove = 1;
 		}
@@ -467,7 +467,7 @@ void ACharacterController::OnMoveRight(float scale)
 		{
 			if (LookDirection != MoveDirection)
 			{
-				OrientMeshToMovementDirection();
+				//OrientMeshToMovementDirection();
 			}
 			HorizontalMove = -1;
 		}
@@ -541,7 +541,7 @@ void ACharacterController::OnMouseMove(float scale)
 									DesiredWeaponRotation.Pitch = 0.f;
 								}
 								
-								if (DirectionHorizontal.Size() > 200.f)
+								if (DirectionHorizontal.Size() > 225.55f)
 								{
 									FRotator YawRotation = (OutHitResultResult.Location - CurrentlyEquippedWeapon->GetActorLocation()).Rotation();
 									DesiredWeaponRotation.Yaw = YawRotation.Yaw;
@@ -550,7 +550,6 @@ void ACharacterController::OnMouseMove(float scale)
 								{
 									DesiredWeaponRotation.Yaw = OldRotation.Yaw;
 								}
-								
 								
 								//FVector DirectionHorizontal = FVector(OutHitResultResult.Location.X - GetActorLocation().X, OutHitResultResult.Location.Y - GetActorLocation().Y, OutHitResultResult.Location.Z - GetActorLocation().Z);
 							}
