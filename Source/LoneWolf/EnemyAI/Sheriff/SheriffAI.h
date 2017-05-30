@@ -77,6 +77,9 @@ protected: //Weapons
 	UPROPERTY(EditAnywhere)
 	class UCableComponent* LassoCableComponent;
 
+	UPROPERTY(EditDefaultsOnly)
+	USphereComponent* SphereComponent;
+
 protected: //Blackboard Key Booleans
 	bool bIsStunned;
 	bool bIsFleeing;

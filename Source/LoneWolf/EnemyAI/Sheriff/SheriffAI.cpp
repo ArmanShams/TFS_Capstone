@@ -33,6 +33,10 @@ ASheriffAI::ASheriffAI()
 	LassoCableComponent->AttachTo(GetMesh(), LassoSocket);
 	//LassoCableComponent->AttachEndTo();
 
+	SphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere Component"));
+	SphereComponent->SetupAttachment(RootComponent);
+
+
 	ConstructorHelpers::FClassFinder<AWeapon>ShotgunAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/Sheriff/SheriffShotgunBP.SheriffShotgunBP_C'"));
 	if (ShotgunAsset.Class)
 	{
