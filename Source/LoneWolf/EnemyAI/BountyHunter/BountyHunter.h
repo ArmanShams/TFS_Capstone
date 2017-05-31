@@ -42,21 +42,26 @@ public:
 	// Implemented public functions
 	virtual BountyHunterState GetBountyHunterState();
 
-protected: //Inherited protected functions from AEnemy
+//Inherited protected functions from AEnemy
+protected: 
 	virtual bool bIsSoftCC() override;
 	virtual bool bIsHardCC() override;
 	virtual void Die() override;
 	virtual AWeapon* EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip) override;
 
-protected: //Implemented Functions
+//Implemented Functions
+protected: 
 	virtual void Attack();
 	virtual void FixWeaponRotation();
 	virtual void Flee(class ACharacterController* PlayerToFleeFrom);
 	virtual void SetBearTrap(class ATrapLocations* NewTrapLocation, const FHitResult & SweepResult);
-	
+	virtual void DecrementActiveBearTraps(ABearTrap* TrapToRemove);
+
 	UFUNCTION()
 	virtual void OnComponentOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	virtual void SetBountyHunterState(BountyHunterState NewState);
+
+	void Aim(class ACharacterController* Player);
 
 protected:
 	//The maximum number of traps he is allowed to put in the world, extra traps will delete the obsolete trap.
@@ -82,8 +87,6 @@ protected:
 protected: //Blackboard Key Booleans
 	bool bIsStunned;
 	bool bIsFleeing;
-
-	void Aim(class ACharacterController* PlayerRecasted);
 
 	//Booleans to check for range
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")

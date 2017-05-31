@@ -14,9 +14,7 @@ AProjectile::AProjectile()
 	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("SphereCollisionComponent"));
 	CollisionComponent->InitSphereRadius(SphereRadius);
 	//CollisionComponent->BodyInstance.SetCollisionProfileName("Projectile");
-	CollisionComponent->OnComponentHit.AddDynamic(this, &ThisClass::OnHit);
 	CollisionComponent->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Ignore);
-
 
 	// Root Component
 	RootComponent = CollisionComponent;
@@ -45,6 +43,7 @@ AProjectile::AProjectile()
 void AProjectile::BeginPlay()
 {
 	Super::BeginPlay();
+	CollisionComponent->OnComponentHit.AddDynamic(this, &ThisClass::OnHit);
 }
 
 void AProjectile::Tick(float DeltaTime)

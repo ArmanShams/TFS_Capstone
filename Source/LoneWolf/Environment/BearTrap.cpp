@@ -20,26 +20,21 @@ ABearTrap::ABearTrap()
 	//MeshComponent->SetupAttachment(RootComponent);
 	MeshComponent->SetupAttachment(TrapCollider);
 	MeshComponent->SetSkeletalMesh(BearTrapSkeletalMesh.Object);
-	MeshComponent->SetSimulatePhysics(true);
-	MeshComponent->WakeRigidBody();
+	Mesh = BearTrapSkeletalMesh.Object;
 
 	radius = 100.f;
 	Damage = 5;
 	TrapCollider->SetCollisionProfileName(TEXT("Traps"));
 	TrapCollider->SetSphereRadius(radius);
-	//TrapCollider->SetupAttachment(MeshComponent, "armA");
-	TrapCollider->OnComponentBeginOverlap.AddDynamic(this, &ABearTrap::OnComponentBeginOverlap);
-	TrapCollider->OnComponentEndOverlap.AddDynamic(this, &ABearTrap::OnComponentEndOverlap);
-	TrapCollider->SetSimulatePhysics(true);
-	TrapCollider->WakeRigidBody();
-	bIsVisible = false;
-	BountyHunter = NULL;
+	
+	RootComponent = TrapCollider;
 }
 
 void ABearTrap::BeginPlay()
 {
 	Super::BeginPlay();
-	if(!bIsVisible) { this->SetActorHiddenInGame(true); }
+	TrapCollider->OnComponentBeginOverlap.AddDynamic(this, &ABearTrap::OnComponentBeginOverlap);
+	TrapCollider->OnComponentEndOverlap.AddDynamic(this, &ABearTrap::OnComponentEndOverlap);
 }
 
 void ABearTrap::Tick(float DeltaTime)
@@ -49,26 +44,28 @@ void ABearTrap::Tick(float DeltaTime)
 
 void ABearTrap::SetOwner(AActor* NewOwner)
 {
-	NewOwner = BountyHunter;
+	Super::SetOwner(NewOwner);
 }
 
 void ABearTrap::Destroyed()
 {
-	if (LocationBeingOccupied != NULL)	{ LocationBeingOccupied->bIsOccupied = false; }
 	Super::Destroyed();
 }
 
 void ABearTrap::SetLocationBeingOccupied(class ATrapLocations* NewLocationBeingOccupied)
 {
 	LocationBeingOccupied = NewLocationBeingOccupied;
+	LocationBeingOccupied->bIsOccupied = true;
 }
 
 void ABearTrap::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (ACharacterController* Player = Cast<ACharacterController>(OtherActor))
 	{
-		bIsVisible = true;
 		this->SetActorHiddenInGame(false);
+		SetActorLocation(Player->GetMesh()->GetComponentLocation());
+		MeshComponent->SetRelativeLocation(FVector::ZeroVector);
+		Player->AddStatusEffect(UStatusEffect_SoftCrowdControl::StaticClass(), false, 0.25f, 0.f, Cast<ALoneWolfCharacter>(Player));
 		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, FString::Printf(TEXT("You've stepped on a bear trap, dodge to avoid snapping your legs!")));
 	}
 }
@@ -77,19 +74,28 @@ void ABearTrap::OnComponentEndOverlap(UPrimitiveComponent* OverlappedComp, AActo
 {
 	if (ACharacterController* Player = Cast<ACharacterController>(OtherActor))
 	{
-		UE_LOG(LogTemp, Display, TEXT("The trap activated and applied damage to you"));
-		if (BountyHunter != NULL)
+		AActor* OwningActor = GetOwner();
+		if (OwningActor != NULL)
 		{
-			if (APawn* RecastedOwner = Cast<APawn>(BountyHunter))
+			if (APawn* RecastedOwner = Cast<APawn>(OwningActor))
 			{
-				UGameplayStatics::ApplyDamage(OtherActor, Damage, BountyHunter->GetController(), this, TSubclassOf<UDamageType>());
-				Player->AddStatusEffect(UStatusEffect_SoftCrowdControl::StaticClass(), false, 2.4f, 0.f, Cast<ALoneWolfCharacter>(BountyHunter));
+				UGameplayStatics::ApplyDamage(OtherActor, Damage, RecastedOwner->GetController(), this, TSubclassOf<UDamageType>());
+				Player->AddStatusEffect(UStatusEffect_SoftCrowdControl::StaticClass(), false, 2.4f, 0.f, Cast<ALoneWolfCharacter>(RecastedOwner));
+
+				if (ABountyHunter* RecastToBountyHunter = Cast<ABountyHunter>(RecastedOwner))
+				{
+					RecastToBountyHunter->DecrementActiveBearTraps(this);
+				}
 			}
 		}
 		else
 		{
 			UGameplayStatics::ApplyDamage(OtherActor, Damage, GetWorld()->GetFirstPlayerController(), this, TSubclassOf<UDamageType>());
 			Player->AddStatusEffect(UStatusEffect_SoftCrowdControl::StaticClass(), false, 2.4f, 0.f, Cast<ALoneWolfCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn()));
+		}
+		if (LocationBeingOccupied != NULL)
+		{
+			LocationBeingOccupied->bIsOccupied = false;
 		}
 		Destroy();
 	}

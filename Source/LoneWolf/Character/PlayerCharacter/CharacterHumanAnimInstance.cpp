@@ -19,10 +19,9 @@ void UCharacterHumanAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			//if (CharacterController->CurrentForm == TransformationState::HUMAN)
 			{
 				bRolling = CharacterController->bIsRolling;
-				if (!bPrimaryFire)
-				{
-					bPrimaryFire = CharacterController->bAnimPrimaryFire;
-				}
+				
+				bPrimaryFire = CharacterController->bAnimPrimaryFire;
+				
 				ForwardMovementMultiplier = 0;
 				bSecondaryFiring = CharacterController->bAnimSecondaryFire;
 				bIsDead = CharacterController->Health <= 0.f;
@@ -35,383 +34,386 @@ void UCharacterHumanAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 				EightDirectional CharacterFacing = CharacterController->GetRelativeFacing();
 				EightDirectional CharacterMovement = CharacterController->GetRelativeMovement();
 
-				switch (CharacterFacing)
+				if (!CharacterController->bIsInSoftCC)
 				{
-				case EightDirectional::NONE:
-					break;
-				case EightDirectional::RIGHT:
-					switch (CharacterMovement)
+					switch (CharacterFacing)
 					{
 					case EightDirectional::NONE:
-						ForwardMovementMultiplier = 0;
-						RightMovementMultiplier = 0;
 						break;
 					case EightDirectional::RIGHT:
-						ForwardMovementMultiplier = 1;
-						RightMovementMultiplier = 0;
+						switch (CharacterMovement)
+						{
+						case EightDirectional::NONE:
+							ForwardMovementMultiplier = 0;
+							RightMovementMultiplier = 0;
+							break;
+						case EightDirectional::RIGHT:
+							ForwardMovementMultiplier = 1;
+							RightMovementMultiplier = 0;
+							break;
+						case EightDirectional::DOWN_RIGHT:
+							ForwardMovementMultiplier = 1;
+							RightMovementMultiplier = 1;
+							break;
+						case EightDirectional::DOWN:
+							ForwardMovementMultiplier = 0;
+							RightMovementMultiplier = 1;
+							break;
+						case EightDirectional::DOWN_LEFT:
+							ForwardMovementMultiplier = -1;
+							RightMovementMultiplier = 1;
+							break;
+						case EightDirectional::LEFT:
+							ForwardMovementMultiplier = -1;
+							RightMovementMultiplier = 0;
+							break;
+						case EightDirectional::UP_LEFT:
+							ForwardMovementMultiplier = -1;
+							RightMovementMultiplier = -1;
+							break;
+						case EightDirectional::UP:
+							ForwardMovementMultiplier = 0;
+							RightMovementMultiplier = -1;
+							break;
+						case EightDirectional::UP_RIGHT:
+							ForwardMovementMultiplier = 1;
+							RightMovementMultiplier = -1;
+							break;
+						default:
+							ForwardMovementMultiplier = 0;
+							RightMovementMultiplier = 0;
+							break;
+						}
 						break;
 					case EightDirectional::DOWN_RIGHT:
-						ForwardMovementMultiplier = 1;
-						RightMovementMultiplier = 1;
+						switch (CharacterMovement)
+						{
+						case EightDirectional::NONE:
+							ForwardMovementMultiplier = 0;
+							RightMovementMultiplier = 0;
+							break;
+						case EightDirectional::RIGHT:
+							ForwardMovementMultiplier = 1;
+							RightMovementMultiplier = -1;
+							break;
+						case EightDirectional::DOWN_RIGHT:
+							ForwardMovementMultiplier = 1;
+							RightMovementMultiplier = 0;
+							break;
+						case EightDirectional::DOWN:
+							ForwardMovementMultiplier = 1;
+							RightMovementMultiplier = 1;
+							break;
+						case EightDirectional::DOWN_LEFT:
+							ForwardMovementMultiplier = 0;
+							RightMovementMultiplier = 1;
+							break;
+						case EightDirectional::LEFT:
+							ForwardMovementMultiplier = -1;
+							RightMovementMultiplier = 1;
+							break;
+						case EightDirectional::UP_LEFT:
+							ForwardMovementMultiplier = -1;
+							RightMovementMultiplier = 0;
+							break;
+						case EightDirectional::UP:
+							ForwardMovementMultiplier = -1;
+							RightMovementMultiplier = -1;
+							break;
+						case EightDirectional::UP_RIGHT:
+							ForwardMovementMultiplier = 0;
+							RightMovementMultiplier = -1;
+							break;
+						default:
+							ForwardMovementMultiplier = 0;
+							RightMovementMultiplier = 0;
+							break;
+						}
 						break;
 					case EightDirectional::DOWN:
-						ForwardMovementMultiplier = 0;
-						RightMovementMultiplier = 1;
+						switch (CharacterMovement)
+						{
+						case EightDirectional::NONE:
+							ForwardMovementMultiplier = 0;
+							RightMovementMultiplier = 0;
+							break;
+						case EightDirectional::RIGHT:
+							ForwardMovementMultiplier = 0;
+							RightMovementMultiplier = -1;
+							break;
+						case EightDirectional::DOWN_RIGHT:
+							ForwardMovementMultiplier = 1;
+							RightMovementMultiplier = -1;
+							break;
+						case EightDirectional::DOWN:
+							ForwardMovementMultiplier = 1;
+							RightMovementMultiplier = 0;
+							break;
+						case EightDirectional::DOWN_LEFT:
+							ForwardMovementMultiplier = 1;
+							RightMovementMultiplier = 1;
+							break;
+						case EightDirectional::LEFT:
+							ForwardMovementMultiplier = 0;
+							RightMovementMultiplier = 1;
+							break;
+						case EightDirectional::UP_LEFT:
+							ForwardMovementMultiplier = -1;
+							RightMovementMultiplier = 1;
+							break;
+						case EightDirectional::UP:
+							ForwardMovementMultiplier = -1;
+							RightMovementMultiplier = 0;
+							break;
+						case EightDirectional::UP_RIGHT:
+							ForwardMovementMultiplier = -1;
+							RightMovementMultiplier = -1;
+							break;
+						default:
+							ForwardMovementMultiplier = 0;
+							RightMovementMultiplier = 0;
+							break;
+						}
 						break;
 					case EightDirectional::DOWN_LEFT:
-						ForwardMovementMultiplier = -1;
-						RightMovementMultiplier = 1;
+						switch (CharacterMovement)
+						{
+						case EightDirectional::NONE:
+							ForwardMovementMultiplier = 0;
+							RightMovementMultiplier = 0;
+							break;
+						case EightDirectional::RIGHT:
+							ForwardMovementMultiplier = -1;
+							RightMovementMultiplier = -1;
+							break;
+						case EightDirectional::DOWN_RIGHT:
+							ForwardMovementMultiplier = 0;
+							RightMovementMultiplier = -1;
+							break;
+						case EightDirectional::DOWN:
+							ForwardMovementMultiplier = 1;
+							RightMovementMultiplier = -1;
+							break;
+						case EightDirectional::DOWN_LEFT:
+							ForwardMovementMultiplier = 1;
+							RightMovementMultiplier = 0;
+							break;
+						case EightDirectional::LEFT:
+							ForwardMovementMultiplier = 0;
+							RightMovementMultiplier = 1;
+							break;
+						case EightDirectional::UP_LEFT:
+							ForwardMovementMultiplier = 0;
+							RightMovementMultiplier = -1;
+							break;
+						case EightDirectional::UP:
+							ForwardMovementMultiplier = -1;
+							RightMovementMultiplier = 1;
+							break;
+						case EightDirectional::UP_RIGHT:
+							ForwardMovementMultiplier = -1;
+							RightMovementMultiplier = 0;
+							break;
+						default:
+							ForwardMovementMultiplier = 0;
+							RightMovementMultiplier = 0;
+							break;
+						}
 						break;
 					case EightDirectional::LEFT:
-						ForwardMovementMultiplier = -1;
-						RightMovementMultiplier = 0;
+						switch (CharacterMovement)
+						{
+						case EightDirectional::NONE:
+							ForwardMovementMultiplier = 0;
+							RightMovementMultiplier = 0;
+							break;
+						case EightDirectional::RIGHT:
+							ForwardMovementMultiplier = -1;
+							RightMovementMultiplier = 0;
+							break;
+						case EightDirectional::DOWN_RIGHT:
+							ForwardMovementMultiplier = -1;
+							RightMovementMultiplier = -1;
+							break;
+						case EightDirectional::DOWN:
+							ForwardMovementMultiplier = 0;
+							RightMovementMultiplier = -1;
+							break;
+						case EightDirectional::DOWN_LEFT:
+							ForwardMovementMultiplier = 1;
+							RightMovementMultiplier = -1;
+							break;
+						case EightDirectional::LEFT:
+							ForwardMovementMultiplier = 1;
+							RightMovementMultiplier = 0;
+							break;
+						case EightDirectional::UP_LEFT:
+							ForwardMovementMultiplier = 1;
+							RightMovementMultiplier = 1;
+							break;
+						case EightDirectional::UP:
+							ForwardMovementMultiplier = 0;
+							RightMovementMultiplier = 1;
+							break;
+						case EightDirectional::UP_RIGHT:
+							ForwardMovementMultiplier = -1;
+							RightMovementMultiplier = 1;
+							break;
+						default:
+							ForwardMovementMultiplier = 0;
+							RightMovementMultiplier = 0;
+							break;
+						}
 						break;
 					case EightDirectional::UP_LEFT:
-						ForwardMovementMultiplier = -1;
-						RightMovementMultiplier = -1;
+						switch (CharacterMovement)
+						{
+						case EightDirectional::NONE:
+							ForwardMovementMultiplier = 0;
+							RightMovementMultiplier = 0;
+							break;
+						case EightDirectional::RIGHT:
+							ForwardMovementMultiplier = -1;
+							RightMovementMultiplier = 1;
+							break;
+						case EightDirectional::DOWN_RIGHT:
+							ForwardMovementMultiplier = -1;
+							RightMovementMultiplier = 0;
+							break;
+						case EightDirectional::DOWN:
+							ForwardMovementMultiplier = -1;
+							RightMovementMultiplier = -1;
+							break;
+						case EightDirectional::DOWN_LEFT:
+							ForwardMovementMultiplier = 0;
+							RightMovementMultiplier = -1;
+							break;
+						case EightDirectional::LEFT:
+							ForwardMovementMultiplier = 1;
+							RightMovementMultiplier = -1;
+							break;
+						case EightDirectional::UP_LEFT:
+							ForwardMovementMultiplier = 1;
+							RightMovementMultiplier = 0;
+							break;
+						case EightDirectional::UP:
+							ForwardMovementMultiplier = 1;
+							RightMovementMultiplier = 1;
+							break;
+						case EightDirectional::UP_RIGHT:
+							ForwardMovementMultiplier = 0;
+							RightMovementMultiplier = 1;
+							break;
+						default:
+							ForwardMovementMultiplier = 0;
+							RightMovementMultiplier = 0;
+							break;
+						}
 						break;
 					case EightDirectional::UP:
-						ForwardMovementMultiplier = 0;
-						RightMovementMultiplier = -1;
+						switch (CharacterMovement)
+						{
+						case EightDirectional::NONE:
+							ForwardMovementMultiplier = 0;
+							RightMovementMultiplier = 0;
+							break;
+						case EightDirectional::RIGHT:
+							ForwardMovementMultiplier = 0;
+							RightMovementMultiplier = 1;
+							break;
+						case EightDirectional::DOWN_RIGHT:
+							ForwardMovementMultiplier = -1;
+							RightMovementMultiplier = 1;
+							break;
+						case EightDirectional::DOWN:
+							ForwardMovementMultiplier = -1;
+							RightMovementMultiplier = 0;
+							break;
+						case EightDirectional::DOWN_LEFT:
+							ForwardMovementMultiplier = -1;
+							RightMovementMultiplier = -1;
+							break;
+						case EightDirectional::LEFT:
+							ForwardMovementMultiplier = 0;
+							RightMovementMultiplier = -1;
+							break;
+						case EightDirectional::UP_LEFT:
+							ForwardMovementMultiplier = 1;
+							RightMovementMultiplier = -1;
+							break;
+						case EightDirectional::UP:
+							ForwardMovementMultiplier = 1;
+							RightMovementMultiplier = 0;
+							break;
+						case EightDirectional::UP_RIGHT:
+							ForwardMovementMultiplier = 1;
+							RightMovementMultiplier = 1;
+							break;
+						default:
+							ForwardMovementMultiplier = 0;
+							RightMovementMultiplier = 0;
+							break;
+						}
 						break;
 					case EightDirectional::UP_RIGHT:
-						ForwardMovementMultiplier = 1;
-						RightMovementMultiplier = -1;
+						switch (CharacterMovement)
+						{
+						case EightDirectional::NONE:
+							ForwardMovementMultiplier = 0;
+							RightMovementMultiplier = 0;
+							break;
+						case EightDirectional::RIGHT:
+							ForwardMovementMultiplier = 1;
+							RightMovementMultiplier = 1;
+							break;
+						case EightDirectional::DOWN_RIGHT:
+							ForwardMovementMultiplier = 0;
+							RightMovementMultiplier = 1;
+							break;
+						case EightDirectional::DOWN:
+							ForwardMovementMultiplier = -1;
+							RightMovementMultiplier = 1;
+							break;
+						case EightDirectional::DOWN_LEFT:
+							ForwardMovementMultiplier = -1;
+							RightMovementMultiplier = 0;
+							break;
+						case EightDirectional::LEFT:
+							ForwardMovementMultiplier = -1;
+							RightMovementMultiplier = -1;
+							break;
+						case EightDirectional::UP_LEFT:
+							ForwardMovementMultiplier = 0;
+							RightMovementMultiplier = -1;
+							break;
+						case EightDirectional::UP:
+							ForwardMovementMultiplier = 1;
+							RightMovementMultiplier = -1;
+							break;
+						case EightDirectional::UP_RIGHT:
+							ForwardMovementMultiplier = 1;
+							RightMovementMultiplier = 0;
+							break;
+						default:
+							ForwardMovementMultiplier = 0;
+							RightMovementMultiplier = 0;
+							break;
+						}
 						break;
 					default:
 						ForwardMovementMultiplier = 0;
 						RightMovementMultiplier = 0;
 						break;
 					}
-					break;
-				case EightDirectional::DOWN_RIGHT:
-					switch (CharacterMovement)
-					{
-					case EightDirectional::NONE:
-						ForwardMovementMultiplier = 0;
-						RightMovementMultiplier = 0;
-						break;
-					case EightDirectional::RIGHT:
-						ForwardMovementMultiplier = 1;
-						RightMovementMultiplier = -1;
-						break;
-					case EightDirectional::DOWN_RIGHT:
-						ForwardMovementMultiplier = 1;
-						RightMovementMultiplier = 0;
-						break;
-					case EightDirectional::DOWN:
-						ForwardMovementMultiplier = 1;
-						RightMovementMultiplier = 1;
-						break;
-					case EightDirectional::DOWN_LEFT:
-						ForwardMovementMultiplier = 0;
-						RightMovementMultiplier = 1;
-						break;
-					case EightDirectional::LEFT:
-						ForwardMovementMultiplier = -1;
-						RightMovementMultiplier = 1;
-						break;
-					case EightDirectional::UP_LEFT:
-						ForwardMovementMultiplier = -1;
-						RightMovementMultiplier = 0;
-						break;
-					case EightDirectional::UP:
-						ForwardMovementMultiplier = -1;
-						RightMovementMultiplier = -1;
-						break;
-					case EightDirectional::UP_RIGHT:
-						ForwardMovementMultiplier = 0;
-						RightMovementMultiplier = -1;
-						break;
-					default:
-						ForwardMovementMultiplier = 0;
-						RightMovementMultiplier = 0;
-						break;
-					}
-					break;
-				case EightDirectional::DOWN:
-					switch (CharacterMovement)
-					{
-					case EightDirectional::NONE:
-						ForwardMovementMultiplier = 0;
-						RightMovementMultiplier = 0;
-						break;
-					case EightDirectional::RIGHT:
-						ForwardMovementMultiplier = 0;
-						RightMovementMultiplier = -1;
-						break;
-					case EightDirectional::DOWN_RIGHT:
-						ForwardMovementMultiplier = 1;
-						RightMovementMultiplier = -1;
-						break;
-					case EightDirectional::DOWN:
-						ForwardMovementMultiplier = 1;
-						RightMovementMultiplier = 0;
-						break;
-					case EightDirectional::DOWN_LEFT:
-						ForwardMovementMultiplier = 1;
-						RightMovementMultiplier = 1;
-						break;
-					case EightDirectional::LEFT:
-						ForwardMovementMultiplier = 0;
-						RightMovementMultiplier = 1;
-						break;
-					case EightDirectional::UP_LEFT:
-						ForwardMovementMultiplier = -1;
-						RightMovementMultiplier = 1;
-						break;
-					case EightDirectional::UP:
-						ForwardMovementMultiplier = -1;
-						RightMovementMultiplier = 0;
-						break;
-					case EightDirectional::UP_RIGHT:
-						ForwardMovementMultiplier = -1;
-						RightMovementMultiplier = -1;
-						break;
-					default:
-						ForwardMovementMultiplier = 0;
-						RightMovementMultiplier = 0;
-						break;
-					}
-					break;
-				case EightDirectional::DOWN_LEFT:
-					switch (CharacterMovement)
-					{
-					case EightDirectional::NONE:
-						ForwardMovementMultiplier = 0;
-						RightMovementMultiplier = 0;
-						break;
-					case EightDirectional::RIGHT:
-						ForwardMovementMultiplier = -1;
-						RightMovementMultiplier = -1;
-						break;
-					case EightDirectional::DOWN_RIGHT:
-						ForwardMovementMultiplier = 0;
-						RightMovementMultiplier = -1;
-						break;
-					case EightDirectional::DOWN:
-						ForwardMovementMultiplier = 1;
-						RightMovementMultiplier = -1;
-						break;
-					case EightDirectional::DOWN_LEFT:
-						ForwardMovementMultiplier = 1;
-						RightMovementMultiplier = 0;
-						break;
-					case EightDirectional::LEFT:
-						ForwardMovementMultiplier = 0;
-						RightMovementMultiplier = 1;
-						break;
-					case EightDirectional::UP_LEFT:
-						ForwardMovementMultiplier = 0;
-						RightMovementMultiplier = -1;
-						break;
-					case EightDirectional::UP:
-						ForwardMovementMultiplier = -1;
-						RightMovementMultiplier = 1;
-						break;
-					case EightDirectional::UP_RIGHT:
-						ForwardMovementMultiplier = -1;
-						RightMovementMultiplier = 0;
-						break;
-					default:
-						ForwardMovementMultiplier = 0;
-						RightMovementMultiplier = 0;
-						break;
-					}
-					break;
-				case EightDirectional::LEFT:
-					switch (CharacterMovement)
-					{
-					case EightDirectional::NONE:
-						ForwardMovementMultiplier = 0;
-						RightMovementMultiplier = 0;
-						break;
-					case EightDirectional::RIGHT:
-						ForwardMovementMultiplier = -1;
-						RightMovementMultiplier = 0;
-						break;
-					case EightDirectional::DOWN_RIGHT:
-						ForwardMovementMultiplier = -1;
-						RightMovementMultiplier = -1;
-						break;
-					case EightDirectional::DOWN:
-						ForwardMovementMultiplier = 0;
-						RightMovementMultiplier = -1;
-						break;
-					case EightDirectional::DOWN_LEFT:
-						ForwardMovementMultiplier = 1;
-						RightMovementMultiplier = -1;
-						break;
-					case EightDirectional::LEFT:
-						ForwardMovementMultiplier = 1;
-						RightMovementMultiplier = 0;
-						break;
-					case EightDirectional::UP_LEFT:
-						ForwardMovementMultiplier = 1;
-						RightMovementMultiplier = 1;
-						break;
-					case EightDirectional::UP:
-						ForwardMovementMultiplier = 0;
-						RightMovementMultiplier = 1;
-						break;
-					case EightDirectional::UP_RIGHT:
-						ForwardMovementMultiplier = -1;
-						RightMovementMultiplier = 1;
-						break;
-					default:
-						ForwardMovementMultiplier = 0;
-						RightMovementMultiplier = 0;
-						break;
-					}
-					break;
-				case EightDirectional::UP_LEFT:
-					switch (CharacterMovement)
-					{
-					case EightDirectional::NONE:
-						ForwardMovementMultiplier = 0;
-						RightMovementMultiplier = 0;
-						break;
-					case EightDirectional::RIGHT:
-						ForwardMovementMultiplier = -1;
-						RightMovementMultiplier = 1;
-						break;
-					case EightDirectional::DOWN_RIGHT:
-						ForwardMovementMultiplier = -1;
-						RightMovementMultiplier = 0;
-						break;
-					case EightDirectional::DOWN:
-						ForwardMovementMultiplier = -1;
-						RightMovementMultiplier = -1;
-						break;
-					case EightDirectional::DOWN_LEFT:
-						ForwardMovementMultiplier = 0;
-						RightMovementMultiplier = -1;
-						break;
-					case EightDirectional::LEFT:
-						ForwardMovementMultiplier = 1;
-						RightMovementMultiplier = -1;
-						break;
-					case EightDirectional::UP_LEFT:
-						ForwardMovementMultiplier = 1;
-						RightMovementMultiplier = 0;
-						break;
-					case EightDirectional::UP:
-						ForwardMovementMultiplier = 1;
-						RightMovementMultiplier = 1;
-						break;
-					case EightDirectional::UP_RIGHT:
-						ForwardMovementMultiplier = 0;
-						RightMovementMultiplier = 1;
-						break;
-					default:
-						ForwardMovementMultiplier = 0;
-						RightMovementMultiplier = 0;
-						break;
-					}
-					break;
-				case EightDirectional::UP:
-					switch (CharacterMovement)
-					{
-					case EightDirectional::NONE:
-						ForwardMovementMultiplier = 0;
-						RightMovementMultiplier = 0;
-						break;
-					case EightDirectional::RIGHT:
-						ForwardMovementMultiplier = 0;
-						RightMovementMultiplier = 1;
-						break;
-					case EightDirectional::DOWN_RIGHT:
-						ForwardMovementMultiplier = -1;
-						RightMovementMultiplier = 1;
-						break;
-					case EightDirectional::DOWN:
-						ForwardMovementMultiplier = -1;
-						RightMovementMultiplier = 0;
-						break;
-					case EightDirectional::DOWN_LEFT:
-						ForwardMovementMultiplier = -1;
-						RightMovementMultiplier = -1;
-						break;
-					case EightDirectional::LEFT:
-						ForwardMovementMultiplier = 0;
-						RightMovementMultiplier = -1;
-						break;
-					case EightDirectional::UP_LEFT:
-						ForwardMovementMultiplier = 1;
-						RightMovementMultiplier = -1;
-						break;
-					case EightDirectional::UP:
-						ForwardMovementMultiplier = 1;
-						RightMovementMultiplier = 0;
-						break;
-					case EightDirectional::UP_RIGHT:
-						ForwardMovementMultiplier = 1;
-						RightMovementMultiplier = 1;
-						break;
-					default:
-						ForwardMovementMultiplier = 0;
-						RightMovementMultiplier = 0;
-						break;
-					}
-					break;
-				case EightDirectional::UP_RIGHT:
-					switch (CharacterMovement)
-					{
-					case EightDirectional::NONE:
-						ForwardMovementMultiplier = 0;
-						RightMovementMultiplier = 0;
-						break;
-					case EightDirectional::RIGHT:
-						ForwardMovementMultiplier = 1;
-						RightMovementMultiplier = 1;
-						break;
-					case EightDirectional::DOWN_RIGHT:
-						ForwardMovementMultiplier = 0;
-						RightMovementMultiplier = 1;
-						break;
-					case EightDirectional::DOWN:
-						ForwardMovementMultiplier = -1;
-						RightMovementMultiplier = 1;
-						break;
-					case EightDirectional::DOWN_LEFT:
-						ForwardMovementMultiplier = -1;
-						RightMovementMultiplier = 0;
-						break;
-					case EightDirectional::LEFT:
-						ForwardMovementMultiplier = -1;
-						RightMovementMultiplier = -1;
-						break;
-					case EightDirectional::UP_LEFT:
-						ForwardMovementMultiplier = 0;
-						RightMovementMultiplier = -1;
-						break;
-					case EightDirectional::UP:
-						ForwardMovementMultiplier = 1;
-						RightMovementMultiplier = -1;
-						break;
-					case EightDirectional::UP_RIGHT:
-						ForwardMovementMultiplier = 1;
-						RightMovementMultiplier = 0;
-						break;
-					default:
-						ForwardMovementMultiplier = 0;
-						RightMovementMultiplier = 0;
-						break;
-					}
-					break;
-				default:
+				}
+				else
+				{
 					ForwardMovementMultiplier = 0;
 					RightMovementMultiplier = 0;
-					break;
 				}
-
+			
 				AnimMovementSpeed = CharacterController->AnimMovementSpeed;
 				AnimMovementDirection = CharacterController->AnimMovementDirection;
-
-				if (bPrimaryFire)
-				{
-					CharacterController->bAnimPrimaryFire = bPrimaryFire;
-				}
 			}
 		}
 	}
@@ -436,8 +438,10 @@ void UCharacterHumanAnimInstance::AnimNotify_ReloadEnd()
 		{
 			bReloading = false;
 			bPrimaryFire = false;
-			CharacterController->bAnimPrimaryFire = bPrimaryFire;
-			CharacterController->bShouldEnterReload = bReloading;
+			bSecondaryFiring = false;
+			CharacterController->SetAnimPrimaryFire(false);
+			CharacterController->SetAnimSecondaryFire(false);
+			CharacterController->SetShouldReload(false);
 		}
 	}
 }
@@ -462,7 +466,9 @@ void UCharacterHumanAnimInstance::AnimNotify_EndPrimaryFire()
 		if (CharacterController != NULL)
 		{
 			bPrimaryFire = false;
-			CharacterController->bAnimPrimaryFire = bPrimaryFire;
+			bSecondaryFiring = false;
+			CharacterController->SetAnimPrimaryFire(false);
+			CharacterController->SetAnimSecondaryFire(false);
 		}
 	}
 }
@@ -534,8 +540,10 @@ void UCharacterHumanAnimInstance::ForceCompletionOfReload()
 		{
 			bReloading = false;
 			bPrimaryFire = false;
-			CharacterController->bAnimPrimaryFire = bPrimaryFire;
-			CharacterController->bShouldEnterReload = bReloading;
+			bSecondaryFiring = false;
+			CharacterController->SetAnimPrimaryFire(false);
+			CharacterController->SetAnimSecondaryFire(false);
+			CharacterController->SetShouldReload(false);
 			CharacterController->Reload();
 		}
 	}

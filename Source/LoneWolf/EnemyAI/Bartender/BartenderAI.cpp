@@ -4,6 +4,7 @@
 #include "BartenderAI.h"
 #include "Weapons/Projectile.h"
 #include "Weapons/Molotov.h"
+#include "Weapons/BartenderKeg.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyAllTypes.h"
 #include "BrainComponent.h"
@@ -127,7 +128,7 @@ void ABartenderAI::ThrowMolotov()
 {
 	if (AActor* ValidTarget = Cast<AActor>(Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent()->GetValueAsObject(TEXT("Target"))))
 	{
-		UClass* MolotovClass = LoadObject<UClass>(NULL, TEXT("Blueprint'/Game/Blueprints/Enemies/BartenderAI/MolotovBP.MolotovBP_C'")); //MolotovAsset();
+		UClass* MolotovClass = LoadObject<UClass>(NULL, TEXT("Blueprint'/Game/Blueprints/Enemies/BartenderAI/MolotovBP.MolotovBP_C'")); 
 		if (MolotovClass)
 		{
 			TSubclassOf<AMolotov> SubClassOfMolotov = MolotovClass;
@@ -144,6 +145,27 @@ void ABartenderAI::ThrowMolotov()
 			//	}
 			//}
 			SpawnedMolotov->SetMolotovVelocity(HitTargetLocationAtTime(SpawnedMolotov->GetActorLocation(), TargetDestination, FVector(0.f, 0.f, GetWorld()->GetGravityZ()), TimeForMolotovToReachTargetLocation));
+			TimeSinceLastAttack = 0.f;
+			UE_LOG(LogTemp, Display, TEXT("Time of launching Molotov: %f"), GetWorld()->GetTimeSeconds());
+			//DrawDebugLine(GetWorld(), HitTargetLocationAtTime(T->GetActorLocation(), GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation(), FVector(0.f, 0.f, GetWorld()->GetGravityZ()), 2.0f), 5.f, FColor(255, 0, 0), true, 8);
+		}
+	}
+}
+
+void ABartenderAI::RollKeg()
+{
+	if (AActor* ValidTarget = Cast<AActor>(Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent()->GetValueAsObject(TEXT("Target"))))
+	{
+		UClass* KegClass = LoadObject<UClass>(NULL, TEXT("Blueprint'/Game/Blueprints/Enemies/BartenderAI/BarrelBP.BarrelBP_C'"));
+		if (KegClass)
+		{
+			TSubclassOf<ABartenderKeg> SubClassOfKeg = KegClass;
+
+			ABartenderKeg* SpawnedKeg = GetWorld()->SpawnActor<ABartenderKeg>(SubClassOfKeg);
+			//SpawnedKeg->SetActorLocation(GetActorLocation() + FVector(0.f, 0.f, 200.f));
+			SpawnedKeg->SetOwner(this);
+			FVector TargetDestination = ValidTarget->GetActorLocation();
+		
 			TimeSinceLastAttack = 0.f;
 			UE_LOG(LogTemp, Display, TEXT("Time of launching Molotov: %f"), GetWorld()->GetTimeSeconds());
 			//DrawDebugLine(GetWorld(), HitTargetLocationAtTime(T->GetActorLocation(), GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation(), FVector(0.f, 0.f, GetWorld()->GetGravityZ()), 2.0f), 5.f, FColor(255, 0, 0), true, 8);

@@ -2,7 +2,7 @@
 
 #include "LoneWolf.h"
 #include "Molotov.h"
-
+#include "Character/LoneWolfCharacter.h"
 
 AMolotov::AMolotov()
 {
@@ -14,7 +14,7 @@ AMolotov::AMolotov()
 	CollisionComponent->InitSphereRadius(SphereRadius);
 	CollisionComponent->BodyInstance.SetCollisionProfileName("BlockAll");
 	CollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	CollisionComponent->OnComponentHit.AddDynamic(this, &ThisClass::OnComponentHit);
+
 	CollisionComponent->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Ignore);
 	CollisionComponent->SetCollisionResponseToChannel(ECC_GameTraceChannel5, ECR_Ignore);
 	CollisionComponent->SetCollisionResponseToChannel(ECC_GameTraceChannel6, ECR_Ignore);
@@ -44,11 +44,23 @@ AMolotov::AMolotov()
 
 	// Deconstruct after X seconds as a default
 	InitialLifeSpan = LifeTime;
+
+	ConstructorHelpers::FClassFinder<AActor>FireBPAsset(TEXT("Blueprint'/Game/Blueprints/Enemies/BartenderAI/Molotov_FireBP.Molotov_FireBP_C'"));
+	if (FireBPAsset.Class)
+	{
+		UE_LOG(LogTemp, Display, TEXT("WE HAVE FOUND THE FIRE CLASS"));
+		FireBPClass = (UClass*)FireBPAsset.Class;
+	}
 }
 
 void AMolotov::BeginPlay()
 {
 	Super::BeginPlay();
+	if (CollisionComponent->OnComponentHit.IsBound())
+	{
+		CollisionComponent->OnComponentHit.Clear();
+		CollisionComponent->OnComponentHit.AddDynamic(this, &ThisClass::OnComponentHit);
+	}
 }
 
 void AMolotov::Tick(float DeltaSeconds)
@@ -84,7 +96,27 @@ void AMolotov::OnComponentHit(UPrimitiveComponent* HitComponent, AActor* OtherAc
 
 		if (ACharacter* RecastedOtherCharacter = Cast<ACharacter>(OtherActor))
 		{
-			UGameplayStatics::ApplyDamage(OtherActor, 10.f, RecastedOwner->GetController(), Owner, TSubclassOf<UDamageType>());
+			//UGameplayStatics::ApplyDamage(OtherActor, 10.f, RecastedOwner->GetController(), Owner, TSubclassOf<UDamageType>());
+
+		}
+
+		FCollisionQueryParams TraceParams = FCollisionQueryParams(FName(TEXT("RV_Trace")), true, this);
+		TraceParams.bTraceComplex = true;
+		TraceParams.bTraceAsyncScene = true;
+		TraceParams.bReturnPhysicalMaterial = false;
+
+		FVector StartLocation = GetActorLocation();
+		FVector DesiredLocation = StartLocation + ((-FVector::UpVector) * 512.f);
+
+
+		FHitResult OutHitResult(ForceInit);
+		if (GetWorld()->LineTraceSingleByChannel(OutHitResult, StartLocation, DesiredLocation, ECollisionChannel::ECC_GameTraceChannel9, TraceParams))
+		{
+			//DrawDebugPoint(GetWorld(), OutHitResult.Location, 12.f, FColor::Red, false, 12.f, 12.f);
+			//DrawDebugLine(GetWorld(), StartLocation, OutHitResult.Location, FColor::White, false, 12.f, 12, 12.f);
+
+			FireBP = GetWorld()->SpawnActor<AActor>(FireBPClass, OutHitResult.ImpactPoint, OutHitResult.ImpactNormal.Rotation());
+
 		}
 	}
 	Destroy();
