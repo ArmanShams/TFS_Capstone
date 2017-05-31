@@ -10,9 +10,9 @@
 UENUM(BlueprintType)
 enum class TransformationState : uint8
 {
-	DEAD		UMETA(DisplayName = "Dead"),
-	HUMAN		UMETA(DisplayName = "Human"),
-	WOLF		UMETA(DisplayName = "Wolf")
+	DEAD			UMETA(DisplayName = "Dead"),
+	HUMAN			UMETA(DisplayName = "Human"),
+	WOLF			UMETA(DisplayName = "Wolf")
 };
 
 UENUM(BlueprintType)
