@@ -35,6 +35,7 @@ void ALoneWolfCharacter::SetupPlayerInputComponent(class UInputComponent* InInpu
 
 float ALoneWolfCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
 {
+	this->OnDamageTaken();
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
 /*
@@ -139,7 +140,7 @@ bool ALoneWolfCharacter::bIsSoftCC()
 
 void ALoneWolfCharacter::Die()
 {
-
+	OnDeath();
 }
 
 void ALoneWolfCharacter::Destroyed()

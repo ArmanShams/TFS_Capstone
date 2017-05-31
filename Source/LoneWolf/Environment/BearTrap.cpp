@@ -33,8 +33,14 @@ ABearTrap::ABearTrap()
 void ABearTrap::BeginPlay()
 {
 	Super::BeginPlay();
-	TrapCollider->OnComponentBeginOverlap.AddDynamic(this, &ABearTrap::OnComponentBeginOverlap);
-	TrapCollider->OnComponentEndOverlap.AddDynamic(this, &ABearTrap::OnComponentEndOverlap);
+	if (!this->TrapCollider->OnComponentBeginOverlap.IsBound())
+	{
+		this->TrapCollider->OnComponentBeginOverlap.AddDynamic(this, &ABearTrap::OnComponentBeginOverlap);
+	}
+	if (!this->TrapCollider->OnComponentEndOverlap.IsBound())
+	{
+		this->TrapCollider->OnComponentEndOverlap.AddDynamic(this, &ABearTrap::OnComponentEndOverlap);
+	}
 }
 
 void ABearTrap::Tick(float DeltaTime)

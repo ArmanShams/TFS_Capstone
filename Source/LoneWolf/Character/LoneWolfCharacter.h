@@ -68,6 +68,12 @@ public:
 	virtual float GetHealthPercent();
 	virtual void Destroyed() override;
 
+	UFUNCTION(BlueprintImplementableEvent, category = "Character")
+	void OnDamageTaken();
+
+	UFUNCTION(BlueprintImplementableEvent, category = "Character")
+	void OnDeath();
+
 protected:
 	/*
 		Returns true if the character has at least one hard status effect actor component
