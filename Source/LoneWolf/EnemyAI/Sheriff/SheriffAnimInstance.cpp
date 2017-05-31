@@ -77,16 +77,45 @@ void USheriffAnimInstance::AnimNotify_EndReload()
 		{
 			//Reloading shotgun
 			//CanAttack = true;
+			Sheriff->SetSheriffState(SheriffState::IDLE	);
 		}
 	}
 }
 
 void USheriffAnimInstance::AnimNotify_EndThrow()
 {
-	Sheriff->SetSheriffState(SheriffState::LASSO);
+	if (GetWorld()->HasBegunPlay())
+	{
+		if (Sheriff != NULL)
+		{
+			//Reloading shotgun
+			//CanAttack = true;
+			Sheriff->SetSheriffState(SheriffState::LASSO);
+		}
+	}
+
+}
+
+void USheriffAnimInstance::AnimNotify_Reload()
+{
+	if (GetWorld()->HasBegunPlay())
+	{
+		if (Sheriff != NULL)
+		{
+			//Reloading shotgun
+			//CanAttack = true;
+			Sheriff->SetSheriffState(SheriffState::RELOADING);
+		}
+	}
 }
 
 void USheriffAnimInstance::AnimNotify_ReturnToIdle()
 {
-	Sheriff->SetSheriffState(SheriffState::IDLE);
+	if (GetWorld()->HasBegunPlay())
+	{
+		if (Sheriff != NULL)
+		{
+			Sheriff->SetSheriffState(SheriffState::IDLE);
+		}
+	}
 }

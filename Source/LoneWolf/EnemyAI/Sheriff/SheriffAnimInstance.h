@@ -43,6 +43,9 @@ protected:
 	void AnimNotify_EndThrow();
 
 	UFUNCTION()
+	void AnimNotify_Reload();
+
+	UFUNCTION()
 	void AnimNotify_ReturnToIdle();
 
 	class ASheriffAI* Sheriff;

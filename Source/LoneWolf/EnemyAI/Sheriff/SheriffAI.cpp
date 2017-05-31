@@ -178,7 +178,7 @@ bool ASheriffAI::bIsInRange(float OveriddenDesiredRange)
 
 		if (CurrentDistance > CushionSpace && CurrentDistance <= AttackRange)
 		{
-			DrawDebugLine(GetWorld(), CurrentLocation, PlayerLocation, FColor::White, false, -1, 0, 12.333);
+			//DrawDebugLine(GetWorld(), CurrentLocation, PlayerLocation, FColor::White, false, -1, 0, 12.333);
 			bInAttackRange = true;
 			bInFleeRange = false;
 			bInLassoRange = false;
@@ -186,7 +186,7 @@ bool ASheriffAI::bIsInRange(float OveriddenDesiredRange)
 
 		if (CurrentDistance < CushionSpace)
 		{
-			DrawDebugLine(GetWorld(), CurrentLocation, PlayerLocation, FColor::Red, false, -1, 0, 12.333);
+			//DrawDebugLine(GetWorld(), CurrentLocation, PlayerLocation, FColor::Red, false, -1, 0, 12.333);
 			bInAttackRange = false;
 			bInFleeRange = true;
 			bInLassoRange = false;
@@ -194,7 +194,7 @@ bool ASheriffAI::bIsInRange(float OveriddenDesiredRange)
 
 		if (CurrentDistance > AttackRange)
 		{
-			DrawDebugLine(GetWorld(), CurrentLocation, PlayerLocation, FColor::Blue, false, -1, 0, 12.333);
+			//DrawDebugLine(GetWorld(), CurrentLocation, PlayerLocation, FColor::Blue, false, -1, 0, 12.333);
 			bInLassoRange = true;
 			bInFleeRange = false;
 			bInAttackRange = false;
