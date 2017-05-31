@@ -88,6 +88,8 @@ public:
 	UFUNCTION()
 	void OnAimSnapOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+
+	void InstantOrientToCursor();
 protected:
 	virtual bool bIsHardCC() override;
 	virtual bool bIsSoftCC() override;

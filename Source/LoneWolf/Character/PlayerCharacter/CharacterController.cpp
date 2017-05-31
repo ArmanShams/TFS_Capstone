@@ -119,11 +119,13 @@ void ACharacterController::BeginPlay()
 		if (wInGameHud)
 		{
 			InGameHud = CreateWidget<UUserWidget>(GetWorld(), wInGameHud);
-
 			if (!InGameHud->GetIsVisible())
 			{
-				//InGameHud->AddToPlayerScreen();
 				InGameHud->AddToViewport(80);
+				if (APlayerController* RecastController = Cast<APlayerController>(GetController()))
+				{
+					InGameHud->SetUserFocus(RecastController);
+				}
 			}
 		}
 		
@@ -372,6 +374,7 @@ bool ACharacterController::GetbIsInSoftCC()
 
 float ACharacterController::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
 {
+	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	if (!bIsRolling &&  Effects != CharacterState::INVULNERABLE && Health > 0.f)
 	{
 		float NewHealth = Health;
@@ -626,12 +629,18 @@ void ACharacterController::Roll()
 		FVector MovementVector = GetLastMovementInputVector();
 		if (MovementVector != FVector::ZeroVector)
 		{
-			RollDirection = MovementVector;
 			bIsRolling = true;
+			RollDirection = MovementVector;
 
 			FRotator RollRotator = GetMesh()->RelativeRotation;
 			RollRotator.Yaw = (MovementVector.Rotation().Yaw + RollCompensationYaw);
 			GetMesh()->SetRelativeRotation(RollRotator);
+		}
+		else
+		{
+			bIsRolling = true;
+			InstantOrientToCursor();
+			RollDirection = GetMesh()->GetRightVector();
 		}
 	}
 }
@@ -818,6 +827,25 @@ void ACharacterController::OnAimSnapOverlapEnd(UPrimitiveComponent* OverlappedCo
 	}
 }
 
+void ACharacterController::InstantOrientToCursor()
+{
+	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
+	{
+		FVector2D MousePosition;
+		UGameViewportClient* ViewportClient = GetWorld()->GetGameViewport();
+
+		if (ViewportClient && PlayerController->GetMousePosition(MousePosition.X, MousePosition.Y))
+		{
+			FVector2D CenterPoint;
+			PlayerController->ProjectWorldLocationToScreen(GetMesh()->GetComponentLocation(), CenterPoint);
+
+			FVector Diff = FVector(MousePosition.X - CenterPoint.X, MousePosition.Y - CenterPoint.Y, 0.f);
+
+			GetMesh()->SetRelativeRotation(FRotator(0.f, Diff.Rotation().Yaw, 0.f));
+		}
+	}
+}
+
 bool ACharacterController::IsRolling()
 {
 	return bIsRolling;
@@ -849,6 +877,7 @@ void ACharacterController::Reload()
 
 void ACharacterController::Die()
 {
+	Super::Die();
 	CurrentForm = TransformationState::DEAD;
 	if (APlayerController* RecastController = Cast<APlayerController>(GetController()))
 	{
@@ -857,7 +886,7 @@ void ACharacterController::Die()
 		{
 			InGameHud->RemoveFromViewport();
 			DeadHud = CreateWidget<UUserWidget>(GetWorld(), wDeadHud);
-
+			DeadHud->SetUserFocus(RecastController);
 			if (!DeadHud->GetIsVisible())
 			{
 				DeadHud->AddToViewport(80);
