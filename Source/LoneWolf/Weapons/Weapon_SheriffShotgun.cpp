@@ -44,6 +44,7 @@ bool AWeapon_SheriffShotgun::Fire()
 {
 	if (Super::Fire())
 	{
+		UE_LOG(LogTemp, Display, TEXT("Attempted to fire a shotgun"));
 		return true;
 	}
 	return false;

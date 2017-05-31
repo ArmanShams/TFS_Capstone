@@ -33,8 +33,8 @@ ASheriffAI::ASheriffAI()
 	LassoCableComponent->AttachTo(GetMesh(), LassoSocket);
 	//LassoCableComponent->AttachEndTo();
 
-	SphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere Component"));
-	SphereComponent->SetupAttachment(RootComponent);
+	//SphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere Component"));
+	//SphereComponent->SetupAttachment(RootComponent);
 
 
 	ConstructorHelpers::FClassFinder<AWeapon>ShotgunAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/Sheriff/SheriffShotgunBP.SheriffShotgunBP_C'"));
@@ -55,6 +55,7 @@ void ASheriffAI::BeginPlay()
 {
 	Super::BeginPlay();
 	EquipNewWeapon(DefaultWeapon);
+	SetSheriffState(SheriffState::IDLE);
 }
 
 void ASheriffAI::Tick(float DeltaSeconds)
@@ -97,7 +98,7 @@ void ASheriffAI::Tick(float DeltaSeconds)
 			case SheriffState::FLEEING:
 				break;
 			default:
-				UE_LOG(LogTemp, Display, TEXT("There's been an error in setting the state of the Sheriff"));
+				SetSheriffState(SheriffState::IDLE);
 				break;
 			}
 		}
