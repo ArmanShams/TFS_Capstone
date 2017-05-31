@@ -19,6 +19,10 @@ void UUIWidget::NativeConstruct()
 		{
 			PlayerWeapon = Cast<AWeapon_Ranged>(Player->CurrentlyEquippedWeapon);
 			Health = Player->Health;
+			if (!Player->OnSuccessfulReload.IsBound())
+			{
+				Player->OnSuccessfulReload.AddDynamic(this, &ThisClass::OnReload);
+			}
 			//Player->TakeDamage.AddDynamic(this, &ThisClass::PlayerWasHit);
 		}
 	}
