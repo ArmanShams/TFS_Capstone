@@ -512,7 +512,7 @@ void ACharacterController::OnMouseMove(float scale)
 				}
 				if (CurrentForm == TransformationState::WOLF)
 				{
-					GetMesh()->SetRelativeRotation(FMath::RInterpTo(GetMesh()->RelativeRotation, FRotator(0.f, AimOffsetYaw, 0.f), GetWorld()->GetDeltaSeconds(), TurnRate));
+					GetMesh()->SetRelativeRotation(FMath::RInterpTo(GetMesh()->RelativeRotation, FRotator(0.f, DiffYaw, 0.f), GetWorld()->GetDeltaSeconds(), TurnRate));
 				}
 
 				// Only adjust gun position if the player isn't reloading.
@@ -541,7 +541,7 @@ void ACharacterController::OnMouseMove(float scale)
 									DesiredWeaponRotation.Pitch = 0.f;
 								}
 								
-								if (DirectionHorizontal.Size() > 225.55f)
+								if (DirectionHorizontal.Size() > 270.55f)
 								{
 									FRotator YawRotation = (OutHitResultResult.Location - CurrentlyEquippedWeapon->GetActorLocation()).Rotation();
 									DesiredWeaponRotation.Yaw = YawRotation.Yaw;
@@ -565,8 +565,14 @@ void ACharacterController::OnMouseMove(float scale)
 								}
 								
 							}
+
 							DesiredWeaponRotation.Roll = 0.f;
 							CurrentlyEquippedWeapon->SetActorRotation(FMath::RInterpTo(CurrentlyEquippedWeapon->GetActorRotation(), DesiredWeaponRotation, GetWorld()->GetDeltaSeconds(), TurnRate * TurnRate));
+
+							if (GetMovementComponent()->GetLastInputVector() != FVector::ZeroVector)
+							{
+								//GetMesh()->SetRelativeRotation(FMath::RInterpTo(GetMesh()->RelativeRotation, FRotator(0.f, AimOffsetYaw, 0.f), GetWorld()->GetDeltaSeconds(), TurnRate));
+							}
 						}
 					}
 				}

@@ -19,9 +19,6 @@ public:
 	float radius;
 	float Damage;
 
-	UPROPERTY(EditAnywhere)
-	bool bIsVisible;
-
 	virtual void SetOwner(AActor* NewOwner) override;
 
 	virtual void Destroyed() override;
@@ -32,6 +29,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	USkeletalMeshComponent* MeshComponent;
+
+	UPROPERTY(EditDefaultsOnly)
+	USkeletalMesh* Mesh;
 
 	class ATrapLocations* LocationBeingOccupied;
 
@@ -44,7 +44,7 @@ private:
 	UFUNCTION()
 		void OnComponentEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
-	class ABountyHunter* BountyHunter;
+	//class AActor* Bouty;
 
 	friend class ABountyHunter;
 };
