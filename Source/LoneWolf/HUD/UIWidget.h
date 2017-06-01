@@ -33,6 +33,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, category = "Player UI")
 	void OnReload();
 
+	UFUNCTION(BlueprintImplementableEvent, category = "Player UI")
+	void OnDamageTaken();
+
 	// The speed at which the progress bars on screen smoothly 'slide'
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player UI")
 	float InterpolationSpeed;
