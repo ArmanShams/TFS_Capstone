@@ -8,6 +8,7 @@
 #include "Weapons/Weapon_PlayerRevolver.h"
 #include "Blueprint/UserWidget.h"
 #include "Character/StatusEffects/StatusEffects.h"
+#include "Viewport/LoneWolfViewportClient.h"
 //#include "Character/StatusEffects/StatusEffectBase.h"
 //#include "Character/StatusEffects/StatusEffect_HardCrowdControl.h"
 //#include "Character/StatusEffects/StatusEffect_TestDerivative.h"
@@ -103,6 +104,14 @@ void ACharacterController::BeginPlay()
 	GetMesh()->SetAnimInstanceClass(HumanAnimationClass);
 
 	Super::BeginPlay();
+
+	if (ULoneWolfViewportClient* RecastViewport = Cast<ULoneWolfViewportClient>(GetWorld()->GetGameViewport()))
+	{
+		if (!RecastViewport->OnFocusLost.IsBound())
+		{
+			RecastViewport->OnFocusLost.AddDynamic(this, &ThisClass::OnGameFocusLost);
+		}
+	}
 
 	if (!NeuteredMode)
 	{
@@ -664,6 +673,10 @@ void ACharacterController::OnReloadPressed()
 				if (RecastWeapon->CanReload())
 				{
 					bShouldEnterReload = true;
+					if (OnSuccessfulReload.IsBound())
+					{
+						OnSuccessfulReload.Broadcast();
+					}
 				}
 			}
 		break;
@@ -870,6 +883,7 @@ void ACharacterController::Reload()
 			if (AWeapon_Ranged* RecastPlayerWeapon = Cast<AWeapon_Ranged>(CurrentlyEquippedWeapon))
 			{
 				RecastPlayerWeapon->Reload();
+				
 			}
 		}
 	}
