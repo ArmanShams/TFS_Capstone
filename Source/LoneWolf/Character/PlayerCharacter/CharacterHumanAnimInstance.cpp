@@ -454,6 +454,8 @@ void UCharacterHumanAnimInstance::AnimNotify_ToggleRollState()
 		{
 			CharacterController->bIsRolling = !CharacterController->bIsRolling;
 			CharacterController->RollDirection = FVector::ZeroVector;
+			CharacterController->GetController()->StopMovement();
+			CharacterController->InstantOrientToCursor();
 			UE_LOG(LogTemp, Display, TEXT("Ending Roll"));
 		}
 	}
@@ -528,6 +530,17 @@ void UCharacterHumanAnimInstance::RecenterMeshOnCursor()
 		if (CharacterController != NULL)
 		{
 			CharacterController->bRecenterMesh = true;
+		}
+	}
+}
+
+void UCharacterHumanAnimInstance::OrientMeshToMovement()
+{
+	if (GetWorld()->HasBegunPlay())
+	{
+		if (CharacterController != NULL)
+		{
+			CharacterController->OrientMeshToMovementDirection();
 		}
 	}
 }
