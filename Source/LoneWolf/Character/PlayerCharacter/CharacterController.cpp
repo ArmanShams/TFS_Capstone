@@ -386,6 +386,7 @@ float ACharacterController::TakeDamage(float DamageAmount, struct FDamageEvent c
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	if (!bIsRolling &&  Effects != CharacterState::INVULNERABLE && Health > 0.f)
 	{
+		OnDamageTaken.Broadcast();
 		float NewHealth = Health;
 		NewHealth -= DamageAmount;
 

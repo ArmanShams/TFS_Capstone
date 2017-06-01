@@ -31,6 +31,7 @@ enum class EightDirectional : uint8
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FReloadSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDamageSignature);
 
 UCLASS(Blueprintable)
 class LONEWOLF_API ACharacterController : public ALoneWolfCharacter
@@ -96,7 +97,7 @@ public:
 
 	void InstantOrientToCursor();
 
-
+	FDamageSignature OnDamageTaken;
 	FReloadSignature OnSuccessfulReload;
 
 protected:

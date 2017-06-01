@@ -23,6 +23,10 @@ void UUIWidget::NativeConstruct()
 			{
 				Player->OnSuccessfulReload.AddDynamic(this, &ThisClass::OnReload);
 			}
+			if (!Player->OnDamageTaken.IsBound())
+			{
+				Player->OnDamageTaken.AddDynamic(this, &ThisClass::OnDamageTaken);
+			}
 			//Player->TakeDamage.AddDynamic(this, &ThisClass::PlayerWasHit);
 		}
 	}
