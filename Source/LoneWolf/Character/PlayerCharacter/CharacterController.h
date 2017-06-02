@@ -29,6 +29,10 @@ enum class EightDirectional : uint8
 	UP_RIGHT		UMETA(DisplayName = "Up Right"),
 };
 
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FReloadSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDamageSignature);
+
 UCLASS(Blueprintable)
 class LONEWOLF_API ACharacterController : public ALoneWolfCharacter
 {
@@ -88,8 +92,14 @@ public:
 	UFUNCTION()
 	void OnAimSnapOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+	UFUNCTION(BlueprintImplementableEvent, category = "Viewport")
+	void OnGameFocusLost();
 
 	void InstantOrientToCursor();
+
+	FDamageSignature OnDamageTaken;
+	FReloadSignature OnSuccessfulReload;
+
 protected:
 	virtual bool bIsHardCC() override;
 	virtual bool bIsSoftCC() override;
@@ -160,7 +170,9 @@ protected:
 
 
 	// Variable to store the widget after creating it.
+	UPROPERTY(BlueprintReadOnly, Category = "Widgets")
 	class UUserWidget* InGameHud;
+	UPROPERTY(BlueprintReadOnly, Category = "Widgets")
 	class UUserWidget* DeadHud;
 
 
