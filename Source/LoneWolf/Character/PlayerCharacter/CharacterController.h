@@ -170,7 +170,9 @@ protected:
 
 
 	// Variable to store the widget after creating it.
+	UPROPERTY(BlueprintReadOnly, Category = "Widgets")
 	class UUserWidget* InGameHud;
+	UPROPERTY(BlueprintReadOnly, Category = "Widgets")
 	class UUserWidget* DeadHud;
 
 
