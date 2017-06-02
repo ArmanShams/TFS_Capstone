@@ -901,10 +901,10 @@ void ACharacterController::Die()
 		{
 			InGameHud->RemoveFromViewport();
 			DeadHud = CreateWidget<UUserWidget>(GetWorld(), wDeadHud);
-			DeadHud->SetUserFocus(RecastController);
 			if (!DeadHud->GetIsVisible())
 			{
 				DeadHud->AddToViewport(80);
+				DeadHud->SetUserFocus(RecastController);
 			}
 		}
 	}
