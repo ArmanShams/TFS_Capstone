@@ -27,6 +27,9 @@ public:
 
 protected:
 	UPROPERTY(EditDefaultsOnly)
+	float ProjectileDeviation;
+
+	UPROPERTY(EditDefaultsOnly)
 	uint8 MagazineCapacity;
 
 	UPROPERTY(EditDefaultsOnly)

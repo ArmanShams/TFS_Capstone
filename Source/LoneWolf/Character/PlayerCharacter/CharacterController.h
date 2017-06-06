@@ -95,6 +95,8 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, category = "Viewport")
 	void OnGameFocusLost();
 
+	TransformationState GetCurrentForm();
+
 	void InstantOrientToCursor();
 
 	FDamageSignature OnDamageTaken;
@@ -118,6 +120,7 @@ protected:
 	virtual void OrientMeshToMovementDirection();
 	EightDirectional RelativeFacingDirection(float Rotation);
 	EightDirectional RelativeMovementDirection();
+
 
 	bool bShouldEnterReload;
 	bool bShouldEnterRoll;
@@ -170,7 +173,9 @@ protected:
 
 
 	// Variable to store the widget after creating it.
+	UPROPERTY(BlueprintReadOnly, Category = "Widgets")
 	class UUserWidget* InGameHud;
+	UPROPERTY(BlueprintReadOnly, Category = "Widgets")
 	class UUserWidget* DeadHud;
 
 

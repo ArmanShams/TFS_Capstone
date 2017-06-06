@@ -79,6 +79,9 @@ protected:
 	UFUNCTION(BlueprintCallable, category = "Player")
 	void ForceCompletionOfReload();
 
+	UFUNCTION(BlueprintCallable, category = "Player")
+	void EnsureFiringTransition();
+
 	class ACharacterController* CharacterController;
 
 	friend class ACharacterController;

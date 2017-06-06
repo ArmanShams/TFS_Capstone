@@ -17,7 +17,7 @@ AWeapon_PlayerRevolver::AWeapon_PlayerRevolver()
 	{
 		ProjectileToFire = (UClass*)ProjectileAsset.Class;
 	}
-
+	FanFireDeviationMultiplier = 2.2f;
 }
 
 void AWeapon_PlayerRevolver::BeginPlay()
@@ -32,7 +32,10 @@ void AWeapon_PlayerRevolver::BeginPlay()
 	MAXIMUM_TOTAL_AMMO = 0;
 	TotalAmmo = MAXIMUM_TOTAL_AMMO;
 
-	FanFireInterval = 0.1f;
+	FanFireInterval = 0.1f; 
+	ProjectileDeviationBase = ProjectileDeviation;
+	FanFireDeviation = ProjectileDeviation * FanFireDeviationMultiplier;
+
 	bFanFiring = false;
 }
 
@@ -53,6 +56,10 @@ bool AWeapon_PlayerRevolver::Fire()
 {
 	if (Super::Fire())
 	{
+		if (!bFanFiring)
+		{
+			ProjectileDeviation = ProjectileDeviationBase;
+		}
 		return true;
 	}
 	return false;
@@ -63,16 +70,18 @@ bool AWeapon_PlayerRevolver::AltFire()
 	TimeSinceLastFire = RateOfFire;
 	//if (Super::AltFire())
 	{
-		UE_LOG(LogTemp, Display, TEXT("ALTFIRING BUT ONLY AT AN APPROPRIATE SPEED"));
 		bFanFiring = true;
+		ProjectileDeviation = FanFireDeviation;
 		return true;
 	}
+	
 	return false;
 }
 
 void AWeapon_PlayerRevolver::Reload()
 {
 	Super::Reload();
+	ProjectileDeviation = ProjectileDeviationBase;
 	bFanFiring = false;
 }
 

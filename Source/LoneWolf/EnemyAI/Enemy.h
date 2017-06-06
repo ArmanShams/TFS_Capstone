@@ -52,6 +52,9 @@ public:
 	UPROPERTY(EditInstanceOnly, category = "Enemy")
 	bool bPatrolsLinearly;
 
+	UPROPERTY(EditDefaultsOnly, category = "Enemy")
+	float HealthRestoredOnDeath;
+
 protected:
 	// Returns true if the actor's Status Effects is a 'softCC'. Defined in Design Document
 	virtual bool bIsSoftCC() override;
