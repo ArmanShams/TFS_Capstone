@@ -34,13 +34,13 @@ AEnemy::AEnemy()
 
 	HealthRestoredOnDeath = 12.f;
 
-	ConstructorHelpers::FClassFinder<AWeapon>WeaponAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/KnifeBP_Arman.KnifeBP_Arman_C'"));
+	//ConstructorHelpers::FClassFinder<AWeapon>WeaponAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/KnifeBP_Arman.KnifeBP_Arman_C'"));
 
-	if (WeaponAsset.Class)
-	{
+	//if (WeaponAsset.Class)
+	//{
 		//UE_LOG(LogTemp, Display, TEXT("WE HAVE FOUND THE CLASS"));
-		DefaultWeapon = (UClass*)WeaponAsset.Class;
-	}
+		//DefaultWeapon = (UClass*)WeaponAsset.Class;
+	//}
 }
 
 // Called when the game starts or when spawned
