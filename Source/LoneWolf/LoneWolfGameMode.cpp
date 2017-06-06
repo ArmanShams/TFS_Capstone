@@ -7,8 +7,7 @@ ALoneWolfGameMode::ALoneWolfGameMode(const FObjectInitializer& ObjectInitializer
 	: Super(ObjectInitializer)
 {
 	// TEXT("AssetPath'/MyAsset.MyAsset_C'") to get the class. <APawn>
-	//ConstructorHelpers::FClassFinder<APawn> CharacterClassAsset(TEXT("Blueprint'/Game/Blueprints/Player/CharacterControllerBlueprint.CharacterControllerBlueprint_C'"));
-	ConstructorHelpers::FClassFinder<APawn> CharacterClassAsset(TEXT("Blueprint'/Game/Blueprints/Player/CharacterControllerBlueprint_Minimap.CharacterControllerBlueprint_Minimap_C'"));
+	ConstructorHelpers::FClassFinder<APawn> CharacterClassAsset(TEXT("Blueprint'/Game/Blueprints/Player/CharacterControllerBlueprint.CharacterControllerBlueprint_C'"));
 	if (CharacterClassAsset.Class)
 	{
 		DefaultPawnClass = CharacterClassAsset.Class;
