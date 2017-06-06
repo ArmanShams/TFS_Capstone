@@ -32,13 +32,15 @@ AEnemy::AEnemy()
 
 	DespawnTimer = 2.2f;
 
-	ConstructorHelpers::FClassFinder<AWeapon>WeaponAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/KnifeBP_Arman.KnifeBP_Arman_C'"));
+	HealthRestoredOnDeath = 12.f;
 
-	if (WeaponAsset.Class)
-	{
+	//ConstructorHelpers::FClassFinder<AWeapon>WeaponAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/KnifeBP_Arman.KnifeBP_Arman_C'"));
+
+	//if (WeaponAsset.Class)
+	//{
 		//UE_LOG(LogTemp, Display, TEXT("WE HAVE FOUND THE CLASS"));
-		DefaultWeapon = (UClass*)WeaponAsset.Class;
-	}
+		//DefaultWeapon = (UClass*)WeaponAsset.Class;
+	//}
 }
 
 // Called when the game starts or when spawned
@@ -240,6 +242,14 @@ void AEnemy::Die()
 	if (CurrentlyEquippedWeapon != NULL)
 	{
 		CurrentlyEquippedWeapon->SetLifeSpan(DespawnTimer);
+	}
+	if (ACharacterController* RecastController = Cast<ACharacterController>(GetWorld()->GetFirstPlayerController()->GetPawn()))
+	{
+		if (RecastController->GetCurrentForm() == TransformationState::WOLF)
+		{
+			UGameplayStatics::ApplyDamage(RecastController, -HealthRestoredOnDeath, GetController(), this, TSubclassOf<UDamageType>());
+		}
+	
 	}
 	SetLifeSpan(DespawnTimer);
 }

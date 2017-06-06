@@ -30,7 +30,10 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	float FanFireInterval;
-
+	UPROPERTY(EditDefaultsOnly)
+	float FanFireDeviationMultiplier;
+	float FanFireDeviation;
+	float ProjectileDeviationBase;
 private:
 	bool bFanFiring;
 
