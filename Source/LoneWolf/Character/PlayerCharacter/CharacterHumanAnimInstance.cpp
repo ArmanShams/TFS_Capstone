@@ -561,3 +561,17 @@ void UCharacterHumanAnimInstance::ForceCompletionOfReload()
 		}
 	}
 }
+
+void UCharacterHumanAnimInstance::EnsureFiringTransition()
+{
+	if (GetWorld()->HasBegunPlay())
+	{
+		if (CharacterController != NULL)
+		{
+			bPrimaryFire = false;
+			bSecondaryFiring = false;
+			CharacterController->SetAnimPrimaryFire(false);
+			CharacterController->SetAnimSecondaryFire(false);
+		}
+	}
+}

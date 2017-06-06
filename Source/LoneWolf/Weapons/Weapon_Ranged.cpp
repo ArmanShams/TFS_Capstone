@@ -18,7 +18,7 @@ AWeapon_Ranged::AWeapon_Ranged()
 	{
 		ProjectileToFire = (UClass*)ProjectileAsset.Class;
 	}
-
+	ProjectileDeviation = 0.f;
 	TimeSinceLastFire = RateOfFire;
 
 }
@@ -68,7 +68,11 @@ bool AWeapon_Ranged::Fire()
 			
 			if (MeshComponent->GetSocketByName(FName("BarrelSocket")))
 			{
-				AProjectile* Temp = GetWorld()->SpawnActor<AProjectile>(ProjectileToFire, MeshComponent->GetSocketLocation(FName("BarrelSocket")), MeshComponent->GetSocketRotation(FName("BarrelSocket")));
+				FRotator ProjectileRotation = MeshComponent->GetSocketRotation(FName("BarrelSocket"));
+
+				ProjectileRotation.Yaw += FMath::FRandRange(-ProjectileDeviation, ProjectileDeviation);
+
+				AProjectile* Temp = GetWorld()->SpawnActor<AProjectile>(ProjectileToFire, MeshComponent->GetSocketLocation(FName("BarrelSocket")), ProjectileRotation);
 				Temp->Damage = DamagePerAttack;
 				Temp->SetOwner(OwningActor);
 				//Temp->WeaponSpawnedThis = this;

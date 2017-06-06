@@ -113,7 +113,7 @@ AWeapon* ALoneWolfCharacter::GetEquippedWeapon()
 
 float ALoneWolfCharacter::GetHealthPercent()
 {
-	return Health / MAXHEALTH;
+	return this->Health / this->MAXHEALTH;
 }
 
 bool ALoneWolfCharacter::bIsHardCC()

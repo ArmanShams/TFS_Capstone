@@ -1,8 +1,8 @@
 {
 	"Changelist" : 3172292,
-	"BuildId" : "1d165a17-079e-4d8e-8d09-08243dcc527b",
+	"BuildId" : "99a25c0d-99c1-4763-a776-4e24c7a744df",
 	"Modules" : 
 	{
-		"LoneWolf" : "UE4Editor-LoneWolf-6139.dll"
+		"LoneWolf" : "UE4Editor-LoneWolf.dll"
 	}
 }

@@ -32,6 +32,8 @@ AEnemy::AEnemy()
 
 	DespawnTimer = 2.2f;
 
+	HealthRestoredOnDeath = 12.f;
+
 	ConstructorHelpers::FClassFinder<AWeapon>WeaponAsset(TEXT("Blueprint'/Game/Blueprints/Weapons/KnifeBP_Arman.KnifeBP_Arman_C'"));
 
 	if (WeaponAsset.Class)
@@ -240,6 +242,14 @@ void AEnemy::Die()
 	if (CurrentlyEquippedWeapon != NULL)
 	{
 		CurrentlyEquippedWeapon->SetLifeSpan(DespawnTimer);
+	}
+	if (ACharacterController* RecastController = Cast<ACharacterController>(GetWorld()->GetFirstPlayerController()->GetPawn()))
+	{
+		if (RecastController->GetCurrentForm() == TransformationState::WOLF)
+		{
+			UGameplayStatics::ApplyDamage(RecastController, -HealthRestoredOnDeath, GetController(), this, TSubclassOf<UDamageType>());
+		}
+	
 	}
 	SetLifeSpan(DespawnTimer);
 }

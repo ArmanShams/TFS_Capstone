@@ -1146,3 +1146,8 @@ EightDirectional ACharacterController::RelativeMovementDirection()
 		break;
 	}
 }
+
+TransformationState ACharacterController::GetCurrentForm()
+{
+	return CurrentForm;
+}
