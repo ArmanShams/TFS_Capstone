@@ -110,6 +110,10 @@ void ACharacterController::BeginPlay()
 		if (!RecastViewport->OnFocusLost.IsBound())
 		{
 			RecastViewport->OnFocusLost.AddDynamic(this, &ThisClass::OnGameFocusLost);
+
+			auto CurrentFocus = FSlateApplication::Get().GetKeyboardFocusedWidget();
+			FSlateApplication::Get().ClearKeyboardFocus(EKeyboardFocusCause::SetDirectly);
+			FSlateApplication::Get().SetKeyboardFocus(CurrentFocus);
 		}
 	}
 
@@ -135,9 +139,12 @@ void ACharacterController::BeginPlay()
 				{
 					//InGameHud->SetUserFocus(RecastController);
 					FInputModeGameAndUI Mode;
-					Mode.SetWidgetToFocus(InGameHud->GetCachedWidget());
-					RecastController->SetInputMode(Mode);
+					FInputModeGameOnly NewMode;
+					Mode.SetHideCursorDuringCapture(false);
+					//Mode.SetWidgetToFocus(InGameHud->GetCachedWidget());
+					RecastController->SetInputMode(NewMode);
 					RecastController->bShowMouseCursor = false;
+					RecastController->CurrentMouseCursor = EMouseCursor::None;
 				}
 			}
 		}
@@ -163,7 +170,6 @@ void ACharacterController::BeginPlay()
 void ACharacterController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-
 
 	FVector LastInputVector = GetMovementComponent()->GetLastInputVector();
 	if (bIsRolling && RollDirection != FVector::ZeroVector)
@@ -271,11 +277,6 @@ void ACharacterController::Tick(float DeltaSeconds)
 				bAnimSecondaryFire = RecastWeaponToRevolver->IsFanFiring();
 			}
 		}
-		if (Rage >= MAXRAGE)
-		{
-			CurrentForm = TransformationState::WOLF;
-			UE_LOG(LogTemp, Display, TEXT("Player 'Transformed' to wolf"));
-		}
 		break;
 	case TransformationState::WOLF:
 		Rage -= RageDrainPerSecond * DeltaSeconds;
@@ -343,7 +344,8 @@ void ACharacterController::SetupPlayerInputComponent(class UInputComponent* InIn
 		InInputComponent->BindAction(TEXT("Reload"), IE_Pressed, this, &ThisClass::OnReloadPressed);
 
 		// Debug key binding, remove later.
-		InInputComponent->BindAction(TEXT("DebugRage"), IE_Pressed, this, &ThisClass::OnDebugRagePressed);
+		//InInputComponent->BindAction(TEXT("Transform"), IE_Pressed, this, &ThisClass::OnDebugRagePressed);
+		InInputComponent->BindAction(TEXT("Transform"), IE_Pressed, this, &ThisClass::OnTransformPressed);
 	}
 }
 void ACharacterController::AddRage(float RageToAdd)
@@ -695,6 +697,15 @@ void ACharacterController::OnReloadPressed()
 	}
 }
 	
+}
+
+void ACharacterController::OnTransformPressed()
+{
+	if (Rage >= MAXRAGE)
+	{
+		CurrentForm = TransformationState::WOLF;
+		UE_LOG(LogTemp, Display, TEXT("Player transformed to wolf"));
+	}
 }
 
 EightDirectional ACharacterController::GetRelativeFacing()

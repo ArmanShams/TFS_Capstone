@@ -70,6 +70,7 @@ public:
 	void OnDebugRagePressed();
 	void Roll();
 	void OnReloadPressed();
+	void OnTransformPressed();
 
 	EightDirectional GetRelativeFacing();
 	EightDirectional GetRelativeMovement();

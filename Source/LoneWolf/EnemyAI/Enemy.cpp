@@ -48,17 +48,9 @@ void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//EnemyState = EState::Idle;
-
-	//TimeSinceLastAttack = 0.0f;
-	//Skill1Cooldown = MAX_FLT;
-	//Skill2Cooldown = MAX_FLT;
-	
-	//EquipNewWeapon(DefaultWeapon);
-
 	if (CurrentlyEquippedWeapon != NULL)
 	{
-		UE_LOG(LogTemp, Display, TEXT("Knife Equipped"));
+		UE_LOG(LogTemp, Display, TEXT("Weapon equipped"));
 	}
 }
 
@@ -78,22 +70,22 @@ float AEnemy::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEv
 	UE_LOG(LogTemp, Display, TEXT("Enemy health modified, health was %f, now: %f"), Health, NewHealth);
 
 	Health = NewHealth;
-	if (DamageCauser->IsValidLowLevel())
+	if (DamageCauser != NULL)
 	{
 		if (ACharacterController* Player = Cast<ACharacterController>(DamageCauser))
 		{
-			if (Player->IsValidLowLevel())
-			{	//UE_LOG(LogTemp, Display, TEXT("We are in the beam."));
-				float RageGeneratedFromDamage = DamageAmount * 1.8f;
+			if (Player != NULL)
+			{
+				float RageGeneratedFromDamage = DamageAmount * 0.8f;
 
 				Player->AddRage(RageGeneratedFromDamage);
-				if (AAIController* Controller = Cast<AAIController>(GetController()))
+				if (AAIController* RecastController = Cast<AAIController>(GetController()))
 				{
-					Controller->GetBrainComponent()->GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), Cast<AActor>(Player));
+					RecastController->GetBrainComponent()->GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), Cast<AActor>(Player));
 				}
 				if (NewHealth <= 0.f)
 				{
-					Player->AddRage(RageGeneratedFromDamage * 2.0f);
+					Player->AddRage(RageGeneratedFromDamage);
 				}
 			}
 		
@@ -148,11 +140,25 @@ void AEnemy::Tick(float DeltaTime)
 
 	TimeSinceLastAttack += DeltaTime;
 
-	//Skill1Cooldown += DeltaTime;
-	//Skill2Cooldown += DeltaTime;
-
-	//bIsAttacking();
-
+	if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
+	{
+		if (ACharacterController* RecastedTarget = Cast<ACharacterController>(BlackboardComponent->GetValueAsObject(TEXT("Target"))))
+		{
+			if (RecastedTarget->GetCurrentForm() == TransformationState::DEAD)
+			{
+				if (AAIController* AIController = Cast<AAIController>(GetController()))
+				{
+					if (UBrainComponent* BrainComponent = AIController->GetBrainComponent())
+					{
+						BlackboardComponent->SetValueAsObject(FName("Target"), NULL);
+						BrainComponent->StopLogic(FString("Player is dead, time to stop."));
+						PrimaryActorTick.bCanEverTick = false;
+						GetCapsuleComponent()->SetCollisionProfileName(FName("NoCollision"));
+					}
+				}
+			}
+		}
+	}
 }
 
 void AEnemy::SetupPlayerInputComponent(class UInputComponent* InInputComponent)
