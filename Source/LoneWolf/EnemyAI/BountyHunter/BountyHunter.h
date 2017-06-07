@@ -87,6 +87,10 @@ protected:
 protected: //Blackboard Key Booleans
 	bool bIsStunned;
 	bool bIsFleeing;
+	FVector NewPosition;
+	FVector CurrentPosition;
+	FVector PlayerPosition;
+	FVector DirectionToFlee;
 
 	//Booleans to check for range
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
