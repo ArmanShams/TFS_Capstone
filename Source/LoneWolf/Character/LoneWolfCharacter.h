@@ -7,7 +7,7 @@
 #include "Character/StatusEffects/StatusEffects.h"
 #include "LoneWolfCharacter.generated.h"
 
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDamageSignature);
 UCLASS()
 class LONEWOLF_API ALoneWolfCharacter : public ACharacter
 {
@@ -74,6 +74,8 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, category = "Character")
 	void OnDeath();
 
+
+	FDamageSignature OnDamageRecieved;
 protected:
 	/*
 		Returns true if the character has at least one hard status effect actor component

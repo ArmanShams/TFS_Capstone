@@ -17,6 +17,8 @@ ALoneWolfCharacter::ALoneWolfCharacter()
 void ALoneWolfCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	this->OnDamageRecieved.AddDynamic(this, &ThisClass::OnDamageTaken);
 	
 }
 
@@ -35,7 +37,8 @@ void ALoneWolfCharacter::SetupPlayerInputComponent(class UInputComponent* InInpu
 
 float ALoneWolfCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
 {
-	this->OnDamageTaken();
+	//this->OnDamageTaken();
+	//this->OnDamageTaken.Broadcast();
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
 /*
