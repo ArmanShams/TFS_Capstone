@@ -7,6 +7,17 @@
 #include "BountyHunterAnimInstance.h"
 #include "Engine.h"
 
+void UBountyHunterAnimInstance::NativeInitializeAnimation()
+{
+	Super::NativeInitializeAnimation();
+	ALoneWolfCharacter* Owner = Cast<ALoneWolfCharacter>(TryGetPawnOwner());
+
+	if (Owner != NULL)
+	{
+		Owner->OnDamageRecieved.AddDynamic(this, &ThisClass::OnDamageTaken);
+	}
+}
+
 void UBountyHunterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	if (GetWorld()->HasBegunPlay())

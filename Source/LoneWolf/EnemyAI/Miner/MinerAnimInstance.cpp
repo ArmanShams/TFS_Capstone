@@ -14,7 +14,13 @@
 
 void UMinerAnimInstance::NativeInitializeAnimation()
 {
+	Super::NativeInitializeAnimation();
+	ALoneWolfCharacter* Owner = Cast<ALoneWolfCharacter>(TryGetPawnOwner());
 
+	if (Owner != NULL)
+	{
+		Owner->OnDamageRecieved.AddDynamic(this, &ThisClass::OnDamageTaken);
+	}
 }
 
 void UMinerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)

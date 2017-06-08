@@ -4,6 +4,17 @@
 #include "BartenderAIAnimInstance.h"
 #include "BartenderAI.h"
 
+void UBartenderAIAnimInstance::NativeInitializeAnimation()
+{
+	Super::NativeInitializeAnimation();
+	ALoneWolfCharacter* Owner = Cast<ALoneWolfCharacter>(TryGetPawnOwner());
+
+	if (Owner != NULL)
+	{
+		Owner->OnDamageRecieved.AddDynamic(this, &ThisClass::OnDamageTaken);
+	}
+}
+
 void UBartenderAIAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);

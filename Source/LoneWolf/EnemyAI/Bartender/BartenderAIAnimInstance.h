@@ -14,6 +14,8 @@ class LONEWOLF_API UBartenderAIAnimInstance : public UAnimInstance
 	GENERATED_BODY()
 	
 public:
+	virtual void NativeInitializeAnimation() override;
+
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 	
 protected:
@@ -21,6 +23,8 @@ protected:
 	virtual void AnimNotify_SpawnMolotov();
 	UFUNCTION()
 	virtual void AnimNotify_EndAttack();
+	UFUNCTION(BlueprintImplementableEvent, category = "Enemy")
+	void OnDamageTaken();
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Bartender")
 	bool bIsAttacking;
