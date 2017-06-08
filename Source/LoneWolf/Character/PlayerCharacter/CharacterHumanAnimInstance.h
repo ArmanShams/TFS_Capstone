@@ -15,6 +15,8 @@ class LONEWOLF_API UCharacterHumanAnimInstance : public UAnimInstance
 	GENERATED_BODY()
 	
 public:
+	virtual void NativeInitializeAnimation() override;
+
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
 protected:
@@ -81,6 +83,9 @@ protected:
 
 	UFUNCTION(BlueprintCallable, category = "Player")
 	void EnsureFiringTransition();
+
+	UFUNCTION(BlueprintImplementableEvent, category = "Player")
+	void OnDamageTaken();
 
 	class ACharacterController* CharacterController;
 

@@ -392,7 +392,8 @@ float ACharacterController::TakeDamage(float DamageAmount, struct FDamageEvent c
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	if (!bIsRolling &&  Effects != CharacterState::INVULNERABLE && Health > 0.f)
 	{
-		OnDamageTaken.Broadcast();
+		this->OnDamageRecieved.Broadcast();
+
 		float NewHealth = Health;
 		NewHealth -= DamageAmount;
 
@@ -401,7 +402,7 @@ float ACharacterController::TakeDamage(float DamageAmount, struct FDamageEvent c
 			NewHealth = MAXHEALTH;
 		}
 
-		UE_LOG(LogTemp, Display, TEXT("Player health modified, health is now: %f"), NewHealth);
+		UE_LOG(LogTemp, Display, TEXT("Player health modified was: %f, health is now: %f"), Health, NewHealth);
 
 		Health = NewHealth;
 
