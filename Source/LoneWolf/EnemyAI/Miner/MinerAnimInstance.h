@@ -25,7 +25,7 @@ protected:
 	UFUNCTION()
 	virtual void AnimNotify_ChargeEnd();
 	UFUNCTION()
-	virtual void AnimNotify_Stomp();
+	virtual void AnimNotify_ApplyStompDamage();
 	UFUNCTION()
 	virtual void AnimNotify_ReturnToIdle();
 	UFUNCTION(BlueprintImplementableEvent, category = "Enemy")

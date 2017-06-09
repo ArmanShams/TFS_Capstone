@@ -2,7 +2,7 @@
 	"TargetName" : "LoneWolfEditor",
 	"Platform" : "Win64",
 	"Configuration" : "Development",
-	"BuildId" : "c3abd5d9-e33a-4496-8139-b9482deb3130",
+	"BuildId" : "f743d3aa-61b1-47fe-aa5b-1f03390e5d9f",
 	"Version" : 
 	{
 		"MajorVersion" : 4,
@@ -15,15 +15,15 @@
 	"BuildProducts" :
 	[
 		{
-			"Path" : "$(ProjectDir)/Binaries/Win64/UE4Editor-LoneWolf.dll",
+			"Path" : "$(ProjectDir)/Binaries/Win64/UE4Editor-LoneWolf-3795.dll",
 			"Type" : "DynamicLibrary"
 		},
 		{
-			"Path" : "$(ProjectDir)/Binaries/Win64/UE4Editor-LoneWolf.pdb",
+			"Path" : "$(ProjectDir)/Binaries/Win64/UE4Editor-LoneWolf-3795.pdb",
 			"Type" : "SymbolFile"
 		},
 		{
-			"Path" : "$(ProjectDir)/Intermediate/Build/Win64/UE4Editor/Development/UE4Editor-LoneWolf.lib",
+			"Path" : "$(ProjectDir)/Intermediate/Build/Win64/UE4Editor/Development/UE4Editor-LoneWolf-3795.lib",
 			"Type" : "ImportLibrary"
 		}
 	],
