@@ -26,6 +26,7 @@ ACharacterController::ACharacterController()
 	Health = 100.f;
 	Rage = 0.f;
 	AimOffsetYaw = 0.f;
+	WolfDamageTakenMultiplier = 0.65f;
 	RageDrainPerSecond = 4.f;
 	TurnRate = 0.25f;
 	bIsRolling = false;
@@ -392,16 +393,24 @@ float ACharacterController::TakeDamage(float DamageAmount, struct FDamageEvent c
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	if (!bIsRolling &&  Effects != CharacterState::INVULNERABLE && Health > 0.f)
 	{
-		OnDamageTaken.Broadcast();
+		this->OnDamageRecieved.Broadcast();
+
 		float NewHealth = Health;
-		NewHealth -= DamageAmount;
+		if (CurrentForm == TransformationState::WOLF)
+		{
+			NewHealth -= (DamageAmount * WolfDamageTakenMultiplier);
+		}
+		else
+		{
+			NewHealth -= DamageAmount;
+		}
 
 		if (NewHealth > MAXHEALTH)
 		{
 			NewHealth = MAXHEALTH;
 		}
 
-		UE_LOG(LogTemp, Display, TEXT("Player health modified, health is now: %f"), NewHealth);
+		UE_LOG(LogTemp, Display, TEXT("Player health modified was: %f, health is now: %f"), Health, NewHealth);
 
 		Health = NewHealth;
 

@@ -58,6 +58,8 @@ float AEnemy::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEv
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
+	OnDamageRecieved.Broadcast();
+
 	float NewHealth = Health;
 	
 	NewHealth -= DamageAmount;
@@ -257,6 +259,7 @@ void AEnemy::Die()
 		}
 	
 	}
+	GetCapsuleComponent()->BodyInstance.bLockRotation = true;
 	SetLifeSpan(DespawnTimer);
 }
 

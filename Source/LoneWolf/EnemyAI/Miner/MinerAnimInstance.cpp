@@ -14,7 +14,13 @@
 
 void UMinerAnimInstance::NativeInitializeAnimation()
 {
+	Super::NativeInitializeAnimation();
+	ALoneWolfCharacter* Owner = Cast<ALoneWolfCharacter>(TryGetPawnOwner());
 
+	if (Owner != NULL)
+	{
+		Owner->OnDamageRecieved.AddDynamic(this, &ThisClass::OnDamageTaken);
+	}
 }
 
 void UMinerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -75,12 +81,13 @@ void UMinerAnimInstance::AnimNotify_ChargeEnd()
 	}
 }
 
-void UMinerAnimInstance::AnimNotify_Stomp()
+void UMinerAnimInstance::AnimNotify_ApplyStompDamage()
 {
 	if (GetWorld()->HasBegunPlay())
 	{
-		if (EnemyCharacter)
+		if (EnemyCharacter != NULL)
 		{
+			UE_LOG(LogTemp, Display, TEXT("Stomping"));
 			EnemyCharacter->Stomp();
 		}
 	}

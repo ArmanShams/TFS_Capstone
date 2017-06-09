@@ -12,6 +12,7 @@ class LONEWOLF_API UBountyHunterAnimInstance : public UAnimInstance
 	GENERATED_BODY()
 
 public:
+	virtual void NativeInitializeAnimation() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
 protected:
@@ -48,6 +49,9 @@ protected:
 
 	UFUNCTION()
 	void AnimNotify_PlaceTrap();
+
+	UFUNCTION(BlueprintImplementableEvent, category = "Enemy")
+	void OnDamageTaken();
 
 	class ABountyHunter* BountyHunter;
 

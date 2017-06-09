@@ -8,6 +8,17 @@
 #include "Weapons/Weapon_Ranged.h"
 
 
+void UCharacterWolfAnimInstance::NativeInitializeAnimation()
+{
+	Super::NativeInitializeAnimation();
+	CharacterController = Cast<ACharacterController>(TryGetPawnOwner());
+
+	if (CharacterController != NULL)
+	{
+		CharacterController->OnDamageRecieved.AddDynamic(this, &ThisClass::OnDamageTaken);
+	}
+}
+
 void UCharacterWolfAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	if (GetWorld()->HasBegunPlay())
@@ -503,6 +514,14 @@ void UCharacterWolfAnimInstance::AnimNotify_EnableInputAndRevokeInvulnerable()
 
 void UCharacterWolfAnimInstance::AnimNotify_ReplaceMesh()
 {
+	if (GetWorld()->HasBegunPlay())
+	{
+		if (CharacterController != NULL)
+		{
+			
+			CharacterController->OnDamageRecieved.RemoveDynamic(this, &ThisClass::OnDamageTaken);
 
+		}
+	}
 }
 

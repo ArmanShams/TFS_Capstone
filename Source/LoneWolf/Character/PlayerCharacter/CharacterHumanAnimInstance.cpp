@@ -7,6 +7,17 @@
 #include "Weapons/Weapon_Melee.h"
 #include "Weapons/Weapon_Ranged.h"
 
+void UCharacterHumanAnimInstance::NativeInitializeAnimation()
+{
+	Super::NativeInitializeAnimation();
+	CharacterController = Cast<ACharacterController>(TryGetPawnOwner());
+
+	if (CharacterController != NULL)
+	{
+		CharacterController->OnDamageRecieved.AddDynamic(this, &ThisClass::OnDamageTaken);
+	}
+}
+
 void UCharacterHumanAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
@@ -517,7 +528,8 @@ void UCharacterHumanAnimInstance::AnimNotify_ReplaceMesh()
 			CharacterController->TransformIntoWolf();
 
 			CharacterController->RestoreControlAndRevokeInvulnerable();
-
+///
+			CharacterController->OnDamageRecieved.RemoveDynamic(this, &ThisClass::OnDamageTaken);
 			CharacterController = NULL;
 		}
 	}
