@@ -53,7 +53,6 @@ protected:
 protected: 
 	virtual void Attack();
 	virtual void FixWeaponRotation();
-	virtual void Flee(class ACharacterController* PlayerToFleeFrom);
 	virtual void SetBearTrap(class ATrapLocations* NewTrapLocation, const FHitResult & SweepResult);
 	virtual void DecrementActiveBearTraps(ABearTrap* TrapToRemove);
 

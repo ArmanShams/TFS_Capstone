@@ -42,7 +42,6 @@ void UBountyHunterAnimInstance::AnimNotify_ReturnToIdle()
 		{
 			BountyHunter->bIsPlacingTrap = false;
 			bIsSettingTrap = false;
-			UE_LOG(LogTemp, Display, TEXT(""));
 			BountyHunter->SetBountyHunterState(BountyHunterState::IDLE);
 		}
 	}

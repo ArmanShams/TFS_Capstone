@@ -97,18 +97,9 @@ void ABountyHunter::Tick(float DeltaTime)
 			if (ACharacterController* RecastedTarget = Cast<ACharacterController>(BlackboardComponent->GetValueAsObject(TEXT("Target"))))
 			{
 				bIsInRange(AttackRange);
-				NewPosition = GetActorLocation() - RecastedTarget->GetActorLocation();
-				GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, FString::Printf(TEXT("New Position FVector: %s"), *NewPosition.ToString()));
-
 				switch (CurrentState)
 				{
 				case BountyHunterState::IDLE:		
-					//CurrentPosition = GetActorLocation();
-					//PlayerPosition = PlayerRecasted->GetActorLocation();
-					//DirectionToFlee = PlayerPosition - CurrentPosition;
-					//NewPosition = CurrentPosition * DirectionToFlee;
-					//Flee(RecastedTarget);
-					//NewPosition = PlayerPosition + (100.f, 0.f, 0.f);
 					break;
 				case BountyHunterState::AIMING:
 					FixWeaponRotation();
@@ -249,13 +240,6 @@ BountyHunterState ABountyHunter::GetBountyHunterState()
 
 void ABountyHunter::Die()
 { 
-	if (AimLineDecalActor != NULL)
-	{ 
-		UE_LOG(LogTemp, Display, TEXT("Aiming Line Decal actor successfully DE-Stroyed"));
-		AimLineDecalActor->SetOwner(NULL);
-		AimLineDecalActor->SetLifeSpan(0.001f);
-		AimLineDecalActor = NULL;
-	}
 	return Super::Die();
 }
 
@@ -334,31 +318,6 @@ void ABountyHunter::Aim(ACharacterController* Player)
 void ABountyHunter::Attack()
 {
 	CurrentlyEquippedWeapon->Fire();
-}
-
-void ABountyHunter::Flee(ACharacterController* Player)
-{
-	//if (CurrentState == BountyHunterState::FLEEING)
-	//{
-	//	FVector CurrentLocation = GetActorLocation();
-	//	FVector PlayerLocation = Player->GetActorLocation();
-	//	FRotator RotationToPlayer = Player->GetActorRotation();
-	//	FVector Direction = CurrentLocation - PlayerLocation;
-
-	//	float DistanceToPlayer = FVector::Dist(CurrentLocation, PlayerLocation);
-
-	//	if (GetMovementComponent())
-	//	{
-	//		SetActorRotation(Direction.Rotation());
-	//		GetMovementComponent()->AddInputVector(DistanceToPlayer * Direction);
-	//	}
-
-	//	if (DistanceToPlayer > CushionSpace)
-	//	{
-	//		bIsFleeing = false;
-	//		SetBountyHunterState(BountyHunterState::IDLE);
-	//	}
-	//}
 }
 
 void ABountyHunter::FixWeaponRotation()
