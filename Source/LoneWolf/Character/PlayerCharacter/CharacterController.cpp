@@ -26,6 +26,7 @@ ACharacterController::ACharacterController()
 	Health = 100.f;
 	Rage = 0.f;
 	AimOffsetYaw = 0.f;
+	WolfDamageTakenMultiplier = 0.65f;
 	RageDrainPerSecond = 4.f;
 	TurnRate = 0.25f;
 	bIsRolling = false;
@@ -395,7 +396,14 @@ float ACharacterController::TakeDamage(float DamageAmount, struct FDamageEvent c
 		this->OnDamageRecieved.Broadcast();
 
 		float NewHealth = Health;
-		NewHealth -= DamageAmount;
+		if (CurrentForm == TransformationState::WOLF)
+		{
+			NewHealth -= (DamageAmount * WolfDamageTakenMultiplier);
+		}
+		else
+		{
+			NewHealth -= DamageAmount;
+		}
 
 		if (NewHealth > MAXHEALTH)
 		{

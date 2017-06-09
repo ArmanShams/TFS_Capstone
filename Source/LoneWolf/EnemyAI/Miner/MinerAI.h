@@ -15,7 +15,8 @@ enum class MinerState : uint8
 	READYINGCHARGE	UMETA(DisplayName = "PreparingCharge"),
 	READYINGSTOMP	UMETA(DisplayName = "PreparingStomp"),
 	CHARGING		UMETA(DisplayName = "Charging"),
-	ATTACKING		UMETA(DisplayName = "Attacking")
+	ATTACKING		UMETA(DisplayName = "Attacking"),
+	DEAD			UMETA(DisplayName = "Dead")
 };
 
 UCLASS(Blueprintable)

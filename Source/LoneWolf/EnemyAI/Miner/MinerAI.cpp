@@ -256,6 +256,7 @@ void AMinerAI::Die()
 		StompDecalActor->SetLifeSpan(0.001f);
 		StompDecalActor = NULL;
 	}
+	CurrentState = MinerState::DEAD;
 	Super::Die();
 }
 
@@ -390,14 +391,8 @@ CharacterState::StatusEffect AMinerAI::GetStatusEffect()
 
 void AMinerAI::Destroyed()
 {
-	
 	Super::Destroyed();
 }
-
-//void AMinerAI::EquipWeapon(TSubclassOf<AWeapon> WeaponToEquip)
-//{
-//	Super::EquipWeapon(WeaponToEquip);
-//}
 
 void AMinerAI::OnCollision(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
@@ -407,20 +402,21 @@ void AMinerAI::OnCollision(UPrimitiveComponent* HitComponent, AActor* OtherActor
 
 	if (CurrentState == MinerState::CHARGING)
 	{
-
-		if (GetWorld()->LineTraceSingleByChannel(OutHit, RootComponent->GetComponentLocation(), RootComponent->GetComponentLocation() + GetActorForwardVector() * 50.f, ECC_GameTraceChannel5, Params, ResponseParam))
+		TArray<FHitResult> HitResults;
+		FCollisionShape CollisionShape = FCollisionShape::MakeSphere(50.f);
+		if (GetWorld()->SweepMultiByChannel(HitResults,
+			RootComponent->GetComponentLocation(),
+			RootComponent->GetComponentLocation() + GetActorForwardVector() * 50.f,
+			GetActorRotation().Quaternion(),
+			ECC_GameTraceChannel5,
+			CollisionShape,
+			Params,
+			ResponseParam))
 		{
-			DrawDebugLine(GetWorld(), RootComponent->GetComponentLocation(), RootComponent->GetComponentLocation() + GetActorForwardVector() * 50.f, FColor(255, 255, 255), true, -1, 0, 12.333);
-			DrawDebugLine(GetWorld(), RootComponent->GetComponentLocation(), OutHit.Location, FColor(0, 255, 0), true, -1, 0, 12.333);
-			//Effects = CharacterState::NONE;
-			//DrawDebugLine(GetWorld(), GetActorLocation(), GetMesh()->GetForwardVector() * 15.f, FColor(255, 0, 0), true, -1, 0, 12.333);
-			//DrawDebugLine(GetWorld(), RootComponent->GetComponentLocation(), OutHit.Location, FColor(0, 255, 0), true, -1, 0, 12.333);
-			
-
 			if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
 			{
 				BlackboardComponent->SetValueAsBool(TEXT("MarkedToReturnToIdleState"), true);
-				UE_LOG(LogTemp, Display, TEXT("Miner hit a %s"), *OutHit.GetActor()->GetName());
+				UE_LOG(LogTemp, Display, TEXT("Sweep returned a blocking hit when the miner was charging, miner hit something."));
 				CurrentState = MinerState::IDLE;
 				//SetActorRelativeRotation(FRotator(GetActorRotation().Pitch, -GetActorRotation().Yaw, GetActorRotation().Roll));
 				GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Block);
@@ -431,6 +427,30 @@ void AMinerAI::OnCollision(UPrimitiveComponent* HitComponent, AActor* OtherActor
 				AddStatusEffect(UStatusEffect_HardCrowdControl::StaticClass(), false, PostChargeSelfStunDuration, 0.f, this);
 			}
 		}
+		
+		//if (GetWorld()->LineTraceSingleByChannel(OutHit, RootComponent->GetComponentLocation(), RootComponent->GetComponentLocation() + GetActorForwardVector() * 50.f, ECC_GameTraceChannel5, Params, ResponseParam))
+		//{
+		//	DrawDebugLine(GetWorld(), RootComponent->GetComponentLocation(), RootComponent->GetComponentLocation() + GetActorForwardVector() * 50.f, FColor(255, 255, 255), true, -1, 0, 12.333);
+		//	DrawDebugLine(GetWorld(), RootComponent->GetComponentLocation(), OutHit.Location, FColor(0, 255, 0), true, -1, 0, 12.333);
+		//	//Effects = CharacterState::NONE;
+		//	//DrawDebugLine(GetWorld(), GetActorLocation(), GetMesh()->GetForwardVector() * 15.f, FColor(255, 0, 0), true, -1, 0, 12.333);
+		//	//DrawDebugLine(GetWorld(), RootComponent->GetComponentLocation(), OutHit.Location, FColor(0, 255, 0), true, -1, 0, 12.333);
+		//	
+		//
+		//	if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
+		//	{
+		//		BlackboardComponent->SetValueAsBool(TEXT("MarkedToReturnToIdleState"), true);
+		//		UE_LOG(LogTemp, Display, TEXT("Miner hit a %s"), *OutHit.GetActor()->GetName());
+		//		CurrentState = MinerState::IDLE;
+		//		//SetActorRelativeRotation(FRotator(GetActorRotation().Pitch, -GetActorRotation().Yaw, GetActorRotation().Roll));
+		//		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Block);
+		//		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel4, ECR_Block);
+		//		GetMovementComponent()->StopActiveMovement();
+		//		Cast<UCharacterMovementComponent>(GetMovementComponent())->MaxWalkSpeed = DefaultMoveSpeed;
+		//
+		//		AddStatusEffect(UStatusEffect_HardCrowdControl::StaticClass(), false, PostChargeSelfStunDuration, 0.f, this);
+		//	}
+		//}
 	}
 }
 

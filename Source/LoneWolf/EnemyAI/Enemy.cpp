@@ -259,6 +259,7 @@ void AEnemy::Die()
 		}
 	
 	}
+	GetCapsuleComponent()->BodyInstance.bLockRotation = true;
 	SetLifeSpan(DespawnTimer);
 }
 

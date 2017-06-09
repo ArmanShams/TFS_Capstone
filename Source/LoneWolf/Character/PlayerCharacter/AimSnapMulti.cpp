@@ -30,7 +30,7 @@ void AAimSnapMulti::Tick( float DeltaTime )
 		if (!AreAllChildernActive())
 		{
 			SetAllChildrenActive(true);
-			UE_LOG(LogTemp, Display, TEXT("NOT ALL CHILDREN ARE ACTIVE SO I SET THEM ACTIVE BUT ONLY ONE TIME"));
+			//UE_LOG(LogTemp, Display, TEXT("NOT ALL CHILDREN ARE ACTIVE SO I SET THEM ACTIVE BUT ONLY ONE TIME"));
 		}
 	}
 	else
@@ -38,7 +38,7 @@ void AAimSnapMulti::Tick( float DeltaTime )
 		if (!AreAllChildernInactive())
 		{
 			SetAllChildrenActive(false);
-			UE_LOG(LogTemp, Display, TEXT("NOT ALL CHILDREN ARE ACTIVE SO I SET THEM INACTIVE BUT ONLY ONE TIME"));
+			//UE_LOG(LogTemp, Display, TEXT("NOT ALL CHILDREN ARE ACTIVE SO I SET THEM INACTIVE BUT ONLY ONE TIME"));
 		}
 	}
 }

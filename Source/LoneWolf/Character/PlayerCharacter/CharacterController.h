@@ -140,6 +140,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character")
 	float RollSpeed;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character")
+	float WolfDamageTakenMultiplier;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character")
 	float RageDrainPerSecond;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character")
 	float AimSnapHalfHeight;
