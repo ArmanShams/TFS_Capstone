@@ -17,4 +17,5 @@ protected:
 	virtual EBTNodeResult::Type AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
 	friend class ABountyHunter;
+	friend class ATrapLocations;
 };
