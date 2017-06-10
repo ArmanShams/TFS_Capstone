@@ -102,10 +102,10 @@ void ABountyHunter::Tick(float DeltaTime)
 					CurrentLocation = GetActorLocation();
 					PlayerLocation = RecastedTarget->GetActorLocation();
 					RotationToPlayer = RecastedTarget->GetActorRotation();
-					Direction = -1.f * (PlayerLocation - CurrentLocation).GetSafeNormal();
+					DirectionToFace = -1.f * (PlayerLocation - CurrentLocation).GetSafeNormal();
 					DistanceToPlayer = FVector::Dist(CurrentLocation, PlayerLocation);
 					Rotator = GetActorRotation();
-					Rotator.Yaw = Direction.Rotation().Yaw;
+					Rotator.Yaw = DirectionToFace.Rotation().Yaw;
 					SetActorRotation(Rotator);
 					if (DistanceToPlayer > CushionSpace)
 					{
@@ -167,9 +167,9 @@ bool ABountyHunter::bIsInRange(float OveriddenDesiredRange)
 	if (PlayerCharacter != NULL)
 	{
 		float DesiredRange = OveriddenDesiredRange;
-		FVector CurrentLocation = GetActorLocation();
-		FVector PlayerLocation = PlayerCharacter->GetActorLocation();
-		const float CurrentDistance = FVector::Dist(PlayerLocation, CurrentLocation);
+		FVector EnemyLocation = GetActorLocation();
+		FVector TargetLocation = PlayerCharacter->GetActorLocation();
+		const float CurrentDistance = FVector::Dist(TargetLocation, EnemyLocation);
 
 		if (CurrentDistance > CushionSpace && CurrentDistance <= AttackRange)
 		{ //DrawDebugLine(GetWorld(), CurrentLocation, PlayerLocation, FColor::White, false, -1, 0, 12.333);
@@ -241,6 +241,7 @@ BountyHunterState ABountyHunter::GetBountyHunterState()
 
 void ABountyHunter::Die()
 {
+	SetBountyHunterState(BountyHunterState::IDLE);
 	if (AAIController* AIController = Cast<AAIController>(GetController()))
 	{
 		if (UBrainComponent* BrainComponent = AIController->GetBrainComponent())
@@ -319,8 +320,8 @@ void ABountyHunter::OnComponentOverlap(UPrimitiveComponent * OverlappedComp, AAc
 void ABountyHunter::Aim(ACharacterController* Player)
 {
 	FixWeaponRotation();
-	FVector Direction = Player->GetActorLocation() - GetActorLocation();
-	FRotator NewRotation = FRotationMatrix::MakeFromX(Direction).Rotator();
+	FVector NewDirection = Player->GetActorLocation() - GetActorLocation();
+	FRotator NewRotation = FRotationMatrix::MakeFromX(NewDirection).Rotator();
 	SetActorRotation(NewRotation);
 }
 

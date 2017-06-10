@@ -95,7 +95,7 @@ protected: //Blackboard Key Booleans
 	FVector CurrentLocation;
 	FVector PlayerLocation;
 	FRotator RotationToPlayer;
-	FVector Direction;
+	FVector DirectionToFace;
 	FRotator Rotator;
 
 	float DistanceToPlayer;
