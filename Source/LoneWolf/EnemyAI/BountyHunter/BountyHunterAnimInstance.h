@@ -58,4 +58,5 @@ protected:
 	friend class AEnemy;
 	friend class ABountyHunter;
 	friend class ABountyHunterAIController;
+	friend class UBTTask_BountyHunterPlaceTrap;
 };

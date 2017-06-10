@@ -53,7 +53,6 @@ protected:
 protected: 
 	virtual void Attack();
 	virtual void FixWeaponRotation();
-	virtual void Flee(class ACharacterController* PlayerToFleeFrom);
 	virtual void SetBearTrap(class ATrapLocations* NewTrapLocation, const FHitResult & SweepResult);
 	virtual void DecrementActiveBearTraps(ABearTrap* TrapToRemove);
 
@@ -89,12 +88,18 @@ protected: //Blackboard Key Booleans
 	bool bIsFleeing;
 
 	//Booleans to check for range
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
 	bool bAttack;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
 	bool bFlee;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
 	bool bPatrol;
+
+	FVector CurrentLocation;
+	FVector PlayerLocation;
+	FRotator RotationToPlayer;
+	FVector DirectionToFace;
+	FRotator Rotator;
+
+	float DistanceToPlayer;
+
 
 	//Booleans for animation
 	bool bShouldAdjustGun;

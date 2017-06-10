@@ -3,6 +3,7 @@
 #include "LoneWolf.h"
 #include "BTTask_BountyHunterPlaceTrap.h"
 #include "EnemyAI/BountyHunter/BountyHunter.h"
+#include "EnemyAI./BountyHunter/TrapLocations.h"
 #include "EnemyAI/BountyHunter/BountyHunterAIController.h"
 
 UBTTask_BountyHunterPlaceTrap::UBTTask_BountyHunterPlaceTrap()
