@@ -117,12 +117,7 @@ void ABountyHunter::Tick(float DeltaTime)
 					break;
 				case BountyHunterState::FLEEING:
 					Rotator.Yaw = Direction.Rotation().Yaw;
-					if (GetMovementComponent())
-					{
-						SetActorRotation(Rotator);
-						GetMovementComponent()->AddInputVector(DistanceToPlayer * Direction);
-					}
-
+					SetActorRotation(Rotator);
 					if (DistanceToPlayer > CushionSpace)
 					{
 						bIsFleeing = false;
@@ -256,7 +251,15 @@ BountyHunterState ABountyHunter::GetBountyHunterState()
 }
 
 void ABountyHunter::Die()
-{ 
+{
+	if (AAIController* AIController = Cast<AAIController>(GetController()))
+	{
+		if (UBrainComponent* BrainComponent = AIController->GetBrainComponent())
+		{
+			BrainComponent->StopLogic(FString("An enemy died, stopping logic."));
+			GetCapsuleComponent()->SetCollisionProfileName(FName("NoCollision"));
+		}
+	}
 	return Super::Die();
 }
 
