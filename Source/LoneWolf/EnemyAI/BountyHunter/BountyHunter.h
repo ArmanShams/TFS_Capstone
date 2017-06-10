@@ -86,18 +86,20 @@ protected:
 protected: //Blackboard Key Booleans
 	bool bIsStunned;
 	bool bIsFleeing;
-	FVector NewPosition;
-	FVector CurrentPosition;
-	FVector PlayerPosition;
-	FVector DirectionToFlee;
 
 	//Booleans to check for range
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
 	bool bAttack;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
 	bool bFlee;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
 	bool bPatrol;
+
+	FVector CurrentLocation;
+	FVector PlayerLocation;
+	FRotator RotationToPlayer;
+	FVector Direction;
+	FRotator Rotator;
+
+	float DistanceToPlayer;
+
 
 	//Booleans for animation
 	bool bShouldAdjustGun;

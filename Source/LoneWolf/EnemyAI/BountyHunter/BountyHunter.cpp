@@ -43,34 +43,24 @@ ABountyHunter::ABountyHunter()
 	{
 		BearTrapClass = (UClass*)TrapAsset.Class;
 	}
-
-	ConstructorHelpers::FClassFinder<AActor>AimLineDecalAsset(TEXT("Blueprint'/Game/Blueprints/Enemies/BountyHunterAI/AimingDecal.AimingDecal_C'"));
-	if (AimLineDecalAsset.Class)
-	{
-		AimLineDecalClass = (UClass*)AimLineDecalAsset.Class;
-	}
+	//ConstructorHelpers::FClassFinder<AActor>AimLineDecalAsset(TEXT("Blueprint'/Game/Blueprints/Enemies/BountyHunterAI/AimingDecal.AimingDecal_C'"));
+	//if (AimLineDecalAsset.Class)
+	//{
+	//	AimLineDecalClass = (UClass*)AimLineDecalAsset.Class;
+	//}
 }
 
 void ABountyHunter::BeginPlay()
 {
 	Super::BeginPlay();
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ABountyHunter::OnComponentOverlap);
-
 	EquipNewWeapon(DefaultWeapon);
 }
 
 void ABountyHunter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
-	if (bIsInHardCC && CurrentState != BountyHunterState::IDLE)
-	{
-		SetBountyHunterState(BountyHunterState::IDLE);
-	}
-	if (Health >= 0.1f)
-	{
 
-	}
 	if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
 	{
 		//Animation																	Variables:
@@ -90,7 +80,6 @@ void ABountyHunter::Tick(float DeltaTime)
 		BlackboardComponent->SetValueAsObject(TEXT("FirstTargetLocation"), NULL);
 		BlackboardComponent->SetValueAsObject(TEXT("SecondTargetLocation"), NULL);
 		BlackboardComponent->SetValueAsObject(TEXT("ThirdTargetLocation"), NULL);
-		BlackboardComponent->SetValueAsVector(TEXT("PositionToFlee"), NewPosition);
 
 		if (BlackboardComponent->GetValueAsObject(TEXT("Target")) != NULL)
 		{
@@ -98,12 +87,6 @@ void ABountyHunter::Tick(float DeltaTime)
 			{
 				bIsInRange(AttackRange);
 
-				FVector CurrentLocation = GetActorLocation();
-				FVector PlayerLocation = RecastedTarget->GetActorLocation();
-				FRotator RotationToPlayer = RecastedTarget->GetActorRotation();
-				FVector Direction = -1.f * (PlayerLocation - CurrentLocation).GetSafeNormal();
-				FRotator Rotator = GetActorRotation();
-				float DistanceToPlayer = FVector::Dist(CurrentLocation, PlayerLocation);
 
 				switch (CurrentState)
 				{
@@ -116,6 +99,12 @@ void ABountyHunter::Tick(float DeltaTime)
 				case BountyHunterState::ATTACKING:
 					break;
 				case BountyHunterState::FLEEING:
+					CurrentLocation = GetActorLocation();
+					PlayerLocation = RecastedTarget->GetActorLocation();
+					RotationToPlayer = RecastedTarget->GetActorRotation();
+					Direction = -1.f * (PlayerLocation - CurrentLocation).GetSafeNormal();
+					DistanceToPlayer = FVector::Dist(CurrentLocation, PlayerLocation);
+					Rotator = GetActorRotation();
 					Rotator.Yaw = Direction.Rotation().Yaw;
 					SetActorRotation(Rotator);
 					if (DistanceToPlayer > CushionSpace)
