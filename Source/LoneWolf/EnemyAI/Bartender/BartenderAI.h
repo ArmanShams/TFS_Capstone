@@ -5,15 +5,12 @@
 #include "EnemyAI/Enemy.h"
 #include "BartenderAI.generated.h"
 
-/**
- * 
- */
+
 UCLASS()
 class LONEWOLF_API ABartenderAI : public AEnemy
 {
 	GENERATED_BODY()
-	
-	
+
 public:
 	ABartenderAI();
 
@@ -29,9 +26,10 @@ public:
 	virtual bool bIsSoftCC() override;
 	virtual bool bIsHardCC() override;
 
+
 	virtual CharacterState::StatusEffect GetStatusEffect() override;
 	virtual void Destroyed() override;
-	
+
 
 	virtual void ThrowMolotov();
 	virtual void RollKeg();
@@ -39,6 +37,7 @@ public:
 	virtual void SetIsAttacking(bool NewValue);
 
 protected:
+	virtual void Die() override;
 	virtual AWeapon* EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip) override;
 
 
@@ -51,11 +50,11 @@ protected:
 
 
 	UPROPERTY(EditDefaultsOnly)
-	float TimeForMolotovToReachTargetLocation;
+		float TimeForMolotovToReachTargetLocation;
 
 	UPROPERTY(EditDefaultsOnly)
-	float CushionSpace;
-	
+		float CushionSpace;
+
 	//Blackboard booleans to check range
 	bool bAttack;
 	bool bFlee;
