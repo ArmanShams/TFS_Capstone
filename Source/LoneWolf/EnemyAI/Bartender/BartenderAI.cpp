@@ -27,12 +27,12 @@ ABartenderAI::ABartenderAI()
 	AttackFrequency = 5.f;
 
 	AttackRange = 250.0f;
-	
+
 	TimeForMolotovToReachTargetLocation = 4.0f;
 
 	bIsAttacking = false;
 
-	CushionSpace = 450.f;
+	CushionSpace = 200.f;
 }
 
 void ABartenderAI::BeginPlay()
@@ -48,6 +48,7 @@ void ABartenderAI::Tick(float DeltaSeconds)
 
 		BlackboardComponent->SetValueAsBool(TEXT("bIsInFleeRange"), bFlee);
 		BlackboardComponent->SetValueAsBool(TEXT("bIsInAttackRange"), bAttack);
+		BlackboardComponent->SetValueAsBool(TEXT("bIsAttacking"), bIsAttacking);
 
 		bIsInRange(AttackRange);
 	}
@@ -68,7 +69,7 @@ void ABartenderAI::Tick(float DeltaSeconds)
 	{
 		if (bIsInRange())
 		{
-			
+
 		}
 	}
 }
@@ -154,6 +155,19 @@ void ABartenderAI::Destroyed()
 	Super::Destroyed();
 }
 
+void ABartenderAI::Die()
+{
+	if (AAIController* AIController = Cast<AAIController>(GetController()))
+	{
+		if (UBrainComponent* BrainComponent = AIController->GetBrainComponent())
+		{
+			BrainComponent->StopLogic(FString("An enemy died, stopping logic."));
+			GetCapsuleComponent()->SetCollisionProfileName(FName("NoCollision"));
+		}
+	}
+	return Super::Die();
+}
+
 AWeapon* ABartenderAI::EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip)
 {
 	CurrentlyEquippedWeapon = Super::EquipNewWeapon(WeaponToEquip);
@@ -164,7 +178,7 @@ void ABartenderAI::ThrowMolotov()
 {
 	if (AActor* ValidTarget = Cast<AActor>(Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent()->GetValueAsObject(TEXT("Target"))))
 	{
-		UClass* MolotovClass = LoadObject<UClass>(NULL, TEXT("Blueprint'/Game/Blueprints/Enemies/BartenderAI/MolotovBP.MolotovBP_C'")); 
+		UClass* MolotovClass = LoadObject<UClass>(NULL, TEXT("Blueprint'/Game/Blueprints/Enemies/BartenderAI/MolotovBP.MolotovBP_C'"));
 		if (MolotovClass)
 		{
 			TSubclassOf<AMolotov> SubClassOfMolotov = MolotovClass;
@@ -201,7 +215,7 @@ void ABartenderAI::RollKeg()
 			//SpawnedKeg->SetActorLocation(GetActorLocation() + FVector(0.f, 0.f, 200.f));
 			SpawnedKeg->SetOwner(this);
 			FVector TargetDestination = ValidTarget->GetActorLocation();
-		
+
 			TimeSinceLastAttack = 0.f;
 			UE_LOG(LogTemp, Display, TEXT("Time of launching Molotov: %f"), GetWorld()->GetTimeSeconds());
 			//DrawDebugLine(GetWorld(), HitTargetLocationAtTime(T->GetActorLocation(), GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation(), FVector(0.f, 0.f, GetWorld()->GetGravityZ()), 2.0f), 5.f, FColor(255, 0, 0), true, 8);
