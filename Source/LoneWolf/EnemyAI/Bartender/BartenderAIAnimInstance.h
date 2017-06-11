@@ -5,9 +5,6 @@
 #include "Animation/AnimInstance.h"
 #include "BartenderAIAnimInstance.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class LONEWOLF_API UBartenderAIAnimInstance : public UAnimInstance
 {
@@ -19,6 +16,11 @@ public:
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 	
 protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool bIsDead;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool bIsInHardCC;
+
 	UFUNCTION()
 	virtual void AnimNotify_SpawnMolotov();
 	UFUNCTION()

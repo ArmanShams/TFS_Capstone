@@ -25,6 +25,8 @@ void UBartenderAIAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		if (Bartender != NULL)
 		{
 			bIsAttacking = Bartender->GetIsAttacking();
+			bIsDead = Bartender->Health <= 0.0f;
+			bIsInHardCC = Bartender->bIsInHardCC;
 		}
 	}
 }

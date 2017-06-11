@@ -31,6 +31,8 @@ ABartenderAI::ABartenderAI()
 	TimeForMolotovToReachTargetLocation = 4.0f;
 
 	bIsAttacking = false;
+
+	CushionSpace = 450.f;
 }
 
 void ABartenderAI::BeginPlay()
@@ -41,6 +43,14 @@ void ABartenderAI::BeginPlay()
 void ABartenderAI::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+	if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
+	{
+
+		BlackboardComponent->SetValueAsBool(TEXT("bIsInFleeRange"), bFlee);
+		BlackboardComponent->SetValueAsBool(TEXT("bIsInAttackRange"), bAttack);
+
+		bIsInRange(AttackRange);
+	}
 
 	TimeSinceLastAttack += DeltaSeconds;
 
@@ -90,6 +100,32 @@ bool ABartenderAI::bIsInRange()
 
 bool ABartenderAI::bIsInRange(float OveriddenDesiredRange)
 {
+	ACharacter* PlayerCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+	if (PlayerCharacter != NULL)
+	{
+		float DesiredRange = OveriddenDesiredRange;
+		FVector EnemyLocation = GetActorLocation();
+		FVector TargetLocation = PlayerCharacter->GetActorLocation();
+		const float CurrentDistance = FVector::Dist(TargetLocation, EnemyLocation);
+
+		if (CurrentDistance > CushionSpace && CurrentDistance <= AttackRange)
+		{
+			bAttack = true;
+			bFlee = false;
+		}
+
+		if (CurrentDistance < CushionSpace)
+		{
+			bAttack = false;
+			bFlee = true;
+		}
+
+		if (CurrentDistance > AttackRange)
+		{
+			bFlee = false;
+			bAttack = false;
+		}
+	}
 	return Super::bIsInRange(OveriddenDesiredRange);
 }
 
