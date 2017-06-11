@@ -195,11 +195,53 @@ void AMinerAI::SetupPlayerInputComponent(class UInputComponent* InInputComponent
 void AMinerAI::AddStatusEffect(TSubclassOf<class UStatusEffectBase> ClassToCreateFrom, bool bShouldPerformTickAction, float LifeTime, float TickRate, ALoneWolfCharacter* CharacterThatInflictedStatusEffect)
 {
 	Super::AddStatusEffect(ClassToCreateFrom, bShouldPerformTickAction, LifeTime, TickRate, CharacterThatInflictedStatusEffect);
+	if (bIsInHardCC)
+	{
+		if (CurrentState == MinerState::READYINGSTOMP || CurrentState == MinerState::READYINGCHARGE)
+		{
+			if (ArrowDecalActor != NULL)
+			{
+				ArrowDecalActor->SetOwner(NULL);
+				ArrowDecalActor->SetLifeSpan(0.001f);
+				ArrowDecalActor = NULL;
+			}
+			if (StompDecalActor != NULL)
+			{
+				StompDecalActor->SetOwner(NULL);
+				StompDecalActor->SetLifeSpan(0.001f);
+				StompDecalActor = NULL;
+			}
+			Effects = CharacterState::UNSTOPPABLE;
+			CurrentState = MinerState::CHARGING;
+		}
+		SetMinerState(MinerState::IDLE);
+	}
 }
 
 void AMinerAI::AddStatusEffect(TSubclassOf<class UStatusEffectBase> ClassToCreateFrom, bool bShouldPerformTickAction, bool bShouldDealDamage, float LifeTime, float DamageToDeal, float TickRate, ALoneWolfCharacter* CharacterThatInflictedStatusEffect)
 {
 	Super::AddStatusEffect(ClassToCreateFrom, bShouldPerformTickAction, bShouldDealDamage, LifeTime, DamageToDeal, TickRate, CharacterThatInflictedStatusEffect);
+	if (bIsInHardCC)
+	{
+		if (CurrentState == MinerState::READYINGSTOMP || CurrentState == MinerState::READYINGCHARGE)
+		{
+			if (ArrowDecalActor != NULL)
+			{
+				ArrowDecalActor->SetOwner(NULL);
+				ArrowDecalActor->SetLifeSpan(0.001f);
+				ArrowDecalActor = NULL;
+			}
+			if (StompDecalActor != NULL)
+			{
+				StompDecalActor->SetOwner(NULL);
+				StompDecalActor->SetLifeSpan(0.001f);
+				StompDecalActor = NULL;
+			}
+			Effects = CharacterState::UNSTOPPABLE;
+			CurrentState = MinerState::CHARGING;
+		}
+		SetMinerState(MinerState::IDLE);
+	}
 }
 
 float AMinerAI::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
