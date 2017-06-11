@@ -53,8 +53,17 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	float TimeForMolotovToReachTargetLocation;
 
+	UPROPERTY(EditDefaultsOnly)
+	float CushionSpace;
+	
+	//Blackboard booleans to check range
+	bool bAttack;
+	bool bFlee;
+
 	bool bSpawned = false;
 	bool bIsAttacking;
+
+
 
 	friend class UBartenderAIAnimInstance;
 	friend class UBTTask_BountyHunterAttack;
