@@ -83,11 +83,9 @@ void ABountyHunter::Tick(float DeltaTime)
 
 		if (BlackboardComponent->GetValueAsObject(TEXT("Target")) != NULL)
 		{
+			bIsInRange(AttackRange);
 			if (ACharacterController* RecastedTarget = Cast<ACharacterController>(BlackboardComponent->GetValueAsObject(TEXT("Target"))))
 			{
-				bIsInRange(AttackRange);
-
-
 				switch (CurrentState)
 				{
 				case BountyHunterState::IDLE:		

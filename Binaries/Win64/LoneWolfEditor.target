@@ -2,7 +2,7 @@
 	"TargetName" : "LoneWolfEditor",
 	"Platform" : "Win64",
 	"Configuration" : "Development",
-	"BuildId" : "1ecf625c-3231-4829-be07-4e6acce122ef",
+	"BuildId" : "8659e8c7-4b62-4124-870f-3be9ab5ce812",
 	"Version" : 
 	{
 		"MajorVersion" : 4,
@@ -15,15 +15,15 @@
 	"BuildProducts" :
 	[
 		{
-			"Path" : "$(ProjectDir)/Binaries/Win64/UE4Editor-LoneWolf-3496.dll",
+			"Path" : "$(ProjectDir)/Binaries/Win64/UE4Editor-LoneWolf.dll",
 			"Type" : "DynamicLibrary"
 		},
 		{
-			"Path" : "$(ProjectDir)/Binaries/Win64/UE4Editor-LoneWolf-3496.pdb",
+			"Path" : "$(ProjectDir)/Binaries/Win64/UE4Editor-LoneWolf.pdb",
 			"Type" : "SymbolFile"
 		},
 		{
-			"Path" : "$(ProjectDir)/Intermediate/Build/Win64/UE4Editor/Development/UE4Editor-LoneWolf-3496.lib",
+			"Path" : "$(ProjectDir)/Intermediate/Build/Win64/UE4Editor/Development/UE4Editor-LoneWolf.lib",
 			"Type" : "ImportLibrary"
 		}
 	],
@@ -91,6 +91,10 @@
 		},
 		{
 			"Path" : "$(EngineDir)/Plugins/Experimental/HTML5Networking/HTML5Networking.uplugin",
+			"Type" : "UFS"
+		},
+		{
+			"Path" : "$(EngineDir)/Plugins/Marketplace/Substance/Substance.uplugin",
 			"Type" : "UFS"
 		},
 		{
