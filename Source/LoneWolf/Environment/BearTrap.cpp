@@ -22,8 +22,10 @@ ABearTrap::ABearTrap()
 	MeshComponent->SetSkeletalMesh(BearTrapSkeletalMesh.Object);
 	Mesh = BearTrapSkeletalMesh.Object;
 
+	SoftStunTime = 0.5f;
+	StunTime = 2.4f;
 	radius = 100.f;
-	Damage = 5;
+	Damage = 5.f;
 	TrapCollider->SetCollisionProfileName(TEXT("Traps"));
 	TrapCollider->SetSphereRadius(radius);
 	
@@ -71,8 +73,8 @@ void ABearTrap::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComp, AAc
 		this->SetActorHiddenInGame(false);
 		SetActorLocation(Player->GetMesh()->GetComponentLocation());
 		MeshComponent->SetRelativeLocation(FVector::ZeroVector);
-		Player->AddStatusEffect(UStatusEffect_SoftCrowdControl::StaticClass(), false, 0.25f, 0.f, Cast<ALoneWolfCharacter>(Player));
-		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, FString::Printf(TEXT("You've stepped on a bear trap, dodge to avoid snapping your legs!")));
+		Player->AddStatusEffect(UStatusEffect_SoftCrowdControl::StaticClass(), false, SoftStunTime, 0.f, Cast<ALoneWolfCharacter>(Player));
+		//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, FString::Printf(TEXT("You've stepped on a bear trap, dodge to avoid snapping your legs!")));
 	}
 }
 
@@ -86,8 +88,7 @@ void ABearTrap::OnComponentEndOverlap(UPrimitiveComponent* OverlappedComp, AActo
 			if (APawn* RecastedOwner = Cast<APawn>(OwningActor))
 			{
 				UGameplayStatics::ApplyDamage(OtherActor, Damage, RecastedOwner->GetController(), this, TSubclassOf<UDamageType>());
-				Player->AddStatusEffect(UStatusEffect_SoftCrowdControl::StaticClass(), false, 2.4f, 0.f, Cast<ALoneWolfCharacter>(RecastedOwner));
-
+				Player->AddStatusEffect(UStatusEffect_SoftCrowdControl::StaticClass(), false, StunTime, 0.f, Cast<ALoneWolfCharacter>(RecastedOwner));
 				if (ABountyHunter* RecastToBountyHunter = Cast<ABountyHunter>(RecastedOwner))
 				{
 					RecastToBountyHunter->DecrementActiveBearTraps(this);
@@ -97,7 +98,7 @@ void ABearTrap::OnComponentEndOverlap(UPrimitiveComponent* OverlappedComp, AActo
 		else
 		{
 			UGameplayStatics::ApplyDamage(OtherActor, Damage, GetWorld()->GetFirstPlayerController(), this, TSubclassOf<UDamageType>());
-			Player->AddStatusEffect(UStatusEffect_SoftCrowdControl::StaticClass(), false, 2.4f, 0.f, Cast<ALoneWolfCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn()));
+			Player->AddStatusEffect(UStatusEffect_SoftCrowdControl::StaticClass(), false, StunTime, 0.f, Cast<ALoneWolfCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn()));
 		}
 		if (LocationBeingOccupied != NULL)
 		{
