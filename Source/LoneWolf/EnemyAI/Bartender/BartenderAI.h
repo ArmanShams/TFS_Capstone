@@ -46,6 +46,10 @@ protected:
 
 	virtual float Sign(float RetrieveSignOf);
 
+protected:
+	//virtual void OnFireBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	//virtual void OnFireEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
 	UPROPERTY(EditDefaultsOnly, Category = "Molotov")
 	float TimeForMolotovToReachTargetLocation;
 
@@ -66,6 +70,11 @@ protected:
 
 	bool bSpawned = false;
 	bool bIsAttacking;
+
+	//bool bFireDetected;
+
+	//FVector TargetPosition;
+	//FVector CurrentPosition;
 
 	friend class UBartenderAIAnimInstance;
 	friend class UBTTask_BountyHunterAttack;

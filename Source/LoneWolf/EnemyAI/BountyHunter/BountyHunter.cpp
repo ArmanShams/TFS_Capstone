@@ -60,68 +60,70 @@ void ABountyHunter::BeginPlay()
 void ABountyHunter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
+	if (Health > 0.0f)
 	{
-		//Animation																	Variables:
-		BlackboardComponent->SetValueAsBool(TEXT("IsHardCC"), bIsInHardCC);			// bIsHardCC
-		BlackboardComponent->SetValueAsBool(TEXT("IsSoftCC"), bIsInSoftCC);			// bIsSoftCC
-
-		//Checking the range
-		BlackboardComponent->SetValueAsBool(TEXT("bIsInFleeRange"), bFlee);
-		BlackboardComponent->SetValueAsBool(TEXT("bIsInAttackRange"), bAttack);
-		BlackboardComponent->SetValueAsBool(TEXT("bIsInPatrolRange"), bPatrol);
-
-		//Check for status
-		BlackboardComponent->SetValueAsEnum(TEXT("StatusEffects"), Effects);
-		BlackboardComponent->SetValueAsEnum(TEXT("CurrentState"), (uint8)CurrentState);
-
-		//When patrolling, set target locations, if NULL, set searching for trap locations to false
-		BlackboardComponent->SetValueAsObject(TEXT("FirstTargetLocation"), NULL);
-		BlackboardComponent->SetValueAsObject(TEXT("SecondTargetLocation"), NULL);
-		BlackboardComponent->SetValueAsObject(TEXT("ThirdTargetLocation"), NULL);
-
-		if (BlackboardComponent->GetValueAsObject(TEXT("Target")) != NULL)
+		if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
 		{
-			bIsInRange(AttackRange);
-			if (ACharacterController* RecastedTarget = Cast<ACharacterController>(BlackboardComponent->GetValueAsObject(TEXT("Target"))))
-			{
-				switch (CurrentState)
-				{
-				case BountyHunterState::IDLE:		
-					break;
-				case BountyHunterState::AIMING:
-					FixWeaponRotation();
-					DrawDebugLine(GetWorld(), GetActorLocation(), RecastedTarget->GetActorLocation(), FColor::Red, false, 0.05f, 1.f, 5.f);
-					break;
-				case BountyHunterState::ATTACKING:
-					break;
-				case BountyHunterState::FLEEING:
-					CurrentLocation = GetActorLocation();
-					PlayerLocation = RecastedTarget->GetActorLocation();
-					RotationToPlayer = RecastedTarget->GetActorRotation();
-					DirectionToFace = -1.f * (PlayerLocation - CurrentLocation).GetSafeNormal();
-					DistanceToPlayer = FVector::Dist(CurrentLocation, PlayerLocation);
-					Rotator = GetActorRotation();
-					Rotator.Yaw = DirectionToFace.Rotation().Yaw;
-					SetActorRotation(Rotator);
-					if (DistanceToPlayer > CushionSpace)
-					{
-						bIsFleeing = false;
-						SetBountyHunterState(BountyHunterState::IDLE);
-					}
-					break;
-				case BountyHunterState::HARDCC:
-					break;
-				case BountyHunterState::SETTINGTRAP:
-					break;
-				default:
-					break;
-				}
+			//Animation																	Variables:
+			BlackboardComponent->SetValueAsBool(TEXT("IsHardCC"), bIsInHardCC);			// bIsHardCC
+			BlackboardComponent->SetValueAsBool(TEXT("IsSoftCC"), bIsInSoftCC);			// bIsSoftCC
 
-				if (bShouldAdjustGun)
+			//Checking the range
+			BlackboardComponent->SetValueAsBool(TEXT("bIsInFleeRange"), bFlee);
+			BlackboardComponent->SetValueAsBool(TEXT("bIsInAttackRange"), bAttack);
+			BlackboardComponent->SetValueAsBool(TEXT("bIsInPatrolRange"), bPatrol);
+
+			//Check for status
+			BlackboardComponent->SetValueAsEnum(TEXT("StatusEffects"), Effects);
+			BlackboardComponent->SetValueAsEnum(TEXT("CurrentState"), (uint8)CurrentState);
+
+			//When patrolling, set target locations, if NULL, set searching for trap locations to false
+			BlackboardComponent->SetValueAsObject(TEXT("FirstTargetLocation"), NULL);
+			BlackboardComponent->SetValueAsObject(TEXT("SecondTargetLocation"), NULL);
+			BlackboardComponent->SetValueAsObject(TEXT("ThirdTargetLocation"), NULL);
+
+			if (BlackboardComponent->GetValueAsObject(TEXT("Target")) != NULL)
+			{
+				bIsInRange(AttackRange);
+				if (ACharacterController* RecastedTarget = Cast<ACharacterController>(BlackboardComponent->GetValueAsObject(TEXT("Target"))))
 				{
-					Aim(RecastedTarget);
+					switch (CurrentState)
+					{
+					case BountyHunterState::IDLE:
+						break;
+					case BountyHunterState::AIMING:
+						FixWeaponRotation();
+						DrawDebugLine(GetWorld(), GetActorLocation(), RecastedTarget->GetActorLocation(), FColor::Red, false, 0.05f, 1.f, 5.f);
+						break;
+					case BountyHunterState::ATTACKING:
+						break;
+					case BountyHunterState::FLEEING:
+						CurrentLocation = GetActorLocation();
+						PlayerLocation = RecastedTarget->GetActorLocation();
+						RotationToPlayer = RecastedTarget->GetActorRotation();
+						DirectionToFace = -1.f * (PlayerLocation - CurrentLocation).GetSafeNormal();
+						DistanceToPlayer = FVector::Dist(CurrentLocation, PlayerLocation);
+						Rotator = GetActorRotation();
+						Rotator.Yaw = DirectionToFace.Rotation().Yaw;
+						SetActorRotation(Rotator);
+						if (DistanceToPlayer > CushionSpace)
+						{
+							bIsFleeing = false;
+							SetBountyHunterState(BountyHunterState::IDLE);
+						}
+						break;
+					case BountyHunterState::HARDCC:
+						break;
+					case BountyHunterState::SETTINGTRAP:
+						break;
+					default:
+						break;
+					}
+
+					if (bShouldAdjustGun)
+					{
+						Aim(RecastedTarget);
+					}
 				}
 			}
 		}
@@ -192,7 +194,7 @@ bool ABountyHunter::bIsInRange(float OveriddenDesiredRange)
 	}
 	if (PlayerCharacter == NULL)
 	{
-		UE_LOG(LogTemp, Display, TEXT("WE ARE NOT IN THE BEAM"));
+		UE_LOG(LogTemp, Display, TEXT("BountyHunter_PlayerRecasted is NULL"));
 	}
 	return false;
 }
@@ -265,13 +267,13 @@ void ABountyHunter::SetBearTrap(ATrapLocations* NewTrapLocation, const FHitResul
 	{
 		if (!NewTrapLocation->bIsOccupied)
 		{
-			UE_LOG(LogTemp, Display, TEXT("The trap location is now occupied"));
+			//UE_LOG(LogTemp, Display, TEXT("The trap location is now occupied"));
 			if (BearTrapClass != NULL)
 			{
-				UE_LOG(LogTemp, Display, TEXT("Bounty Hunter set a bear trap, trap added to array list"));
+				//UE_LOG(LogTemp, Display, TEXT("Bounty Hunter set a bear trap, trap added to array list"));
 				if (TrapArray.Num() > MaximumTrapsAllowed)
 				{
-					UE_LOG(LogTemp, Display, TEXT("Element popped from Trap Array"));
+					//UE_LOG(LogTemp, Display, TEXT("Element popped from Trap Array"));
 					AActor* TrapToDelete = TrapArray[0];
 					TrapArray.RemoveAt(0, 1, false);
 					TrapToDelete->SetLifeSpan(0.1f);
@@ -296,7 +298,7 @@ void ABountyHunter::DecrementActiveBearTraps(ABearTrap* TrapToRemove)
 		AActor* TrapToDelete = TrapToRemove;
 		TrapArray.RemoveSingle(TrapToRemove);
 		TrapToDelete->SetLifeSpan(0.1f);
-		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, FString::Printf(TEXT("Removed element from array.")));
+		//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, FString::Printf(TEXT("Removed element from array.")));
 	}
 }
 
@@ -317,10 +319,10 @@ void ABountyHunter::OnComponentOverlap(UPrimitiveComponent * OverlappedComp, AAc
 
 void ABountyHunter::Aim(ACharacterController* Player)
 {
-	FixWeaponRotation();
-	FVector NewDirection = Player->GetActorLocation() - GetActorLocation();
-	FRotator NewRotation = FRotationMatrix::MakeFromX(NewDirection).Rotator();
-	SetActorRotation(NewRotation);
+		FixWeaponRotation();
+		FVector NewDirection = Player->GetActorLocation() - GetActorLocation();
+		FRotator NewRotation = FRotationMatrix::MakeFromX(NewDirection).Rotator();
+		SetActorRotation(NewRotation);
 }
 
 void ABountyHunter::Attack()

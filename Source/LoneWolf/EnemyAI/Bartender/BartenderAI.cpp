@@ -9,6 +9,7 @@
 #include "BehaviorTree/Blackboard/BlackboardKeyAllTypes.h"
 #include "BrainComponent.h"
 #include "AIController.h"
+#include "EnemyAI/AreaOfEffect.h"
 
 ABartenderAI::ABartenderAI()
 {
@@ -35,11 +36,16 @@ ABartenderAI::ABartenderAI()
 void ABartenderAI::BeginPlay()
 {
 	Super::BeginPlay();
+	//GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ABartenderAI::OnFireBeginOverlap);
+	//GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &ABartenderAI::OnFireEndOverlap);
+
 }
 
 void ABartenderAI::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+
+	TimeSinceLastAttack += DeltaSeconds;
 
 	if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
 	{
@@ -49,7 +55,10 @@ void ABartenderAI::Tick(float DeltaSeconds)
 		bIsInRange(AttackRange);
 	}
 
-	TimeSinceLastAttack += DeltaSeconds;
+	//if (bFireDetected)
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("Bartender is on fire"));
+	//}
 }
 
 void ABartenderAI::SetupPlayerInputComponent(class UInputComponent* InInputComponent)
@@ -207,7 +216,7 @@ void ABartenderAI::ThrowMolotov()
 			}
 			SpawnedMolotov->SetMolotovVelocity(HitTargetLocationAtTime(SpawnedMolotov->GetActorLocation(), TargetDestination, FVector(0.f, 0.f, GetWorld()->GetGravityZ()), TimeForMolotovToReachTargetLocation));
 			TimeSinceLastAttack = 0.f;
-			UE_LOG(LogTemp, Display, TEXT("Time of launching Molotov: %f"), GetWorld()->GetTimeSeconds());
+			//UE_LOG(LogTemp, Display, TEXT("Time of launching Molotov: %f"), GetWorld()->GetTimeSeconds());
 			//DrawDebugLine(GetWorld(), HitTargetLocationAtTime(T->GetActorLocation(), GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation(), FVector(0.f, 0.f, GetWorld()->GetGravityZ()), 2.0f), 5.f, FColor(255, 0, 0), true, 8);
 			if (!SpawnedMolotov)
 			{
@@ -237,7 +246,7 @@ void ABartenderAI::RollKeg()
 			FVector TargetDestination = ValidTarget->GetActorLocation();
 
 			TimeSinceLastAttack = 0.f;
-			UE_LOG(LogTemp, Display, TEXT("Time of launching Molotov: %f"), GetWorld()->GetTimeSeconds());
+			//UE_LOG(LogTemp, Display, TEXT("Time of launching Molotov: %f"), GetWorld()->GetTimeSeconds());
 			//DrawDebugLine(GetWorld(), HitTargetLocationAtTime(T->GetActorLocation(), GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation(), FVector(0.f, 0.f, GetWorld()->GetGravityZ()), 2.0f), 5.f, FColor(255, 0, 0), true, 8);
 		}
 	}
@@ -301,3 +310,22 @@ float ABartenderAI::Sign(float RetrieveSignOf)
 	return 0;
 }
 
+//void ABartenderAI::OnFireBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+//{
+//	UE_LOG(LogTemp, Warning, TEXT("Overlap"));
+//
+//	if (AAreaOfEffect* RecastedOverlappedAOE = Cast<AAreaOfEffect>(OtherActor))
+//	{
+//		UE_LOG(LogTemp, Warning, TEXT("FireFound"));
+//		bFireDetected = true;
+//	}
+//}
+//
+//void ABartenderAI::OnFireEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+//{
+//	if (AAreaOfEffect* RecastedOverlappedAOE = Cast<AAreaOfEffect>(OtherActor))
+//	{
+//		UE_LOG(LogTemp, Warning, TEXT("FireEscaped"));
+//		bFireDetected = false;
+//	}
+//}

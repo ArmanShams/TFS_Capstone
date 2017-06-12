@@ -59,7 +59,7 @@ void AAreaOfEffect::Tick( float DeltaTime )
 			//float realtimeSeconds = UGameplayStatics::GetRealTimeSeconds(GetWorld());
 			//UE_LOG(LogTemp, Warning, TEXT("Time since last tick: %f"), timeSinceLastTick);
 			//UE_LOG(LogTemp, Warning, TEXT("Total game time: %f"),  realtimeSeconds);
-			UE_LOG(LogTemp, Warning, TEXT("AreaOfEffect ticked!"));
+			//UE_LOG(LogTemp, Warning, TEXT("AreaOfEffect ticked!"));
 
 			//STUFF HAPPENS HERE.
 			TotalTicks++;
