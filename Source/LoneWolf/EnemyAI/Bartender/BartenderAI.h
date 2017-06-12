@@ -40,20 +40,25 @@ protected:
 	virtual void Die() override;
 	virtual AWeapon* EquipNewWeapon(TSubclassOf<class AWeapon> WeaponToEquip) override;
 
-
-
 	virtual FVector HitTargetLocationAtTime(FVector StartPosition, FVector TargetPosition, FVector GravityBase, float TimeToTarget);
 	virtual FVector GetHorizontalVector(FVector Direction, FVector GravityBase);
 	virtual FVector GetVerticalVector(FVector Direction, FVector GravityBase);
 
 	virtual float Sign(float RetrieveSignOf);
 
+	UPROPERTY(EditDefaultsOnly, Category = "Molotov")
+	float TimeForMolotovToReachTargetLocation;
 
-	UPROPERTY(EditDefaultsOnly)
-		float TimeForMolotovToReachTargetLocation;
+	UPROPERTY(EditDefaultsOnly, Category = "Molotov")
+	float CushionSpace;
 
-	UPROPERTY(EditDefaultsOnly)
-		float CushionSpace;
+	UPROPERTY(EditDefaultsOnly, Category = "Molotov")
+	float DecalLifeTime;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Molotov")
+	AActor* MolotovDecalActor;
+	UPROPERTY(EditDefaultsOnly, Category = "Molotov")
+	TSubclassOf<AActor> MolotovActorClass;
 
 	//Blackboard booleans to check range
 	bool bAttack;
@@ -61,8 +66,6 @@ protected:
 
 	bool bSpawned = false;
 	bool bIsAttacking;
-
-
 
 	friend class UBartenderAIAnimInstance;
 	friend class UBTTask_BountyHunterAttack;

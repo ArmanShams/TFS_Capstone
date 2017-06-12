@@ -15,9 +15,18 @@ public:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
 
-	UPROPERTY(EditAnywhere)
+	//Radius of the collider
+	UPROPERTY(EditDefaultsOnly, Category = "BearTrap")
 	float radius;
-	float Damage;
+	//Damage to be applied to the applied character
+	UPROPERTY(EditDefaultsOnly, Category = "BearTrap")
+	float Damage;	
+	//Stun time when the player overlaps a trap
+	UPROPERTY(EditDefaultsOnly, Category = "BearTrap")
+	float SoftStunTime;
+	//Stun time when the player fails to escape from trap
+	UPROPERTY(EditDefaultsOnly, Category = "BearTrap")
+	float StunTime;
 
 	virtual void SetOwner(AActor* NewOwner) override;
 
@@ -27,10 +36,10 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Collision")
 	USphereComponent* TrapCollider;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category = "Mesh Component")
 	USkeletalMeshComponent* MeshComponent;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category = "Mesh Component")
 	USkeletalMesh* Mesh;
 
 	class ATrapLocations* LocationBeingOccupied;

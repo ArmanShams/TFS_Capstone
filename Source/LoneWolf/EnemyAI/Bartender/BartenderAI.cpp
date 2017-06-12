@@ -13,26 +13,23 @@
 ABartenderAI::ABartenderAI()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
-
 	Health = MAXHEALTH;
-
 	MoveSpeed = .04f;
-
 	TurnRate = 0.25f;
-
 	MaxRange = 100.0f;
-
 	AttackFrequency = 5.f;
-
 	AttackRange = 250.0f;
-
+	DecalLifeTime = 3.f;
 	TimeForMolotovToReachTargetLocation = 4.0f;
-
 	bIsAttacking = false;
-
 	CushionSpace = 200.f;
+
+	ConstructorHelpers::FClassFinder<AActor>DecalMolotovActor(TEXT("Blueprint'/Game/Blueprints/Enemies/BartenderAI/BartenderVisualTelegraph_Molotov.BartenderVisualTelegraph_Molotov_C'"));
+	if (DecalMolotovActor.Class)
+	{
+		MolotovActorClass = (UClass*)DecalMolotovActor.Class;
+	}
 }
 
 void ABartenderAI::BeginPlay()
@@ -43,35 +40,16 @@ void ABartenderAI::BeginPlay()
 void ABartenderAI::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+
 	if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
 	{
-
 		BlackboardComponent->SetValueAsBool(TEXT("bIsInFleeRange"), bFlee);
 		BlackboardComponent->SetValueAsBool(TEXT("bIsInAttackRange"), bAttack);
 		BlackboardComponent->SetValueAsBool(TEXT("bIsAttacking"), bIsAttacking);
-
 		bIsInRange(AttackRange);
 	}
 
 	TimeSinceLastAttack += DeltaSeconds;
-
-	if (bIsAttacking)
-	{
-		//UE_LOG(LogTemp, Display, TEXT("JAM"));
-	}
-	else
-	{
-		//UE_LOG(LogTemp, Display, TEXT("NOJAM"));
-	}
-
-
-	if (TimeSinceLastAttack >= AttackFrequency)
-	{
-		if (bIsInRange())
-		{
-
-		}
-	}
 }
 
 void ABartenderAI::SetupPlayerInputComponent(class UInputComponent* InInputComponent)
@@ -82,11 +60,29 @@ void ABartenderAI::SetupPlayerInputComponent(class UInputComponent* InInputCompo
 void ABartenderAI::AddStatusEffect(TSubclassOf<class UStatusEffectBase> ClassToCreateFrom, bool bShouldPerformTickAction, float LifeTime, float TickRate, ALoneWolfCharacter* CharacterThatInflictedStatusEffect)
 {
 	Super::AddStatusEffect(ClassToCreateFrom, bShouldPerformTickAction, LifeTime, TickRate, CharacterThatInflictedStatusEffect);
+	if (ClassToCreateFrom->GetClass() == UStatusEffect_HardCrowdControl::StaticClass())
+	{
+		if (MolotovDecalActor != NULL)
+		{
+			MolotovDecalActor->SetOwner(NULL);
+			MolotovDecalActor->SetLifeSpan(0.0001f);
+			MolotovDecalActor = NULL;
+		}
+	}
 }
 
 void ABartenderAI::AddStatusEffect(TSubclassOf<class UStatusEffectBase> ClassToCreateFrom, bool bShouldPerformTickAction, bool bShouldDealDamage, float LifeTime, float DamageToDeal, float TickRate, ALoneWolfCharacter* CharacterThatInflictedStatusEffect)
 {
 	Super::AddStatusEffect(ClassToCreateFrom, bShouldPerformTickAction, bShouldDealDamage, LifeTime, DamageToDeal, TickRate, CharacterThatInflictedStatusEffect);
+	if (ClassToCreateFrom->GetClass() == UStatusEffect_HardCrowdControl::StaticClass())
+	{
+		if (MolotovDecalActor != NULL)
+		{
+			MolotovDecalActor->SetOwner(NULL);
+			MolotovDecalActor->SetLifeSpan(0.0001f);
+			MolotovDecalActor = NULL;
+		}
+	}
 }
 
 float ABartenderAI::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
@@ -165,6 +161,13 @@ void ABartenderAI::Die()
 			GetCapsuleComponent()->SetCollisionProfileName(FName("NoCollision"));
 		}
 	}
+	if (MolotovDecalActor != NULL)
+	{
+		MolotovDecalActor->SetOwner(NULL);
+		MolotovDecalActor->SetLifeSpan(0.001f);
+		MolotovDecalActor = NULL;
+	}
+
 	return Super::Die();
 }
 
@@ -194,10 +197,27 @@ void ABartenderAI::ThrowMolotov()
 			//		TargetDestination += RecastTarget->GetVelocity();
 			//	}
 			//}
+			FRotator TargetRotation = ValidTarget->GetActorRotation();
+			MolotovDecalActor = GetWorld()->SpawnActor<AActor>(MolotovActorClass, TargetDestination, TargetRotation);
+			MolotovDecalActor->SetOwner(SpawnedMolotov);
+			MolotovDecalActor->SetActorScale3D(FVector(.0005f, .0005f, .00005f));
+			if (MolotovDecalActor != NULL)
+			{
+				MolotovDecalActor->SetLifeSpan(DecalLifeTime);
+			}
 			SpawnedMolotov->SetMolotovVelocity(HitTargetLocationAtTime(SpawnedMolotov->GetActorLocation(), TargetDestination, FVector(0.f, 0.f, GetWorld()->GetGravityZ()), TimeForMolotovToReachTargetLocation));
 			TimeSinceLastAttack = 0.f;
 			UE_LOG(LogTemp, Display, TEXT("Time of launching Molotov: %f"), GetWorld()->GetTimeSeconds());
 			//DrawDebugLine(GetWorld(), HitTargetLocationAtTime(T->GetActorLocation(), GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation(), FVector(0.f, 0.f, GetWorld()->GetGravityZ()), 2.0f), 5.f, FColor(255, 0, 0), true, 8);
+			if (!SpawnedMolotov)
+			{
+				if (MolotovDecalActor != NULL)
+				{
+					MolotovDecalActor->SetOwner(NULL);
+					MolotovDecalActor->SetLifeSpan(0.001f);
+					MolotovDecalActor = NULL;
+				}
+			}
 		}
 	}
 }
