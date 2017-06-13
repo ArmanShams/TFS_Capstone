@@ -533,7 +533,6 @@ void UCharacterHumanAnimInstance::AnimNotify_ReplaceMesh()
 			CharacterController->TransformIntoWolf();
 
 			CharacterController->OnDamageRecieved.RemoveDynamic(this, &ThisClass::OnDamageTaken);
-			//CharacterController = NULL;
 		}
 	}
 }
