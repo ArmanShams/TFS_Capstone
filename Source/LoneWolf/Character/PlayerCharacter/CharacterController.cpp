@@ -90,6 +90,7 @@ ACharacterController::ACharacterController()
 
 void ACharacterController::BeginPlay()
 {
+	CurrentForm = TransformationState::HUMAN;
 	AimSnapCapsule->SetCapsuleHalfHeight(AimSnapHalfHeight);
 	AimSnapCapsule->SetCapsuleRadius(AimSnapRadius);
 	AimSnapCapsule->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
@@ -104,6 +105,7 @@ void ACharacterController::BeginPlay()
 	HumanAnimationClass = LoadObject<UClass>(NULL, *AnimClassStringHuman);
 	GetMesh()->SetAnimInstanceClass(HumanAnimationClass);
 
+	
 	Super::BeginPlay();
 
 	if (ULoneWolfViewportClient* RecastViewport = Cast<ULoneWolfViewportClient>(GetWorld()->GetGameViewport()))
@@ -487,7 +489,7 @@ void ACharacterController::OnMoveRight(float scale)
 		{
 			if (LookDirection != MoveDirection)
 			{
-				//OrientMeshToMovementDirection();
+				OrientMeshToMovementDirection();
 			}
 			HorizontalMove = 1;
 		}
@@ -495,7 +497,7 @@ void ACharacterController::OnMoveRight(float scale)
 		{
 			if (LookDirection != MoveDirection)
 			{
-				//OrientMeshToMovementDirection();
+				OrientMeshToMovementDirection();
 			}
 			HorizontalMove = -1;
 		}
@@ -853,7 +855,7 @@ void ACharacterController::OnAimSnapBeginOverlap(UPrimitiveComponent* Overlapped
 	if (AAimSnapSurface* RecastedSurface = Cast<AAimSnapSurface>(OtherActor))
 	{
 		// UE_LOG(LogTemp, Display, TEXT("Activating an aimsnap area %s"), *OtherActor->GetName());
-		DrawDebugLine(GetWorld(), GetActorLocation(), OtherActor->GetActorLocation(), FColor(0, 255, 0), false, 0.05f, 0, 12.333f);
+		//DrawDebugLine(GetWorld(), GetActorLocation(), OtherActor->GetActorLocation(), FColor(0, 255, 0), false, 0.05f, 0, 12.333f);
 		RecastedSurface->SetActive(true);
 	}
 }
@@ -863,7 +865,7 @@ void ACharacterController::OnAimSnapOverlapEnd(UPrimitiveComponent* OverlappedCo
 	if (AAimSnapSurface* RecastedSurface = Cast<AAimSnapSurface>(OtherActor))
 	{
 		// UE_LOG(LogTemp, Display, TEXT("DeActivating an aimsnap area %s"), *OtherActor->GetName());
-		DrawDebugLine(GetWorld(), GetActorLocation(), OtherActor->GetActorLocation(), FColor(255, 0, 0), false, 0.05f, 0, 12.333f);
+		//DrawDebugLine(GetWorld(), GetActorLocation(), OtherActor->GetActorLocation(), FColor(255, 0, 0), false, 0.05f, 0, 12.333f);
 		RecastedSurface->SetActive(false);
 	}
 }

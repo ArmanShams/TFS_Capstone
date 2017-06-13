@@ -223,13 +223,19 @@ void AMinerAI::AddStatusEffect(TSubclassOf<class UStatusEffectBase> ClassToCreat
 	{
 		if (ArrowDecalActor != NULL)
 		{
-			ArrowDecalActor->SetOwner(NULL);
+			if (ArrowDecalActor->GetOwner())
+			{
+				ArrowDecalActor->SetOwner(NULL);
+			}
 			ArrowDecalActor->SetLifeSpan(0.001f);
 			ArrowDecalActor = NULL;
 		}
 		if (StompDecalActor != NULL)
 		{
-			StompDecalActor->SetOwner(NULL);
+			if (StompDecalActor->GetOwner())
+			{
+				StompDecalActor->SetOwner(NULL);
+			}
 			StompDecalActor->SetLifeSpan(0.001f);
 			StompDecalActor = NULL;
 		}
@@ -282,13 +288,20 @@ void AMinerAI::Die()
 {
 	if (ArrowDecalActor != NULL)
 	{
-		ArrowDecalActor->SetOwner(NULL);
+		if (ArrowDecalActor->GetOwner())
+		{
+			ArrowDecalActor->SetOwner(NULL);
+		}	
 		ArrowDecalActor->SetLifeSpan(0.001f);
 		ArrowDecalActor = NULL;
 	}
 	if (StompDecalActor != NULL)
 	{
-		StompDecalActor->SetOwner(NULL);
+		
+		if (StompDecalActor->GetOwner())
+		{
+			StompDecalActor->SetOwner(NULL);
+		}
 		StompDecalActor->SetLifeSpan(0.001f);
 		StompDecalActor = NULL;
 	}
@@ -395,9 +408,15 @@ void AMinerAI::Stomp()
 {
 	if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
 	{
-		StompDecalActor->SetLifeSpan(0.2f);
-		StompDecalActor->SetOwner(NULL);
-		StompDecalActor = NULL;
+		if (StompDecalActor != NULL)
+		{
+			if (StompDecalActor->GetOwner())
+			{
+				StompDecalActor->SetOwner(NULL);
+			}
+			StompDecalActor->SetLifeSpan(0.2f);
+			StompDecalActor = NULL;
+		}
 		
 		if (UGameplayStatics::ApplyRadialDamage(this, StompDamage, GetActorLocation(), StompRadius, UDamageType::StaticClass(), TArray<AActor*>(), this, GetController()))
 		{
