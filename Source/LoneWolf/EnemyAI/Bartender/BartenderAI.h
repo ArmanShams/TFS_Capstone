@@ -30,11 +30,19 @@ public:
 	virtual CharacterState::StatusEffect GetStatusEffect() override;
 	virtual void Destroyed() override;
 
-
 	virtual void ThrowMolotov();
 	virtual void RollKeg();
 	virtual bool GetIsAttacking();
 	virtual void SetIsAttacking(bool NewValue);
+
+protected:
+	UFUNCTION()
+	void OnFireBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
+	void OnFireEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fire Detection")
+		bool bDetectedFire;
 
 protected:
 	virtual void Die() override;

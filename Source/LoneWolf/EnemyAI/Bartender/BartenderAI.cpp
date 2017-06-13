@@ -8,6 +8,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyAllTypes.h"
 #include "BrainComponent.h"
+#include "EnemyAI/AreaOfEffect.h"
 #include "AIController.h"
 
 ABartenderAI::ABartenderAI()
@@ -25,6 +26,8 @@ ABartenderAI::ABartenderAI()
 	bIsAttacking = false;
 	CushionSpace = 200.f;
 
+	bDetectedFire = false;
+
 	ConstructorHelpers::FClassFinder<AActor>DecalMolotovActor(TEXT("Blueprint'/Game/Blueprints/Enemies/BartenderAI/BartenderVisualTelegraph_Molotov.BartenderVisualTelegraph_Molotov_C'"));
 	if (DecalMolotovActor.Class)
 	{
@@ -35,11 +38,22 @@ ABartenderAI::ABartenderAI()
 void ABartenderAI::BeginPlay()
 {
 	Super::BeginPlay();
+
+	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ABartenderAI::OnFireBeginOverlap);
+	GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &ABartenderAI::OnFireEndOverlap);
+
 }
 
 void ABartenderAI::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::White, FString::Printf(TEXT("Bool: %s"), bDetectedFire ? TEXT("true") : TEXT("false")));
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Detecting Fire: %s"), bDetectedFire ? TEXT("True") : TEXT("False"));
 
 	if (UBlackboardComponent* BlackboardComponent = Cast<AAIController>(GetController())->GetBrainComponent()->GetBlackboardComponent())
 	{
@@ -149,6 +163,24 @@ CharacterState::StatusEffect ABartenderAI::GetStatusEffect()
 void ABartenderAI::Destroyed()
 {
 	Super::Destroyed();
+}
+
+void ABartenderAI::OnFireBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (AAreaOfEffect* AOERecasted = Cast<AAreaOfEffect>(OtherActor))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("The Bartender stepped in the fire"));
+		bDetectedFire = true;
+	}
+}
+
+void ABartenderAI::OnFireEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (AAreaOfEffect* AOERecasted = Cast<AAreaOfEffect>(OtherActor))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("The Bartender got out of the fire"));
+		bDetectedFire = false;
+	}
 }
 
 void ABartenderAI::Die()
