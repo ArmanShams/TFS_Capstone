@@ -413,7 +413,6 @@ void ACharacterController::OnMoveRight(float scale)
 		{
 			HorizontalMove = 0;
 		}
-		
 		GetMovementComponent()->AddInputVector(GetActorRightVector() * scale * MoveSpeedActual);
 	}
 }
@@ -529,20 +528,20 @@ void ACharacterController::OnInteractPressed()
 
 void ACharacterController::OnInteractReleased()
 {
-	if (!bIsInSoftCC)
-	{
-		//TArray<FOverlapResult> hitResult;
-		//GetWorld()->OverlapMultiByChannel(hitResult, GetActorLocation(), FQuat::Identity, ECC_GameTraceChannel1, FCollisionShape::MakeSphere(50.f));
-
-		//if (hitResult.Num() > 0)
-		//{
-		//	if (AInteractable* Interactable = Cast<AInteractable>(hitResult[0].GetActor()))
-		//	{
-		//		Interactable->Interact(this);
-		//		//UE_LOG(LogTemp, Display, TEXT("Actually hit a thing."));
-		//	}
-		//}
-	}
+	//if (!bIsInSoftCC)
+	//{
+	//	TArray<FOverlapResult> hitResult;
+	//	GetWorld()->OverlapMultiByChannel(hitResult, GetActorLocation(), FQuat::Identity, ECC_GameTraceChannel1, FCollisionShape::MakeSphere(50.f));
+	//
+	//	if (hitResult.Num() > 0)
+	//	{
+	//		if (AInteractable* Interactable = Cast<AInteractable>(hitResult[0].GetActor()))
+	//		{
+	//			Interactable->Interact(this);
+	//			//UE_LOG(LogTemp, Display, TEXT("Actually hit a thing."));
+	//		}
+	//	}
+	//}
 }
 
 void ACharacterController::OnRollPressed()
@@ -592,7 +591,6 @@ void ACharacterController::OnReloadPressed()
 		case TransformationState::DEAD:
 			break;
 		case TransformationState::HUMAN:
-
 			if (AWeapon_Ranged* RecastWeapon = Cast<AWeapon_Ranged>(CurrentlyEquippedWeapon))
 			{
 				if (AWeapon_PlayerRevolver* RecastAsRevolver = Cast<AWeapon_PlayerRevolver>(RecastWeapon))
@@ -613,8 +611,8 @@ void ACharacterController::OnReloadPressed()
 		break;
 	default:
 		break;
+		}
 	}
-}
 	
 }
 
@@ -762,7 +760,6 @@ void ACharacterController::OnAimSnapBeginOverlap(UPrimitiveComponent* Overlapped
 {
 	if (AAimSnapSurface* RecastedSurface = Cast<AAimSnapSurface>(OtherActor))
 	{
-		// UE_LOG(LogTemp, Display, TEXT("Activating an aimsnap area %s"), *OtherActor->GetName());
 		//DrawDebugLine(GetWorld(), GetActorLocation(), OtherActor->GetActorLocation(), FColor(0, 255, 0), false, 0.05f, 0, 12.333f);
 		RecastedSurface->SetActive(true);
 	}
@@ -772,7 +769,6 @@ void ACharacterController::OnAimSnapOverlapEnd(UPrimitiveComponent* OverlappedCo
 {	
 	if (AAimSnapSurface* RecastedSurface = Cast<AAimSnapSurface>(OtherActor))
 	{
-		// UE_LOG(LogTemp, Display, TEXT("DeActivating an aimsnap area %s"), *OtherActor->GetName());
 		//DrawDebugLine(GetWorld(), GetActorLocation(), OtherActor->GetActorLocation(), FColor(255, 0, 0), false, 0.05f, 0, 12.333f);
 		RecastedSurface->SetActive(false);
 	}
@@ -845,7 +841,6 @@ void ACharacterController::Die()
 				Mode.SetWidgetToFocus(DeadHud->GetCachedWidget());
 				RecastController->SetInputMode(Mode);
 				RecastController->bShowMouseCursor = true;
-				//DeadHud->SetUserFocus(RecastController);
 			}
 		}
 	}
@@ -918,16 +913,11 @@ void ACharacterController::TransformIntoHuman()
 
 		if (UCharacterHumanAnimInstance* RecastAnimInstance = Cast<UCharacterHumanAnimInstance>(GetMesh()->GetAnimInstance()))
 		{
-			UE_LOG(LogTemp, Display, TEXT("The value that should force the exit animation to play was set for the human!"));
 			RecastAnimInstance->SetJustTransformed(true);
 		}
 
 		GetWorld()->ForceGarbageCollection();
 
-		/*if (APlayerController* RecastController = Cast<APlayerController>(GetController()))
-		{
-			EnableInput(RecastController);
-		}*/
 		if (CurrentlyEquippedWeapon == NULL)
 		{
 			CurrentlyEquippedWeapon = EquipNewWeapon(DefaultWeapon);
@@ -968,12 +958,8 @@ void ACharacterController::RevokeControlAndBecomeInvulnerable()
 			{
 				bIsRolling = false;
 			}
-
-			UE_LOG(LogTemp, Display, TEXT("We are entering the beam"));
-
 			DisableInput(RecastController);
 			Effects = CharacterState::INVULNERABLE;
-			UE_LOG(LogTemp, Display, TEXT("We are HAVE DISABLED the beam"));
 		}
 	}
 	
@@ -983,12 +969,8 @@ void ACharacterController::RestoreControlAndRevokeInvulnerable()
 {
 	if (APlayerController* RecastController = Cast<APlayerController>(GetController()))
 	{
-		//if (RecastController->InputEnabled())
-		{
-			UE_LOG(LogTemp, Display, TEXT("We are exiting the beam"));
-			EnableInput(RecastController);
-			Effects = CharacterState::NONE;
-		}
+		EnableInput(RecastController);
+		Effects = CharacterState::NONE;
 	}
 }
 
