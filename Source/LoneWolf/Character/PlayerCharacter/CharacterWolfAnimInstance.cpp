@@ -440,6 +440,11 @@ void UCharacterWolfAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	}
 }
 
+void UCharacterWolfAnimInstance::SetJustTransformed(bool NewValue)
+{
+	bJustTransformed = NewValue;
+}
+
 void UCharacterWolfAnimInstance::AnimNotify_MeleeAtkStart()
 {
 	if (GetWorld()->HasBegunPlay())
@@ -518,9 +523,19 @@ void UCharacterWolfAnimInstance::AnimNotify_ReplaceMesh()
 	{
 		if (CharacterController != NULL)
 		{
-			
 			CharacterController->OnDamageRecieved.RemoveDynamic(this, &ThisClass::OnDamageTaken);
+			CharacterController->TransformIntoHuman();
+		}
+	}
+}
 
+void UCharacterWolfAnimInstance::AnimNotify_EndTransformationAnimation()
+{
+	if (GetWorld()->HasBegunPlay())
+	{
+		if (CharacterController != NULL)
+		{
+			bJustTransformed = false;
 		}
 	}
 }

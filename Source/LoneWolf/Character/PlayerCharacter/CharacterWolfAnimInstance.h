@@ -26,6 +26,8 @@ public:
 
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
+	void SetJustTransformed(bool NewValue);
+
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bCanAttack;
@@ -43,6 +45,8 @@ protected:
 	bool bIsInHardCC;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bIsInSoftCC;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool bJustTransformed;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	int32 ForwardMovementMultiplier;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -74,6 +78,9 @@ protected:
 
 	UFUNCTION()
 	void AnimNotify_ReplaceMesh();
+
+	UFUNCTION()
+	void AnimNotify_EndTransformationAnimation();
 
 	UFUNCTION(BlueprintImplementableEvent, category = "Player")
 	void OnDamageTaken();

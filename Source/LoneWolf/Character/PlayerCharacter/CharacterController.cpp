@@ -3,15 +3,14 @@
 #include "LoneWolf.h"
 #include "CharacterController.h"
 #include "Environment/Interactable.h"
+#include "CharacterHumanAnimInstance.h"
+#include "CharacterWolfAnimInstance.h"
 #include "Weapons/Weapon.h"
 #include "Weapons/Weapon_Ranged.h"
 #include "Weapons/Weapon_PlayerRevolver.h"
 #include "Blueprint/UserWidget.h"
 #include "Character/StatusEffects/StatusEffects.h"
 #include "Viewport/LoneWolfViewportClient.h"
-//#include "Character/StatusEffects/StatusEffectBase.h"
-//#include "Character/StatusEffects/StatusEffect_HardCrowdControl.h"
-//#include "Character/StatusEffects/StatusEffect_TestDerivative.h"
 #include "AimSnapSurface.h"
 
 ACharacterController::ACharacterController()
@@ -199,71 +198,6 @@ void ACharacterController::Tick(float DeltaSeconds)
 
 	// Debug statements for eight axis movement and rotation.
 
-	//switch (LookDirection)
-	//{
-	//case EightDirectional::NONE:
-	//	UE_LOG(LogTemp, Display, TEXT("NOPE"));
-	//	break;
-	//case EightDirectional::RIGHT:
-	//	//UE_LOG(LogTemp, Display, TEXT("Mesh rotation yaw = %f"), LookYaw);
-	//	UE_LOG(LogTemp, Display, TEXT("Player is looking relatively right."));
-	//	break;
-	//case EightDirectional::DOWN_RIGHT:
-	//	UE_LOG(LogTemp, Display, TEXT("Player is looking relatively down and to the right."));
-	//	break;
-	//case EightDirectional::DOWN:
-	//	UE_LOG(LogTemp, Display, TEXT("Player is looking relatively down"));
-	//	break;
-	//case EightDirectional::DOWN_LEFT:
-	//	UE_LOG(LogTemp, Display, TEXT("Player is looking relatively down and to the left."));
-	//	break;
-	//case EightDirectional::LEFT:
-	//	UE_LOG(LogTemp, Display, TEXT("Player is looking relatively left."));
-	//	break;
-	//case EightDirectional::UP_LEFT:
-	//	UE_LOG(LogTemp, Display, TEXT("Player is looking relatively up and to the left."));
-	//	break;
-	//case EightDirectional::UP:
-	//	UE_LOG(LogTemp, Display, TEXT("Player is looking relatively up."));
-	//	break;
-	//case EightDirectional::UP_RIGHT:
-	//	UE_LOG(LogTemp, Display, TEXT("Player is looking relatively up and to the right."));
-	//	break;
-	//default:
-	//	break;
-	//}
-	//switch (MoveDirection)
-	//{
-	//case EightDirectional::NONE:
-	//	break;
-	//case EightDirectional::RIGHT:
-	//	//UE_LOG(LogTemp, Display, TEXT("I AM MOVING RIGHT"));
-	//	break;
-	//case EightDirectional::DOWN_RIGHT:
-	//	//UE_LOG(LogTemp, Display, TEXT("I AM MOVING DOWN AND RIGHT"));
-	//	break;
-	//case EightDirectional::DOWN:		
-	//	//UE_LOG(LogTemp, Display, TEXT("I AM MOVING DOWN"));
-	//	break;
-	//case EightDirectional::DOWN_LEFT:
-	//	//UE_LOG(LogTemp, Display, TEXT("I AM MOVING DOWN AND LEFT"));
-	//	break;
-	//case EightDirectional::LEFT:
-	//	//UE_LOG(LogTemp, Display, TEXT("I AM MOVING LEFT"));
-	//	break;
-	//case EightDirectional::UP_LEFT:
-	//	//UE_LOG(LogTemp, Display, TEXT("I AM MOVING UP AND LEFT"));
-	//	break;
-	//case EightDirectional::UP:
-	//	//UE_LOG(LogTemp, Display, TEXT("I AM MOVING UP"));
-	//	break;
-	//case EightDirectional::UP_RIGHT:
-	//	//UE_LOG(LogTemp, Display, TEXT("I AM MOVING UP AND RIGHT"));
-	//	break;
-	//default:
-	//	break;
-	//}
-
 	switch (CurrentForm)
 	{
 	case TransformationState::DEAD:
@@ -286,38 +220,12 @@ void ACharacterController::Tick(float DeltaSeconds)
 
 		if (Rage <= 0.1f)
 		{
-			HumanMesh = LoadObject<USkeletalMesh>(NULL, TEXT("SkeletalMesh'/Game/Geometry/Characters/VincentArgo/SK_Vincent.SK_Vincent'"), NULL, LOAD_None, NULL);
-			FString AnimClassStringHuman = "Class'/Game/Animation/Vincent/Character_Controller_AnimBP.Character_Controller_AnimBP_C'";
-			HumanAnimationClass = LoadObject<UClass>(NULL, *AnimClassStringHuman);
+
+			
 
 			CurrentForm = TransformationState::HUMAN;
 
-			UE_LOG(LogTemp, Display, TEXT("Player 'Transformed' to human"));
-			if (HumanAnimationClass && HumanMesh)
-			{
-				if (CurrentlyEquippedWeapon != NULL)
-				{
-					CurrentlyEquippedWeapon->SetLifeSpan(0.2f);
-					CurrentlyEquippedWeapon = NULL;
-					
-				}
-				CurrentMeleeAttackType = UAttackTypes::NONE;
-				bIsMeleeAttacking = false;
 
-				GetMesh()->SetAnimInstanceClass(HumanAnimationClass);
-				GetMesh()->SetSkeletalMesh(HumanMesh);
-				GetWorld()->ForceGarbageCollection();
-
-				if (APlayerController* RecastController = Cast<APlayerController>(GetController()))
-				{
-					EnableInput(RecastController);
-				}
-				if (CurrentlyEquippedWeapon == NULL)
-				{
-					CurrentlyEquippedWeapon = EquipNewWeapon(DefaultWeapon);
-				}
-			}
-			Rage = 0.0f;
 		}
 		break;
 	default:
@@ -347,7 +255,7 @@ void ACharacterController::SetupPlayerInputComponent(class UInputComponent* InIn
 		InInputComponent->BindAction(TEXT("Reload"), IE_Pressed, this, &ThisClass::OnReloadPressed);
 
 		// Debug key binding, remove later.
-		//InInputComponent->BindAction(TEXT("Transform"), IE_Pressed, this, &ThisClass::OnDebugRagePressed);
+		InInputComponent->BindAction(TEXT("DEBUG_RAGE"), IE_Pressed, this, &ThisClass::OnDebugRagePressed);
 		InInputComponent->BindAction(TEXT("Transform"), IE_Pressed, this, &ThisClass::OnTransformPressed);
 	}
 }
@@ -461,7 +369,7 @@ void ACharacterController::OnMoveForward(float scale)
 		{
 			if (LookDirection != MoveDirection)
 			{
-				//OrientMeshToMovementDirection();
+				OrientMeshToMovementDirection();
 			}
 			VerticalMove = 1;	
 		}
@@ -469,7 +377,7 @@ void ACharacterController::OnMoveForward(float scale)
 		{
 			if (LookDirection != MoveDirection)
 			{
-				//OrientMeshToMovementDirection();
+				OrientMeshToMovementDirection();
 			}
 			VerticalMove = -1;
 		}
@@ -956,10 +864,19 @@ void ACharacterController::TransformIntoWolf()
 			WolfMesh = LoadObject<USkeletalMesh>(NULL, TEXT("SkeletalMesh'/Game/Geometry/Characters/Werewolf/SK_Werewolf.SK_Werewolf'"), NULL, LOAD_None, NULL);
 			FString AnimClassStringWolf = "AnimBlueprint'/Game/Animation/Wolf/CharacterControllerWolf_AnimBP.CharacterControllerWolf_AnimBP_C'";
 			WolfAnimationClass = LoadObject<UClass>(NULL, *AnimClassStringWolf);
+
 			GetMesh()->SetAnimInstanceClass(WolfAnimationClass);
+			//GetMesh()->GetAnimInstance
+
 			if (GetMesh()->SkeletalMesh != WolfMesh)
 			{
 				GetMesh()->SetSkeletalMesh(WolfMesh);
+			}
+
+			if (UCharacterWolfAnimInstance* RecastAnimInstance = Cast<UCharacterWolfAnimInstance>(GetMesh()->GetAnimInstance()))
+			{
+				UE_LOG(LogTemp, Display, TEXT("The value that should force the exit animation to play was set!"));
+				RecastAnimInstance->SetJustTransformed(true);
 			}
 		}
 
@@ -981,6 +898,42 @@ void ACharacterController::TransformIntoWolf()
 void ACharacterController::TransformIntoHuman()
 {
 
+	HumanMesh = LoadObject<USkeletalMesh>(NULL, TEXT("SkeletalMesh'/Game/Geometry/Characters/VincentArgo/SK_Vincent.SK_Vincent'"), NULL, LOAD_None, NULL);
+	FString AnimClassStringHuman = "Class'/Game/Animation/Vincent/Character_Controller_AnimBP.Character_Controller_AnimBP_C'";
+	HumanAnimationClass = LoadObject<UClass>(NULL, *AnimClassStringHuman);
+	UE_LOG(LogTemp, Display, TEXT("Player 'Transformed' to human"));
+	if (HumanAnimationClass && HumanMesh)
+	{
+		if (CurrentlyEquippedWeapon != NULL)
+		{
+			CurrentlyEquippedWeapon->SetLifeSpan(0.2f);
+			CurrentlyEquippedWeapon = NULL;
+
+		}
+		CurrentMeleeAttackType = UAttackTypes::NONE;
+		bIsMeleeAttacking = false;
+
+		GetMesh()->SetAnimInstanceClass(HumanAnimationClass);
+		GetMesh()->SetSkeletalMesh(HumanMesh);
+
+		if (UCharacterHumanAnimInstance* RecastAnimInstance = Cast<UCharacterHumanAnimInstance>(GetMesh()->GetAnimInstance()))
+		{
+			UE_LOG(LogTemp, Display, TEXT("The value that should force the exit animation to play was set for the human!"));
+			RecastAnimInstance->SetJustTransformed(true);
+		}
+
+		GetWorld()->ForceGarbageCollection();
+
+		/*if (APlayerController* RecastController = Cast<APlayerController>(GetController()))
+		{
+			EnableInput(RecastController);
+		}*/
+		if (CurrentlyEquippedWeapon == NULL)
+		{
+			CurrentlyEquippedWeapon = EquipNewWeapon(DefaultWeapon);
+		}
+	}
+	Rage = 0.0f;
 }
 
 void ACharacterController::DespawnCurrentWeapon()
@@ -1018,12 +971,9 @@ void ACharacterController::RevokeControlAndBecomeInvulnerable()
 
 			UE_LOG(LogTemp, Display, TEXT("We are entering the beam"));
 
-			if (true)
-			{
-				DisableInput(RecastController);
-				Effects = CharacterState::INVULNERABLE;
-				UE_LOG(LogTemp, Display, TEXT("We are HAVE DISABLED the beam"));
-			}
+			DisableInput(RecastController);
+			Effects = CharacterState::INVULNERABLE;
+			UE_LOG(LogTemp, Display, TEXT("We are HAVE DISABLED the beam"));
 		}
 	}
 	
